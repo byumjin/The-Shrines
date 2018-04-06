@@ -12,6 +12,7 @@ uniform sampler2D u_Gbuffer_Specular;
 uniform sampler2D u_Gbuffer_Normal;
 uniform sampler2D u_DepthMap;
 uniform samplerCube u_SkyCubeMap;
+uniform sampler2D u_ShadowMap;
 
 uniform float u_Time;
 
@@ -19,6 +20,7 @@ uniform mat4 u_View;
 uniform vec3 u_CameraWPos; 
 uniform mat4 u_ViewProj;
 uniform mat4 u_InvViewProj;  
+uniform mat4 u_LightViewProj;
 
 uniform vec4 u_lightColor;
 uniform vec4 u_lightDirection;
@@ -84,6 +86,14 @@ void main() {
 	vec4 worldPos =  u_InvViewProj* vec4(ndc, depth, 1.0);
 	worldPos /= worldPos.w;
 
+	vec4 lightPos = u_LightViewProj * worldPos;
+	lightPos /= lightPos.w;
+	float shadowDepth = texture(u_ShadowMap, vec2((lightPos.x + 1.0) * 0.5, ( lightPos.y + 1.0) * 0.5 )).z;
+	float shadow = 1.0;
+	if (lightPos.z >= shadowDepth){
+		shadow = 0.5;
+	}
+
 	vec3 viewVec = normalize(u_CameraWPos - worldPos.xyz);
 	vec3 lightDir = normalize(u_lightDirection.xyz);
 
@@ -120,7 +130,7 @@ void main() {
 
 		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
 
-		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.w;
+		pbrColor.xyz *= shadow * u_lightColor.xyz * u_lightColor.w;
 
 		out_Col = vec4(pbrColor.xyz, depth);
 	}

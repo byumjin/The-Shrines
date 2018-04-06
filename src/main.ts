@@ -26,14 +26,15 @@ let square: Square;
 
 let obj0: string;
 let mesh0: Mesh;
-
 let mesh1: Mesh;
+let mesh2: Mesh;
 
 let obj_lake: string;
 let mesh_lake: Mesh;
 
 let obj_holodeck: string;
 let mesh_holodeck: Mesh;
+let mesh_holodeck2: Mesh;
 
 let skyCubeMap: Texture;
 
@@ -70,25 +71,32 @@ function loadScene() {
      new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
   mesh0.create();
 
-  mesh0.translate( vec3.fromValues(-100.0, 0.0, 0.0) );
+  mesh0.translate( vec3.fromValues(-100.0, 30.0, 0.0) );
 
   mesh1 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
   new Texture('./src/resources/objs/mario/textures/wahoo.bmp', false),
    new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
     new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
-    mesh1.create();
+  mesh1.create();
 
   mesh_lake = new Mesh(obj_lake, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/lake/textures/albedo.png', false),
     new Texture('./src/resources/objs/lake/textures/specular2.png', false),
      new Texture('./src/resources/objs/lake/textures/normal.png', false));
-     mesh_lake.create();
+  mesh_lake.create();
 
   mesh_holodeck = new Mesh(obj_holodeck, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/holodeck/textures/wall.png', false),
     new Texture('./src/resources/objs/holodeck/textures/wall_Specular.png', false),
      new Texture('./src/resources/objs/holodeck/textures/wall_Normal.png', false));
-     mesh_holodeck.create();
+  mesh_holodeck.create();
+
+  mesh_holodeck2 = new Mesh(obj_holodeck, vec3.fromValues(0, 0, 0),
+   new Texture('./src/resources/objs/holodeck/textures/wall02.png', false),
+    new Texture('./src/resources/objs/holodeck/textures/wall_Specular.png', false),
+     new Texture('./src/resources/objs/holodeck/textures/wall_Normal.png', false));
+  mesh_holodeck2.create();
+  mesh_holodeck2.translate( vec3.fromValues(-100.0, 0.0, 0.0));
 
   skyCubeMap = new Texture('./src/resources/objs/skybox/middaySky_', true);
   skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 0);
@@ -134,8 +142,8 @@ function main() {
   loadScene();
 
   const camera = new Camera();
-  camera.updateOrbit(0.0, -30.0);
-  camera.updatePosition( 0, 20);
+  camera.updateOrbit(0.0, -60.0);
+  camera.updatePosition( -100, 60);
   camera.updateOrbit(0.0, 30.0);
   
 
@@ -159,10 +167,35 @@ function main() {
 
   translucentDeferred.setupTexUnits(["AlbedoMap", "SpecularMap", "NormalMap"]);
 
+  const standardShadowMapping = new ShaderProgram([
+      new Shader(gl.VERTEX_SHADER, require('./shaders/standard-vert.glsl')),
+      new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
+      ]);
+
   let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0);
   let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
   let lightDirection : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 0.0);
 
+  function getDirLightViewProj(lightDirection: vec4, lightPosition: vec4, projectionWidth: number, projectionHeight: number, near:number, far:number){
+    let lightViewProj = mat4.create();
+    let halfWidth = projectionWidth/2;
+    let halfHeight = projectionHeight/2;
+    mat4.ortho(lightViewProj, -halfWidth, halfWidth, -halfHeight, halfHeight, near, far);
+
+    let lightViewMat : mat4 = mat4.create();
+    let lightUp : vec3 = vec3.fromValues(0.0, 1.0, 0.0);
+    let lightFocus : vec3 = vec3.create();
+    let lightPos : vec3 = vec3.fromValues(lightPosition[0], lightPosition[1], lightPosition[2]);
+    vec3.add(lightFocus, lightPos, vec3.fromValues(-lightDirection[0], -lightDirection[1], -lightDirection[2]));
+    mat4.lookAt(lightViewMat, lightPos, lightFocus, lightUp);
+
+    let lightViewProjMat : mat4 = mat4.create();
+    mat4.multiply(lightViewProjMat, lightViewProj, lightViewMat); 
+
+    return lightViewProjMat;
+  }
+
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 250, 250, -100, 100);
 
   function tick() {
 
@@ -175,10 +208,11 @@ function main() {
     renderer.clear();
     renderer.clearGB();
 
-    renderer.renderToGBuffer(camera, standardDeferred, [mesh0, mesh1, mesh_holodeck]);
+    renderer.renderToGBuffer(camera, standardDeferred, [mesh0, mesh1, mesh_holodeck, mesh_holodeck2]);
+    renderer.renderToShadowDepth(camera, standardShadowMapping, lightViewProj, [mesh0, mesh1, mesh_holodeck, mesh_holodeck2]);
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake], skyCubeMap.cubemap_texture, lightColor, lightDirection);
 
-    renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightColor, lightDirection);
+    renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderAddTranslucent();    
 

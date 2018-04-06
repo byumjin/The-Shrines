@@ -60,6 +60,8 @@ class ShaderProgram {
 
   unifSSRInfo: WebGLUniformLocation;
 
+  unifLightViewProj: WebGLUniformLocation;
+  unifShadowMap: WebGLUniformLocation;
 
   unifTexUnits: Map<string, WebGLUniformLocation>;
   
@@ -111,6 +113,9 @@ class ShaderProgram {
     this.unifLightDirection = gl.getUniformLocation(this.prog, "u_lightDirection");
     
     this.unifSSRInfo = gl.getUniformLocation(this.prog, "u_SSRInfo");
+    
+    this.unifLightViewProj = gl.getUniformLocation(this.prog, "u_LightViewProj");
+    this.unifShadowMap = gl.getUniformLocation(this.prog, "u_ShadowMap");
 
     this.unifTexUnits = new Map<string, WebGLUniformLocation>();
   }
@@ -269,6 +274,17 @@ class ShaderProgram {
     }
   }
 
+  setShadowMap(texture: WebGLTexture){
+    this.use();
+    if (this.unifShadowMap != -1) {
+  
+      gl.uniform1i(this.unifShadowMap, 13);  
+  
+      gl.activeTexture(gl.TEXTURE13);
+      gl.bindTexture(gl.TEXTURE_2D, texture);  
+    }
+  }
+
   setModelMatrix(model: mat4) {
     this.use();
     if (this.unifModel !== -1) {
@@ -315,6 +331,13 @@ class ShaderProgram {
     this.use();
     if (this.unifInvProj !== -1) {
       gl.uniformMatrix4fv(this.unifInvProj, false, vp);
+    }
+  }
+
+  setLightViewProjMatrix(vp: mat4){
+    this.use();
+    if (this.unifLightViewProj !== -1) {
+      gl.uniformMatrix4fv(this.unifLightViewProj, false, vp);
     }
   }
 
