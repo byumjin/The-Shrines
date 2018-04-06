@@ -39,7 +39,7 @@ void main() {
 
 	bool trans = false;
 
-	if(depth > 9.0)
+	if(depth >= 10.0)
 	{
 		trans = true;
 		depth -= 10.0;
@@ -171,7 +171,7 @@ void main() {
 	else
 	{
 		if(trans)
-			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);
+			reflectionColor = mix(vec4(0.0), reflectionColor, fadeFactor);
 	}
 
 	float energyConservation = 1.0 - roughness * roughness;

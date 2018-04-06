@@ -38,7 +38,10 @@ void main() {
 		if(opaqueColor.a < 1.0)
 		{
 			float depthDistance = clamp( LinearDepth(OpaqueSSRInfo.a) - LinearDepth(transColor.a), 0.0, 1.0);
-			fragColor[0].xyz =  mix(opaqueColor.xyz, transColor.xyz, pow(depthDistance, 1.4));
+			fragColor[0].xyz =  mix(  opaqueColor.xyz, transColor.xyz, pow(depthDistance, 0.7));
+
+			//fragColor[0].xyz = opaqueColor.xyz;
+			//fragColor[0].xyz =  mix(  vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), pow(depthDistance, 0.7));
 		}
 		else
 		{
@@ -55,7 +58,7 @@ void main() {
 	float transDepth =  texture(u_frame1, reverseUV).w;
 	vec4 transInfo = texture(u_frame2, reverseUV);
 
-	if(transDepth <= OpaqueDepth)
+	if( transDepth < OpaqueDepth )
 	{
 		fragColor[0].w = transDepth + 10.0; //differenciate
 		fragColor[1] = transInfo;

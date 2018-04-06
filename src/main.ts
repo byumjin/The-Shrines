@@ -251,7 +251,6 @@ function main() {
     renderer.renderToShadowDepth(camera, standardShadowMapping, lightViewProj, [mesh0, mesh1, mesh_holodeck, mesh_holodeck2]);
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake], skyCubeMap.cubemap_texture, lightColor, lightDirection);
 
-
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderAddTranslucent();    

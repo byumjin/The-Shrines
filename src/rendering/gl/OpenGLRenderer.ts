@@ -249,15 +249,6 @@ class OpenGLRenderer {
  
      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-
-
-
-
-
-
-
-
-
     // create the framebuffers for post processing
     for (let i = 0; i < this.post8Buffers.length; i++) {
 
@@ -302,14 +293,14 @@ class OpenGLRenderer {
       if(i == 1)
       {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling, gl.drawingBufferHeight * this.SSRDownSampling, 0, gl.RGBA, gl.FLOAT, null);       
       }
       else if(i == 2)
       {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling, gl.drawingBufferHeight * this.SSRDownSampling, 0, gl.RGBA, gl.FLOAT, null);       
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth, gl.drawingBufferHeight, 0, gl.RGBA, gl.FLOAT, null);       
       }
       else if(i == PipelineEnum.ShadowPass){//Shadow Map
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -546,7 +537,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.SSRPass.setSSRInfo(vec4.fromValues(SSR_MaxStep, SSR_Opaque_Intensity, SSR_Trans_Intensity, SSR_Threshold));
-    this.SSRPass.setFrame00(this.post8Targets[PipelineEnum.SaveFrame]); //previous frame
+    this.SSRPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]); //previous frame
 
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
     this.SSRPass.setSkyCubeMap(skyCubeMap);
@@ -568,7 +559,7 @@ class OpenGLRenderer {
 
   renderSSRMip() {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SSR_MIP]);
-    gl.viewport(0, 0, gl.drawingBufferWidth * this.SSRDownSampling, gl.drawingBufferHeight* this.SSRDownSampling);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.disable(gl.DEPTH_TEST);
     //gl.enable(gl.BLEND);
 
