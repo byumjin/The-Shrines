@@ -9,8 +9,10 @@ import Square from '../../geometry/Square';
 
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
-const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "TranslucentAdded":3, "ShadowPass": 4,
-                     "ToneMapping": 0,"SaveFrame": 1};
+
+const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "TranslucentAdded":3, "SaveFrame": 4, "ShadowPass": 5,
+                     "ToneMapping": 0};
+
 
 var gShadowMapSize = 2048;
 
@@ -103,8 +105,8 @@ class OpenGLRenderer {
     this.post8Targets = [undefined, undefined];
     this.post8Passes = [];
 
-    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined];
-    this.post32Targets = [undefined, undefined, undefined, undefined, undefined];
+    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined];
     this.post32Passes = [];
 
     if (!gl.getExtension("OES_texture_float_linear")) {
@@ -309,7 +311,7 @@ class OpenGLRenderer {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling, gl.drawingBufferHeight * this.SSRDownSampling, 0, gl.RGBA, gl.FLOAT, null);       
       }
-      else if(i == 4){//Shadow Map
+      else if(i == PipelineEnum.ShadowPass){//Shadow Map
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gShadowMapSize, gShadowMapSize, 0, gl.RGBA, gl.FLOAT, null); 
@@ -324,13 +326,13 @@ class OpenGLRenderer {
       gl.bindTexture(gl.TEXTURE_2D, null);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.post32Targets[i], 0);
 
-      if(i == 4){
+      if(i == PipelineEnum.ShadowPass){
          // depth attachment
          this.shadowDepthTexture = gl.createTexture();
          gl.bindTexture(gl.TEXTURE_2D, this.shadowDepthTexture);
          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
          gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gShadowMapSize, gShadowMapSize, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null);
@@ -587,7 +589,7 @@ class OpenGLRenderer {
   }
 
   renderforSavingCurrentFrame(camera: Camera) {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.SaveFrame]);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SaveFrame]);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.disable(gl.DEPTH_TEST);
     
@@ -614,7 +616,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
     
 
-    this.tonemapPass.setFrame00(this.post8Targets[PipelineEnum.SaveFrame]);
+    this.tonemapPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
    
     this.tonemapPass.draw();
     // bind default frame buffer
@@ -629,7 +631,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00(this.post8Targets[PipelineEnum.SaveFrame]);
+    //this.presentPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
     this.presentPass.draw();
 
     // bind default frame buffer

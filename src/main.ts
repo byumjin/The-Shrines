@@ -36,6 +36,15 @@ let obj_holodeck: string;
 let mesh_holodeck: Mesh;
 let mesh_holodeck2: Mesh;
 
+let obj_B_Outter: string;
+let mesh_B_Outter: Mesh;
+
+let obj_B_Inner: string;
+let mesh_B_Inner: Mesh;
+
+let obj_B_Glass: string;
+let mesh_B_Glass: Mesh;
+
 let skyCubeMap: Texture;
 
 var timer = {
@@ -55,6 +64,10 @@ function loadOBJText() {
   obj0 = readTextFile('./src/resources/objs/mario/models/wahoo.obj');
   obj_lake = readTextFile('./src/resources/objs/lake/models/lake.obj');
   obj_holodeck = readTextFile('./src/resources/objs/holodeck/models/holodeck.obj');
+
+  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter.obj');
+  obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner.obj');
+  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass.obj');
 }
 
 
@@ -62,6 +75,14 @@ function loadScene() {
   square && square.destroy();
   mesh0 && mesh0.destroy();
 
+  skyCubeMap = new Texture('./src/resources/objs/skybox/middaySky_', true);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 0);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 1);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 2);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 3);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 4);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 5);
+  
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
 
@@ -98,13 +119,31 @@ function loadScene() {
   mesh_holodeck2.create();
   mesh_holodeck2.translate( vec3.fromValues(-100.0, 0.0, 0.0));
 
-  skyCubeMap = new Texture('./src/resources/objs/skybox/middaySky_', true);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 0);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 1);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 2);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 3);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 4);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 5);
+  mesh_B_Outter = new Mesh(obj_B_Outter, vec3.fromValues(0, 0, 0),
+  new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+    new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+    mesh_B_Outter.create();
+
+    mesh_B_Outter.scale(vec3.fromValues(10, 10, 10));
+
+  mesh_B_Inner = new Mesh(obj_B_Inner, vec3.fromValues(0, 0, 0),
+   new Texture('./src/resources/objs/B_Side/textures/Inner_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Inner_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Normal.png', false));
+   mesh_B_Inner.create();
+
+   mesh_B_Inner.scale(vec3.fromValues(10, 10, 10));
+
+  mesh_B_Glass = new Mesh(obj_B_Glass, vec3.fromValues(0, 0, 0),
+    new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
+    new Texture('./src/resources/objs/B_Side/textures/Glass_Specular.png', false),
+    new Texture('./src/resources/objs/B_Side/textures/Normal.png', false));
+    mesh_B_Glass.create();
+
+    mesh_B_Glass.scale(vec3.fromValues(10, 10, 10));
+
+ 
   
 }
 
@@ -211,6 +250,7 @@ function main() {
     renderer.renderToGBuffer(camera, standardDeferred, [mesh0, mesh1, mesh_holodeck, mesh_holodeck2]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, lightViewProj, [mesh0, mesh1, mesh_holodeck, mesh_holodeck2]);
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake], skyCubeMap.cubemap_texture, lightColor, lightDirection);
+
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 

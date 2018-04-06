@@ -37,7 +37,7 @@ void main() {
 	{
 		if(opaqueColor.a < 1.0)
 		{
-			float depthDistance = LinearDepth(OpaqueSSRInfo.a) - LinearDepth(transColor.a);
+			float depthDistance = clamp( LinearDepth(OpaqueSSRInfo.a) - LinearDepth(transColor.a), 0.0, 1.0);
 			fragColor[0].xyz =  mix(opaqueColor.xyz, transColor.xyz, pow(depthDistance, 1.4));
 		}
 		else

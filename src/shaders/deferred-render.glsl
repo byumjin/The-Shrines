@@ -68,6 +68,49 @@ vec3 GGX_Spec(vec3 Normal, vec3 HalfVec, float Roughness, vec3 BaseColor, vec3 S
 	return D * FV;
 }
 
+float texture2DCompare(sampler2D depths, vec2 uv, float compare){
+    float depth = texture(depths, uv).r;
+    if(depth < compare)
+    	return 0.25;
+    else
+    	return 1.0;
+}
+
+float PCF(sampler2D depths, vec2 size, vec2 uv, float compare){
+    float result = 0.0;
+    for(int x=-2; x<=2; x++){
+        for(int y=-2; y<=2; y++){
+            vec2 off = vec2(x,y)/size;
+            result += texture2DCompare(depths, uv+off, compare);
+        }
+    }
+    return result/25.0;
+}
+
+// float linstep(float low, float high, float v){
+//     return clamp((v-low)/(high-low), 0.0, 1.0);
+// }
+
+// float VSM(sampler2D depths, vec2 uv, float compare){
+//     vec2 moments = texture(depths, uv).xy;
+//     float p = smoothstep(compare-0.02, compare, moments.x);
+//     float variance = max(moments.y - moments.x*moments.x, -0.001);
+//     float d = compare - moments.x;
+//     float p_max = linstep(0.2, 1.0, variance / (variance + d*d));
+//     return clamp(max(p, p_max), 0.0, 1.0);
+// }
+
+float getShadow(vec4 lightSpacePos){
+	float bias = 0.001;
+	float shadow = PCF(u_ShadowMap, 
+		vec2(2048.0,2048.0), 
+		vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
+		lightSpacePos.z - bias);
+	// float shadow = VSM(u_ShadowMap, 
+	// 	vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
+	// 	lightSpacePos.z - bias);
+	return shadow;
+}
 
 void main() { 
 
@@ -86,13 +129,9 @@ void main() {
 	vec4 worldPos =  u_InvViewProj* vec4(ndc, depth, 1.0);
 	worldPos /= worldPos.w;
 
-	vec4 lightPos = u_LightViewProj * worldPos;
-	lightPos /= lightPos.w;
-	float shadowDepth = texture(u_ShadowMap, vec2((lightPos.x + 1.0) * 0.5, ( lightPos.y + 1.0) * 0.5 )).z;
-	float shadow = 1.0;
-	if (lightPos.z >= shadowDepth){
-		shadow = 0.5;
-	}
+	vec4 lightSpacePos = u_LightViewProj * worldPos;
+	lightSpacePos /= lightSpacePos.w;
+	float shadow = getShadow(lightSpacePos);
 
 	vec3 viewVec = normalize(u_CameraWPos - worldPos.xyz);
 	vec3 lightDir = normalize(u_lightDirection.xyz);
