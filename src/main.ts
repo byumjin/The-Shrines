@@ -214,7 +214,7 @@ function main() {
     renderer.clear();
     renderer.clearGB();
 
-    renderer.renderToGBuffer(camera, standardDeferred, [mesh_B_Outter, mesh_B_Inner]);
+    renderer.renderToGBuffer(camera, standardDeferred, [mesh1, mesh_B_Outter, mesh_B_Inner]);
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightColor, lightDirection);
