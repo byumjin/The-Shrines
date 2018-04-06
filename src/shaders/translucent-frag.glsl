@@ -91,20 +91,29 @@ void main() {
     Pos_SS /= Pos_SS.w;
 
     float Depth = Pos_SS.z;
- 
-    vec3 col = texture(AlbedoMap, fs_UV).rgb;
+
+	vec4 Albedo = texture(AlbedoMap, fs_UV);
+
+    if(Albedo.a < 0.2)
+        discard;
+
+    vec3 col = Albedo.rgb;
     col = pow(col, vec3(2.2));
 
-    vec4 normalInfo0 = texture(NormalMap, fs_UV + vec2(u_Time * 0.1, u_Time * 0.1));
-   
-    vec4 normalInfo1 = texture(NormalMap, fs_UV + vec2(u_Time * 0.076, u_Time * -0.0316));
+	vec3 waterNormal;
 
-    vec4 normalInfo2 = texture(NormalMap, fs_UV - vec2(u_Time * 0.0941, u_Time * 0.07831));
+	if(Albedo.a < 0.6) // Water
+	{
+		vec4 normalInfo0 = texture(NormalMap, fs_UV + vec2(u_Time * 0.1, u_Time * 0.1));   
+  	 	vec4 normalInfo1 = texture(NormalMap, fs_UV + vec2(u_Time * 0.076, u_Time * -0.0316));
+   	 	vec4 normalInfo2 = texture(NormalMap, fs_UV - vec2(u_Time * 0.0941, u_Time * 0.07831));
 
-    vec3 waterNormal = vec3( ( (normalInfo0.x * normalInfo2.y) - 0.5) * 2.0 , ((normalInfo1.y * normalInfo2.z) - 0.5) * 2.0, 20.0);
-
-    waterNormal = normalize(waterNormal);
-
+		waterNormal = vec3( ( (normalInfo0.x * normalInfo2.y) - 0.5) * 2.0 , ((normalInfo1.y * normalInfo2.z) - 0.5) * 2.0, 20.0);
+	}
+	else // Glass
+	{
+		waterNormal = texture(NormalMap, fs_UV).xyz;
+	}
 
     vec3 worldNormal = applyNormalMap(vertexNormal.xyz, waterNormal);
 
