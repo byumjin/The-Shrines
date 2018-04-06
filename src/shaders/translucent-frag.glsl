@@ -112,7 +112,7 @@ void main() {
 	}
 	else // Glass
 	{
-		waterNormal = texture(NormalMap, fs_UV).xyz;
+		waterNormal = normalize( (texture(NormalMap, fs_UV).xyz * 2.0) - vec3(1.0) );
 	}
 
     vec3 worldNormal = applyNormalMap(vertexNormal.xyz, waterNormal);
@@ -167,7 +167,7 @@ void main() {
 
 		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
 
-        float Opacity = 0.05;
+        float Opacity = 0.1;
 
 		fragColor[0] = vec4(pbrColor.xyz * Opacity, Depth);
         fragColor[1] = vec4(normal.xyz, Roughness);

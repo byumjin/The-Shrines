@@ -160,18 +160,21 @@ void main() {
  	vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
 	SkyColor = pow(SkyColor, vec4(2.2));
 
+	fadeFactor = fadeFactor * fadeFactor;
+
 	//We are not going to make inner pool scene. Thus, this is fine
 	if(!bHit) //SkyBox
 	{
 		reflectionColor = SkyColor;
 		fadeFactor = 1.0;		
 	}
-
-	
+	else
+	{
+		if(trans)
+			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);
+	}
 
 	float energyConservation = 1.0 - roughness * roughness;
-
-	//reflectionColor = mix(SkyColor, reflectionColor, fadeFactor * fadeFactor);
 
 	out_Col = reflectionColor * Intensity * energyConservation;
 

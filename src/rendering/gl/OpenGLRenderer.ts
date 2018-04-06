@@ -9,8 +9,8 @@ import Square from '../../geometry/Square';
 
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
-const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "TranslucentAdded":3,
-                     "ToneMapping": 0,"SaveFrame": 1};
+const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "TranslucentAdded":3, "SaveFrame": 4,
+                     "ToneMapping": 0};
 
 
 
@@ -101,8 +101,8 @@ class OpenGLRenderer {
     this.post8Targets = [undefined, undefined];
     this.post8Passes = [];
 
-    this.post32Buffers = [undefined, undefined, undefined, undefined];
-    this.post32Targets = [undefined, undefined, undefined, undefined];
+    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined];
+    this.post32Targets = [undefined, undefined, undefined, undefined, undefined];
     this.post32Passes = [];
 
     if (!gl.getExtension("OES_texture_float_linear")) {
@@ -545,7 +545,7 @@ class OpenGLRenderer {
   }
 
   renderforSavingCurrentFrame(camera: Camera) {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.SaveFrame]);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SaveFrame]);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.disable(gl.DEPTH_TEST);
     
@@ -572,7 +572,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
     
 
-    this.tonemapPass.setFrame00(this.post8Targets[PipelineEnum.SaveFrame]);
+    this.tonemapPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
    
     this.tonemapPass.draw();
     // bind default frame buffer
@@ -587,7 +587,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00(this.post8Targets[PipelineEnum.SaveFrame]);
+    //this.presentPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
     this.presentPass.draw();
 
     // bind default frame buffer

@@ -103,7 +103,16 @@ abstract class Drawable {
 
   translate( xyz: vec3)
   {
-    mat4.translate( this.modelMat, this.modelMat, xyz );
+    let tempMat:mat4 = mat4.create();
+    mat4.translate( tempMat, tempMat, xyz );
+    mat4.multiply(this.modelMat, this.modelMat, tempMat );
+  }
+
+  scale( xyz: vec3)
+  {
+    let tempMat:mat4 = mat4.create();
+    mat4.scale( tempMat, tempMat, xyz );
+    mat4.multiply(this.modelMat, this.modelMat, tempMat );
   }
 };
 

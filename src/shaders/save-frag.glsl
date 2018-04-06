@@ -37,7 +37,7 @@ void main() {
 	
 	vec3 finalColor = vec3(0.0);
 
-	finalColor =  SSRColor * SSRMask + sceneImagecolor;
+	finalColor = SSRColor + sceneImagecolor;// mix(sceneImagecolor, SSRColor + sceneImagecolor, SSRMask);
 	
 	out_Col = vec4(finalColor, 1.0);
 }
