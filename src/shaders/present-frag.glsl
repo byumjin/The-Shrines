@@ -10,4 +10,5 @@ uniform float u_Time;
 
 void main() {
 	out_Col = texture(u_frame0, fs_UV);
+	out_Col.w = 1.0;
 }

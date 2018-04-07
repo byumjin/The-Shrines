@@ -9,12 +9,13 @@ uniform sampler2D u_DepthMap;
 uniform sampler2D u_Gbuffer_Specular;
 uniform sampler2D u_Gbuffer_Normal;
 uniform samplerCube u_SkyCubeMap;
+uniform sampler2D u_frame0;
+uniform sampler2D u_frame1;
 
 uniform mat4 u_InvViewProj;  
 uniform mat4 u_ViewProj; 
 
-uniform sampler2D u_frame0;
-uniform sampler2D u_frame1;
+
 
 uniform float u_deltaTime;
 uniform vec3 u_CameraWPos; 
@@ -145,20 +146,23 @@ void main() {
 
 			if( distance(cworldPos.xyz, currentPos) < stepSize * threshold)
 			{
+				float prevIndicatedLinearDepth = LinearDepth(prevDepth);
+				float prevLinearDepth = LinearDepth(prevDepthFromDepthBuffer);
 				
-				if( dot(relfectVec, texture(u_Gbuffer_Normal, fs_UV).rgb) > 0.0)
-				{					
+				float denom = ( (currentLinearDepth - prevLinearDepth) - (currentIndicatedLinearDepth - prevIndicatedLinearDepth) );
+
+				if(denom == 0.0)
+				{
+					reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
+
 					fadeFactor = 0.0;
 					bHit = true;
 					break;
 				}
-				
-				
 
-				float prevIndicatedLinearDepth = LinearDepth(prevDepth);
-				float prevLinearDepth = LinearDepth(prevDepthFromDepthBuffer);
-				//float lerpVal = (currentLinearDepth - prevIndicatedLinearDepth) / (currentIndicatedLinearDepth - prevIndicatedLinearDepth);
-				float lerpVal = (prevIndicatedLinearDepth - prevLinearDepth) / ( (currentLinearDepth - prevLinearDepth) - (currentIndicatedLinearDepth - prevIndicatedLinearDepth) );
+				float lerpVal = (prevIndicatedLinearDepth - prevLinearDepth) / denom;
+				lerpVal = clamp(lerpVal, 0.0, 1.0);
+
 				lerpVal = sqrt(lerpVal);
 				vec3 lerpedPos = prevPos + relfectVec * stepSize * lerpVal;
 
@@ -167,14 +171,29 @@ void main() {
 				
 				vec2 lerpedScreenSpaceCoords = vec2((lerpedPos_SS.x + 1.0) * 0.5, ( lerpedPos_SS.y + 1.0)*0.5);
 
+				if(lerpedScreenSpaceCoords.x > 1.0 || lerpedScreenSpaceCoords.x < 0.0 || lerpedScreenSpaceCoords.y > 1.0 || lerpedScreenSpaceCoords.y < 0.0 || depth_SS >= 1.0)
+				{
+					reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
+
+					fadeFactor = 0.0;
+					bHit = true;
+					break;
+				}
+
+				if( dot(relfectVec, texture(u_Gbuffer_Specular, lerpedScreenSpaceCoords).xyz) > 0.0 || dot(relfectVec, -viewVec ) > 0.0 )
+				{					
+
+					reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
+
+					fadeFactor = 0.0;
+					bHit = true;
+					break;
+				}
+
 				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), clamp(u_deltaTime * 40.0, 0.0, 1.0) ); //temporal Blend
 				
-
-
 				fadeFactor = fade(lerpedScreenSpaceCoords);
-
 				fadeFactor = min(pow(1.0 -  (i + 1.0)/maxStep, 0.05), fadeFactor);
-
 				bHit = true;
 
 				break;
@@ -198,24 +217,10 @@ void main() {
 		reflectionColor = SkyColor;
 		fadeFactor = 1.0;		
 	}
-	/*
-	else
-	{
-		if(trans)
-			reflectionColor = mix(vec4(0.0), reflectionColor, fadeFactor);
-	}
-	*/
 
 	float energyConservation = 1.0 - roughness * roughness;
 
 	out_Col = reflectionColor * Intensity * energyConservation;
-
-	/*
-	if(bWater)
-	{
-		fadeFactor += 20.0;	
-	}
-	*/
 
 	out_Col.w = fadeFactor; //SSR_Mask
 

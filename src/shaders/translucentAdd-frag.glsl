@@ -45,6 +45,7 @@ void main() {
 		{
 			float depthDistance = clamp( LinearDepth(OpaqueSSRInfo.a) - LinearDepth(transColor.a), 0.0, 1.0);
 			depthDistance *= 10.0;
+			depthDistance = clamp(depthDistance, 0.0, 1.0);
 			fragColor[0].xyz =  mix( opaqueColor.xyz , transColor.xyz, depthDistance);
 
 			//fragColor[0].xyz = opaqueColor.xyz;

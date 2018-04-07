@@ -369,6 +369,7 @@ class OpenGLRenderer {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.gBuffer);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.enable(gl.DEPTH_TEST);
+    gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     
@@ -403,6 +404,8 @@ class OpenGLRenderer {
 
   renderToShadowDepth(camera: Camera, shadowProg: ShaderProgram, lightViewProjMat : mat4, drawables: Array<Drawable>){
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ShadowPass]);
+
+    gl.clearDepth(1.0);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
@@ -541,7 +544,7 @@ class OpenGLRenderer {
 
     this.SSRPass.setSSRInfo(vec4.fromValues(SSR_MaxStep, SSR_Opaque_Intensity, SSR_Trans_Intensity, SSR_Threshold));
     this.SSRPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]); //previous frame
-    this.SSRPass.setFrame01(this.post32Targets[PipelineEnum.SceneImage]); //current frame
+    this.SSRPass.setFrame01(this.tDTargets[0] /*this.post32Targets[PipelineEnum.SceneImage]*/); //current frame
     this.SSRPass.setdeltaTime(this.deltaTime );
 
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
@@ -553,7 +556,7 @@ class OpenGLRenderer {
     this.SSRPass.setInvViewProjMatrix(camera.invViewProjectionMatrix);
 
     this.SSRPass.setCameraWPos(camera.position);
-    this.SSRPass.setNormalMap(this.gbTargets[GbufferEnum.Normal]);
+    //this.SSRPass.setNormalMap(this.gbTargets[GbufferEnum.Normal]);
     this.SSRPass.setSpecularMap( this.tDTargets[1] /*this.gbTargets[GbufferEnum.Specular]*/ );
 
     this.SSRPass.draw();
@@ -627,7 +630,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
+    //this.presentPass.setFrame00(this.post32Targets[PipelineEnum.SSR]);
     this.presentPass.draw();
 
     // bind default frame buffer
