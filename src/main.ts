@@ -106,6 +106,8 @@ function loadScene() {
      new Texture('./src/resources/objs/lake/textures/normal.png', false));
   mesh_lake.create();
 
+  mesh_lake.translate( vec3.fromValues(0.0, -2.0, 0.0));
+
   mesh_holodeck = new Mesh(obj_holodeck, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/holodeck/textures/wall.png', false),
     new Texture('./src/resources/objs/holodeck/textures/wall_Specular.png', false),
@@ -125,7 +127,7 @@ function loadScene() {
     new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
     mesh_B_Outter.create();
 
-    mesh_B_Outter.scale(vec3.fromValues(10, 10, 10));
+    mesh_B_Outter.scale(vec3.fromValues(3, 3, 3));
 
   mesh_B_Inner = new Mesh(obj_B_Inner, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/B_Side/textures/Inner_Albedo.png', false),
@@ -133,7 +135,7 @@ function loadScene() {
    new Texture('./src/resources/objs/B_Side/textures/Normal.png', false));
    mesh_B_Inner.create();
 
-   mesh_B_Inner.scale(vec3.fromValues(10, 10, 10));
+   mesh_B_Inner.scale(vec3.fromValues(3, 3, 3));
 
   mesh_B_Glass = new Mesh(obj_B_Glass, vec3.fromValues(0, 0, 0),
     new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
@@ -141,7 +143,7 @@ function loadScene() {
     new Texture('./src/resources/objs/B_Side/textures/Normal.png', false));
     mesh_B_Glass.create();
 
-    mesh_B_Glass.scale(vec3.fromValues(10, 10, 10));
+    mesh_B_Glass.scale(vec3.fromValues(3, 3, 3));
 
  
   
@@ -182,8 +184,8 @@ function main() {
 
   const camera = new Camera();
   camera.updateOrbit(0.0, -60.0);
-  camera.updatePosition( -100, 60);
-  camera.updateOrbit(0.0, 30.0);
+  camera.updatePosition( -10, 6);
+  camera.updateOrbit(0.0, 60.0);
   
 
   const renderer = new OpenGLRenderer(canvas);

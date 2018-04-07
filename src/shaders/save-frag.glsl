@@ -26,18 +26,25 @@ void main() {
 
 	bool bTrans = false;
 
-	if(SSRMask > 9.0)
+	/*
+	if(SSRMask > 19.0)
+	{
+		bTrans = true;
+		SSRMask -= 20.0;
+	}
+	else if(SSRMask > 9.0)
 	{
 		bTrans = true;
 		SSRMask -= 10.0;
 	}
+	*/
 
-	vec3 SSRColor = textureLod(u_frame2, fs_UV, log2(roughness + 1.0) * 6.0).xyz;
+	vec4 SSRMipColor = textureLod(u_frame2, fs_UV, log2(roughness + 1.0) * 5.0);
 
 	
 	vec3 finalColor = vec3(0.0);
 
-	finalColor = SSRColor + sceneImagecolor;// mix(sceneImagecolor, SSRColor + sceneImagecolor, SSRMask);
+	finalColor = SSRMipColor.xyz * clamp(SSRMask, 0.0, 1.0) + sceneImagecolor;// mix(sceneImagecolor, SSRColor + sceneImagecolor, SSRMask);
 	
 	out_Col = vec4( clamp(finalColor, 0.0, 2.0), 1.0);
 }

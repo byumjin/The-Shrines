@@ -43,18 +43,23 @@ void main() {
 	bool trans = false;
 	bool bWater = false;
 	
-	if(depth >= 20.0)
+	if(depth >= 19.0)
 	{
 		trans = true;
 		bWater = true;
 		depth -= 20.0;
 
 	}
-	else if(depth >= 10.0)
+	//disable glass reflection
+	/*
+	else if(depth >= 9.0)
 	{
 		trans = true;
 		depth -= 10.0;
 	}
+	*/
+
+	depth = clamp(depth, 0.0, 1.0);
 
 	if(depth >= 1.0)
 	{
@@ -116,6 +121,17 @@ void main() {
 		
 		float depth_SS = texture(u_DepthMap, flippedScreenSpaceCoords).w;
 
+		if(depth_SS >= 19.0)
+		{
+			depth_SS -= 20.0;
+		}
+		else if(depth_SS >= 9.0)
+		{
+			depth_SS -= 10.0;
+		}
+
+		depth_SS = clamp(depth_SS, 0.0, 1.0);
+
 		if(pos_SS.z > depth_SS)
 		{	
 			
@@ -129,14 +145,14 @@ void main() {
 
 			if( distance(cworldPos.xyz, currentPos) < stepSize * threshold)
 			{
-				/*
-				if( dot(relfectVec, texture(u_Gbuffer_Normal, flippedScreenSpaceCoords).rgb) > 0.0)
+				
+				if( dot(relfectVec, texture(u_Gbuffer_Normal, fs_UV).rgb) > 0.0)
 				{					
 					fadeFactor = 0.0;
 					bHit = true;
 					break;
 				}
-				*/
+				
 				
 
 				float prevIndicatedLinearDepth = LinearDepth(prevDepth);
@@ -182,20 +198,24 @@ void main() {
 		reflectionColor = SkyColor;
 		fadeFactor = 1.0;		
 	}
+	/*
 	else
 	{
 		if(trans)
 			reflectionColor = mix(vec4(0.0), reflectionColor, fadeFactor);
 	}
+	*/
 
 	float energyConservation = 1.0 - roughness * roughness;
 
 	out_Col = reflectionColor * Intensity * energyConservation;
 
-	if(trans)
+	/*
+	if(bWater)
 	{
-		fadeFactor += 10.0;	
+		fadeFactor += 20.0;	
 	}
+	*/
 
 	out_Col.w = fadeFactor; //SSR_Mask
 

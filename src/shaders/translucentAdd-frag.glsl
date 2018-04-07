@@ -30,10 +30,10 @@ void main() {
 
 	vec4 OpaqueSSRInfo = texture(u_Gbuffer_Albedo, fs_UV);
 	
-	
-	if(transColor.a < 0.0)
+	//water
+	if(transColor.a > 19.0)
 	{
-		transColor.a = -transColor.a;
+		transColor.a -= 20.0;
 	}
 
 
@@ -44,7 +44,8 @@ void main() {
 		if(opaqueColor.a < 1.0)
 		{
 			float depthDistance = clamp( LinearDepth(OpaqueSSRInfo.a) - LinearDepth(transColor.a), 0.0, 1.0);
-			fragColor[0].xyz =  mix(  opaqueColor.xyz, transColor.xyz, pow(depthDistance, 0.7));
+			depthDistance *= 10.0;
+			fragColor[0].xyz =  mix( opaqueColor.xyz , transColor.xyz, depthDistance);
 
 			//fragColor[0].xyz = opaqueColor.xyz;
 			//fragColor[0].xyz =  mix(  vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), pow(depthDistance, 0.7));
@@ -65,9 +66,9 @@ void main() {
 
 	bool bWater = false;
 
-	if(transDepth < 0.0)
+	if(transDepth >= 19.0)
 	{
-		transDepth = -transDepth;
+		transDepth = transDepth - 20.0;
 		bWater = true;
 	}
 	
@@ -76,11 +77,18 @@ void main() {
 	if( transDepth < OpaqueDepth )
 	{
 		if(bWater)
+		{
 			fragColor[0].w = transDepth + 20.0; //differenciate
+			fragColor[1] = transInfo;
+		}
 		else
-			fragColor[0].w = transDepth + 10.0;
+		{
+			//disable glass reflection
+			//fragColor[0].w = transDepth + 10.0; 
 
-		fragColor[1] = transInfo;
+			fragColor[0].w = OpaqueDepth;
+			fragColor[1] = vec4( texture(u_Gbuffer_Normal, reverseUV).xyz , OpaqueRougness);
+		}
 	}
 	else
 	{

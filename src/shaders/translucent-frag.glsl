@@ -128,7 +128,7 @@ void main() {
 	vec4 normal = vec4(worldNormal, 0.0);
 
 	float Roughness = specular.w;
-	Roughness = clamp(Roughness, 0.0, 1.0);
+	Roughness = clamp(Roughness, 0.05, 0.95);
 
 	float depth = albedo.w;
 
@@ -143,7 +143,7 @@ void main() {
     	col = pow(col, vec4(2.2));
 
 		fragColor[0] = col;
-        fragColor[0].w =  bWater ? -1.0 : 1.0;
+        fragColor[0].w =  bWater ? 21.0 : 1.0;
         fragColor[1] = vec4(normal.xyz, Roughness);
 	}
 	else
@@ -171,7 +171,7 @@ void main() {
 
         float Opacity = 0.1;
 
-		fragColor[0] = vec4(pbrColor.xyz * Opacity, bWater ? -Depth : Depth);
+		fragColor[0] = vec4(pbrColor.xyz * Opacity, bWater ? (Depth + 20.0) : Depth);
         fragColor[1] = vec4(normal.xyz, Roughness);
 
 	}
