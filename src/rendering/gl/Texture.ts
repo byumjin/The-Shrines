@@ -32,8 +32,12 @@ export class Texture {
 		this.cubemap_texture = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
 
-		
-		
+		gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
 	}
 	else
 	{
@@ -41,6 +45,7 @@ export class Texture {
 		this.bindTex();
 
 		gl.texImage2D(gl.TEXTURE_2D, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		
 
 		// get a javascript image locally and load it. not instant but will auto-replace white pixel
 		const img = new Image();
@@ -71,8 +76,8 @@ export class Texture {
 	if(index == 0)
 	{
 		// Pos X+
-		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
-		gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		//gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
+		//gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
 		const img_Pos_X = new Image();
 
 		img_Pos_X.onload = function(){
@@ -90,8 +95,8 @@ export class Texture {
 	else if(index == 1)
 	{
 		// Neg X-
-		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
-		gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		//gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
+		//gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
 		const img_Neg_X = new Image();
 
 		img_Neg_X.onload = function(){
@@ -109,8 +114,8 @@ export class Texture {
 	else if(index == 2)
 	{
 		// Pos Y+
-		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
-		gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		//gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
+		//gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
 		const img_Pos_Y = new Image();
 
 		img_Pos_Y.onload = function(){
@@ -129,8 +134,8 @@ export class Texture {
 	else if(index == 3)
 	{
 		// Neg Y-
-		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
-		gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		//gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
+		//gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
 		const img_Neg_Y = new Image();
 
 		img_Neg_Y.onload = function(){
@@ -148,8 +153,8 @@ export class Texture {
 	else if(index == 4)
 	{
 		// Pos Z+
-		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
-		gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		//gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
+		//gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
 		const img_Pos_Z = new Image();
 
 		img_Pos_Z.onload = function(){
@@ -168,8 +173,8 @@ export class Texture {
 	else if(index == 5)
 	{
 		// Neg Z-
-		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
-		gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+		//gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
+		//gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
 		const img_Neg_Z = new Image();
 
 		img_Neg_Z.onload = function(){
