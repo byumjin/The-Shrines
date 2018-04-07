@@ -35,6 +35,12 @@ void main() {
 	{
 		transColor.a -= 20.0;
 	}
+	
+	else if(transColor.a > 9.0)
+	{
+		transColor.a -= 10.0;
+	}
+	
 
 
 	if(transColor.a >= 1.0)
@@ -75,6 +81,11 @@ void main() {
 		transDepth = transDepth - 20.0;
 		bWater = true;
 	}
+	else if(transDepth >= 9.0)
+	{
+		transDepth = transDepth - 10.0;
+		bWater = true;
+	}
 	
 	
 
@@ -88,10 +99,11 @@ void main() {
 		else
 		{
 			//disable glass reflection
-			//fragColor[0].w = transDepth + 10.0; 
+			fragColor[0].w = transDepth + 10.0; 
+			fragColor[1] = transInfo;
 
-			fragColor[0].w = OpaqueDepth;
-			fragColor[1] = vec4( OpaqueNORMAL.xyz , OpaqueSPEC.w);
+			//fragColor[0].w = OpaqueDepth;
+			//fragColor[1] = vec4( OpaqueNORMAL.xyz , OpaqueSPEC.w);
 		}
 	}
 	else

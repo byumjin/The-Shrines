@@ -52,13 +52,13 @@ void main() {
 
 	}
 	//disable glass reflection
-	/*
+	
 	else if(depth >= 9.0)
 	{
 		trans = true;
 		depth -= 10.0;
 	}
-	*/
+	
 
 	depth = clamp(depth, 0.0, 1.0);
 
