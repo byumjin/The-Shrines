@@ -12,8 +12,11 @@ uniform samplerCube u_SkyCubeMap;
 
 uniform mat4 u_InvViewProj;  
 uniform mat4 u_ViewProj; 
+
 uniform sampler2D u_frame0;
-uniform float u_Time;
+uniform sampler2D u_frame1;
+
+uniform float u_deltaTime;
 uniform vec3 u_CameraWPos; 
 
 uniform vec4 u_SSRInfo;
@@ -38,8 +41,16 @@ void main() {
 	float depth = texture(u_DepthMap, fs_UV).w;
 
 	bool trans = false;
+	bool bWater = false;
+	
+	if(depth >= 20.0)
+	{
+		trans = true;
+		bWater = true;
+		depth -= 20.0;
 
-	if(depth >= 10.0)
+	}
+	else if(depth >= 10.0)
 	{
 		trans = true;
 		depth -= 10.0;
@@ -71,7 +82,7 @@ void main() {
 	vec4 reflectionColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	float threshold = 2.0;
-	float stepSize = (1.0 + roughness) * u_SSRInfo.w;
+	float stepSize = (1.0 + roughness) * (bWater ? u_SSRInfo.w * 10.0 : u_SSRInfo.w);
 	float prevDepth;
 	float prevDepthFromDepthBuffer;
 
@@ -126,6 +137,7 @@ void main() {
 					break;
 				}
 				*/
+				
 
 				float prevIndicatedLinearDepth = LinearDepth(prevDepth);
 				float prevLinearDepth = LinearDepth(prevDepthFromDepthBuffer);
@@ -139,7 +151,9 @@ void main() {
 				
 				vec2 lerpedScreenSpaceCoords = vec2((lerpedPos_SS.x + 1.0) * 0.5, ( lerpedPos_SS.y + 1.0)*0.5);
 
-				reflectionColor = texture(u_frame0, lerpedScreenSpaceCoords);
+				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), clamp(u_deltaTime * 40.0, 0.0, 1.0) ); //temporal Blend
+				
+
 
 				fadeFactor = fade(lerpedScreenSpaceCoords);
 

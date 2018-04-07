@@ -48,6 +48,7 @@ class ShaderProgram {
 
   unifColor: WebGLUniformLocation;
   unifTime: WebGLUniformLocation;
+  unifdeltaTime: WebGLUniformLocation;
 
   unifFrame0: WebGLUniformLocation;
 	unifFrame1: WebGLUniformLocation;
@@ -95,6 +96,7 @@ class ShaderProgram {
 
     this.unifColor = gl.getUniformLocation(this.prog, "u_Color");
     this.unifTime = gl.getUniformLocation(this.prog, "u_Time")
+    this.unifdeltaTime = gl.getUniformLocation(this.prog, "u_deltaTime")
 
     this.unifDepthMap = gl.getUniformLocation(this.prog, "u_DepthMap");
     this.unifSkyCubeMap = gl.getUniformLocation(this.prog, "u_SkyCubeMap");
@@ -377,20 +379,22 @@ class ShaderProgram {
     }
   }
 
-
-
-
-  unifSSR_MaxStep: WebGLUniformLocation;
-  unifOpaque_Intensity: WebGLUniformLocation;
-  unifTrans_Intensity: WebGLUniformLocation;
-  unifThreshold: WebGLUniformLocation;
-
   setTime(t: number) {
     this.use();
     if (this.unifTime !== -1) {
       gl.uniform1f(this.unifTime, t);
     }
   }
+
+  setdeltaTime(t: number) {
+    this.use();
+    if (this.unifdeltaTime !== -1) {
+      gl.uniform1f(this.unifdeltaTime, t);
+    }
+  }
+
+
+  
 
   draw(d: Drawable) {
     this.use();

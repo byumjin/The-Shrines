@@ -101,6 +101,7 @@ void main() {
     col = pow(col, vec3(2.2));
 
 	vec3 waterNormal;
+	bool bWater = false;
 
 	if(Albedo.a < 0.6) // Water
 	{
@@ -109,6 +110,7 @@ void main() {
    	 	vec4 normalInfo2 = texture(NormalMap, fs_UV - vec2(u_Time * 0.0941, u_Time * 0.07831));
 
 		waterNormal = vec3( ( (normalInfo0.x * normalInfo2.y) - 0.5) * 2.0 , ((normalInfo1.y * normalInfo2.z) - 0.5) * 2.0, 20.0);
+		bWater = true;
 	}
 	else // Glass
 	{
@@ -141,7 +143,7 @@ void main() {
     	col = pow(col, vec4(2.2));
 
 		fragColor[0] = col;
-        fragColor[0].w = 1.0;
+        fragColor[0].w =  bWater ? -1.0 : 1.0;
         fragColor[1] = vec4(normal.xyz, Roughness);
 	}
 	else
@@ -169,7 +171,7 @@ void main() {
 
         float Opacity = 0.1;
 
-		fragColor[0] = vec4(pbrColor.xyz * Opacity, Depth);
+		fragColor[0] = vec4(pbrColor.xyz * Opacity, bWater ? -Depth : Depth);
         fragColor[1] = vec4(normal.xyz, Roughness);
 
 	}

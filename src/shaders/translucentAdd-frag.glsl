@@ -30,8 +30,14 @@ void main() {
 
 	vec4 OpaqueSSRInfo = texture(u_Gbuffer_Albedo, fs_UV);
 	
+	
+	if(transColor.a < 0.0)
+	{
+		transColor.a = -transColor.a;
+	}
 
-	if(transColor.w >= 1.0)
+
+	if(transColor.a >= 1.0)
 		fragColor[0].xyz = opaqueColor.xyz;
 	else
 	{
@@ -56,11 +62,24 @@ void main() {
 	float OpaqueMetallic = texture(u_Gbuffer_Normal, reverseUV).w;
 
 	float transDepth =  texture(u_frame1, reverseUV).w;
+
+	bool bWater = false;
+
+	if(transDepth < 0.0)
+	{
+		transDepth = -transDepth;
+		bWater = true;
+	}
+	
 	vec4 transInfo = texture(u_frame2, reverseUV);
 
 	if( transDepth < OpaqueDepth )
 	{
-		fragColor[0].w = transDepth + 10.0; //differenciate
+		if(bWater)
+			fragColor[0].w = transDepth + 20.0; //differenciate
+		else
+			fragColor[0].w = transDepth + 10.0;
+
 		fragColor[1] = transInfo;
 	}
 	else

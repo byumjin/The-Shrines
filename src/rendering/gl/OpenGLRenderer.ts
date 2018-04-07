@@ -49,6 +49,7 @@ class OpenGLRenderer {
   post32Passes: PostProcess[];
 
   currentTime: number; // timer number to apply to all drawing shaders
+  deltaTime: number;
 
   SSRDownSampling: number = 0.5;
 
@@ -347,6 +348,7 @@ class OpenGLRenderer {
     for (let pass of this.post8Passes) pass.setTime(currentTime);
     for (let pass of this.post32Passes) pass.setTime(currentTime);
     this.currentTime = currentTime;
+    this.deltaTime = deltaTime;
   }
 
 
@@ -538,6 +540,8 @@ class OpenGLRenderer {
 
     this.SSRPass.setSSRInfo(vec4.fromValues(SSR_MaxStep, SSR_Opaque_Intensity, SSR_Trans_Intensity, SSR_Threshold));
     this.SSRPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]); //previous frame
+    this.SSRPass.setFrame01(this.post32Targets[PipelineEnum.SceneImage]); //current frame
+    this.SSRPass.setdeltaTime(this.deltaTime );
 
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
     this.SSRPass.setSkyCubeMap(skyCubeMap);

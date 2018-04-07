@@ -16,7 +16,7 @@ const controls = {
   SSR_MaxStep : 128,
   SSR_Opaque_Intensity : 0.05,
   SSR_Trans_Intensity : 0.1,
-  SSR_Threshold : 2.0
+  SSR_Threshold : 1.0
   
 };
 
@@ -165,7 +165,7 @@ function main() {
   SSR.add(controls, 'SSR_MaxStep', 16.0, 256.0).step(1);
   SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 0.2).step(0.01);
   SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.01);
-  SSR.add(controls, 'SSR_Threshold', 1.0, 4.0).step(0.1);
+  SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
