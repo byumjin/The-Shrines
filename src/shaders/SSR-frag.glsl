@@ -4,13 +4,13 @@ precision highp float;
 in vec2 fs_UV;
 out vec4 out_Col;
 
-uniform sampler2D u_DepthMap;
+//uniform sampler2D u_DepthMap;
 
 uniform sampler2D u_Gbuffer_Specular;
 uniform sampler2D u_Gbuffer_Normal;
 uniform samplerCube u_SkyCubeMap;
 uniform sampler2D u_frame0;
-uniform sampler2D u_frame1;
+uniform sampler2D u_frame1; //current 
 
 uniform mat4 u_InvViewProj;  
 uniform mat4 u_ViewProj; 
@@ -39,7 +39,7 @@ float fade(vec2 UV)
 void main() {
 
 	
-	float depth = texture(u_DepthMap, fs_UV).w;
+	float depth = texture(u_frame1, fs_UV).w;
 
 	bool trans = false;
 	bool bWater = false;
@@ -79,16 +79,14 @@ void main() {
 	
 
 	vec3 viewVec = normalize(worldPos.xyz - u_CameraWPos);
-
-	float NoV = dot(WorldNormal, viewVec);
 	vec3 relfectVec = reflect(viewVec , WorldNormal);
 
 	vec3 currentPos = worldPos.xyz;
 	vec3 prevPos;
-	vec4 reflectionColor = vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 	float threshold = 2.0;
-	float stepSize = (1.0 + roughness) * (bWater ? u_SSRInfo.w * 10.0 : u_SSRInfo.w);
+	float stepSize =  (1.0 + roughness) * (bWater ? u_SSRInfo.w * 10.0 : u_SSRInfo.w);
 	float prevDepth;
 	float prevDepthFromDepthBuffer;
 
@@ -120,7 +118,7 @@ void main() {
 		vec2 flippedScreenSpaceCoords = screenSpaceCoords;
 		flippedScreenSpaceCoords.y = 1.0 - flippedScreenSpaceCoords.y;
 		
-		float depth_SS = texture(u_DepthMap, flippedScreenSpaceCoords).w;
+		float depth_SS = texture(u_frame1, flippedScreenSpaceCoords).w;
 
 		if(depth_SS >= 19.0)
 		{
@@ -191,7 +189,8 @@ void main() {
 				}
 
 				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), clamp(u_deltaTime * 40.0, 0.0, 1.0) ); //temporal Blend
-				
+				//reflectionColor = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
+
 				fadeFactor = fade(lerpedScreenSpaceCoords);
 				fadeFactor = min(pow(1.0 -  (i + 1.0)/maxStep, 0.05), fadeFactor);
 				bHit = true;
@@ -206,21 +205,26 @@ void main() {
 
 	}
 
- 	vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
-	SkyColor = pow(SkyColor, vec4(2.2));
+ 	
 
 	fadeFactor = fadeFactor * fadeFactor;
 
 	//We are not going to make inner pool scene. Thus, this is fine
+	
 	if(!bHit) //SkyBox
 	{
+		vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
+		SkyColor = pow(SkyColor, vec4(2.2));
+
 		reflectionColor = SkyColor;
 		fadeFactor = 1.0;		
 	}
+	
 
 	float energyConservation = 1.0 - roughness * roughness;
 
 	out_Col = reflectionColor * Intensity * energyConservation;
+	out_Col = clamp(out_Col, 0.0, 1.0);
 
 	out_Col.w = fadeFactor; //SSR_Mask
 

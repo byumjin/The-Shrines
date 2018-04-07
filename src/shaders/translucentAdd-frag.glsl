@@ -57,13 +57,16 @@ void main() {
 		}
 
 	}
+
+	/////
 	
 
 	float OpaqueDepth = texture(u_Gbuffer_Albedo, reverseUV).w;
-	float OpaqueRougness = texture(u_Gbuffer_Specular, reverseUV).w;
-	float OpaqueMetallic = texture(u_Gbuffer_Normal, reverseUV).w;
-
+	vec4 OpaqueSPEC = texture(u_Gbuffer_Specular, reverseUV);
+	vec4 OpaqueNORMAL = texture(u_Gbuffer_Normal, reverseUV);
+	
 	float transDepth =  texture(u_frame1, reverseUV).w;
+	vec4 transInfo = texture(u_frame2, reverseUV);
 
 	bool bWater = false;
 
@@ -73,7 +76,7 @@ void main() {
 		bWater = true;
 	}
 	
-	vec4 transInfo = texture(u_frame2, reverseUV);
+	
 
 	if( transDepth < OpaqueDepth )
 	{
@@ -88,13 +91,13 @@ void main() {
 			//fragColor[0].w = transDepth + 10.0; 
 
 			fragColor[0].w = OpaqueDepth;
-			fragColor[1] = vec4( texture(u_Gbuffer_Normal, reverseUV).xyz , OpaqueRougness);
+			fragColor[1] = vec4( OpaqueNORMAL.xyz , OpaqueSPEC.w);
 		}
 	}
 	else
 	{
 		fragColor[0].w = OpaqueDepth;
-		fragColor[1] = vec4( texture(u_Gbuffer_Normal, reverseUV).xyz , OpaqueRougness);
+		fragColor[1] = vec4( OpaqueNORMAL.xyz , OpaqueSPEC.w);
 	}
 
 	

@@ -10,7 +10,7 @@ import Square from '../../geometry/Square';
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
-const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "TranslucentAdded":3, "SaveFrame": 4, "ShadowPass": 5,
+const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "ShadowPass": 4,
                      "ToneMapping": 0};
 
 
@@ -505,6 +505,7 @@ class OpenGLRenderer {
     this.deferredShader.draw();
      
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null); 
     //gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
   }
 
@@ -529,6 +530,7 @@ class OpenGLRenderer {
 
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null); 
   }
 
   renderSSR(camera: Camera, skyCubeMap: WebGLTexture,
@@ -550,7 +552,7 @@ class OpenGLRenderer {
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
     this.SSRPass.setSkyCubeMap(skyCubeMap);
 
-    this.SSRPass.setDepthMap( this.tDTargets[0] /* this.gbTargets[GbufferEnum.Albedo] */);
+    //this.SSRPass.setDepthMap( this.tDTargets[0] /* this.gbTargets[GbufferEnum.Albedo] */);
     
     this.SSRPass.setViewProjMatrix(camera.viewProjectionMatrix);
     this.SSRPass.setInvViewProjMatrix(camera.invViewProjectionMatrix);
@@ -563,6 +565,7 @@ class OpenGLRenderer {
 
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null); 
   }
 
   renderSSRMip() {
@@ -604,6 +607,7 @@ class OpenGLRenderer {
     this.savePass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
 
   }
 
@@ -620,6 +624,7 @@ class OpenGLRenderer {
     this.tonemapPass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
   }
 
   renderPresent(camera: Camera) {
