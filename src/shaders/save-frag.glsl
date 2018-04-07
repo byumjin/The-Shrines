@@ -39,5 +39,5 @@ void main() {
 
 	finalColor = SSRColor + sceneImagecolor;// mix(sceneImagecolor, SSRColor + sceneImagecolor, SSRMask);
 	
-	out_Col = vec4(finalColor, 1.0);
+	out_Col = vec4( clamp(finalColor, 0.0, 2.0), 1.0);
 }
