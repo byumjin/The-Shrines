@@ -262,6 +262,17 @@ function main() {
     renderer.renderSSRMip();
 
     renderer.renderforSavingCurrentFrame(camera);
+
+    renderer.renderforHighLightCurrentFrame(camera);
+
+    for(var  i = 0; i< 16; i++)
+    {
+      renderer.renderforHorizontalBlur(camera, i);
+      renderer.renderforVerticalBlur(camera);
+    }
+   
+
+
     renderer.renderTonemapping(camera);
    
     renderer.renderPresent(camera);

@@ -149,8 +149,6 @@ void main() {
 	}
 	else
 	{
-		
-		
 			vec4 diffuseColor = vec4(albedo.xyz, 1.0);
 
 			float diffuseTerm = clamp( dot(lightDir, normal.xyz), 0.0, 1.0);
@@ -179,7 +177,7 @@ void main() {
 			//Emissive
 			if(normal.a > 0.8)
 			{
-				out_Col.xyz += albedo.xyz * 5.0;
+				out_Col.xyz += albedo.xyz;
 			}
 		
 

@@ -34,5 +34,5 @@ void main() {
 	//finalColor = SSRMipColor.xyz * clamp(SSRMask, 0.0, 1.0) + sceneImagecolor;// mix(sceneImagecolor, SSRColor + sceneImagecolor, SSRMask);
 	finalColor = SSRMipColor.xyz + sceneImagecolor;
 
-	out_Col = vec4( clamp(finalColor, 0.0, 1.0), 1.0);
+	out_Col = vec4( finalColor, 1.0);
 }

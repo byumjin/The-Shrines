@@ -244,7 +244,7 @@ void main() {
 	float energyConservation = 1.0 - roughness * roughness;
 
 	out_Col = reflectionColor * Intensity * energyConservation;
-	out_Col = clamp(out_Col, 0.0, 1.0);
+	out_Col = out_Col;//clamp(out_Col, 0.0, 1.0);
 
 	out_Col.w = fadeFactor; //SSR_Mask
 

@@ -1,4 +1,4 @@
-import {vec3, vec4, mat4} from 'gl-matrix';
+import {vec2, vec3, vec4, mat4} from 'gl-matrix';
 import Drawable from './Drawable';
 import Texture from './Texture';
 import {gl} from '../../globals';
@@ -64,7 +64,10 @@ class ShaderProgram {
   unifLightViewProj: WebGLUniformLocation;
   unifShadowMap: WebGLUniformLocation;
 
+  unifScreenSize: WebGLUniformLocation;
+
   unifTexUnits: Map<string, WebGLUniformLocation>;
+  
   
 
   constructor(shaders: Array<Shader>) {
@@ -118,6 +121,8 @@ class ShaderProgram {
     
     this.unifLightViewProj = gl.getUniformLocation(this.prog, "u_LightViewProj");
     this.unifShadowMap = gl.getUniformLocation(this.prog, "u_ShadowMap");
+
+    this.unifScreenSize = gl.getUniformLocation(this.prog, "u_screenSize");
 
     this.unifTexUnits = new Map<string, WebGLUniformLocation>();
   }
@@ -284,6 +289,13 @@ class ShaderProgram {
   
       gl.activeTexture(gl.TEXTURE13);
       gl.bindTexture(gl.TEXTURE_2D, texture);  
+    }
+  }
+
+  setScreenSize(screenSize: vec2){
+    this.use();
+    if (this.unifScreenSize !== -1) {
+      gl.uniform2fv(this.unifScreenSize, screenSize);
     }
   }
 

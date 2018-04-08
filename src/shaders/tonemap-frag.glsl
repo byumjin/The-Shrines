@@ -7,7 +7,7 @@ in vec2 fs_UV;
 out vec4 out_Col;
 
 uniform sampler2D u_frame0; //Scene
-
+uniform sampler2D u_frame1; //Bloom
 
 float bloomCalculation(float x, float A, float B, float C, float D, float E, float F)
 {
@@ -131,7 +131,8 @@ void main() {
 		
     float u_Temperature = 6500.0;
 
-	vec3 toneMappedColor = texture(u_frame0, fs_UV).xyz * ColorTemperatureToRGB(u_Temperature);
+    vec2 reverseUV = vec2(fs_UV.x, 1.0 - fs_UV.y);
+	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + texture(u_frame1, reverseUV).xyz) * ColorTemperatureToRGB(u_Temperature);
 
 	out_Col = vec4( RomBinDaHouseToneMapping(toneMappedColor), 1.0);
 }
