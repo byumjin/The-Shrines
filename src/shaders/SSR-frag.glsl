@@ -211,13 +211,18 @@ void main() {
 
 	//We are not going to make inner pool scene. Thus, this is fine
 	
+	vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
+	SkyColor = pow(SkyColor, vec4(2.2));
+
 	if(!bHit) //SkyBox
 	{
-		vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
-		SkyColor = pow(SkyColor, vec4(2.2));
-
 		reflectionColor = SkyColor;
 		fadeFactor = 1.0;		
+	}
+	else
+	{
+		if(!trans)
+			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);		
 	}
 	
 
