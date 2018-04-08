@@ -365,7 +365,7 @@ class OpenGLRenderer {
   }
 
 
-  renderToGBuffer(camera: Camera, gbProg: ShaderProgram, drawables: Array<Drawable>) {
+  renderToGBuffer(camera: Camera, gbProg: ShaderProgram, leafProg: ShaderProgram, barkProg: ShaderProgram, drawables: Array<Drawable>) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.gBuffer);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.enable(gl.DEPTH_TEST);
@@ -387,14 +387,50 @@ class OpenGLRenderer {
 
     gbProg.setTime(this.currentTime);
 
+    // Tree Render
+    leafProg.setViewProjMatrix(viewProj);
+    leafProg.setGeometryColor(color);
+    leafProg.setViewMatrix(view);
+    leafProg.setProjMatrix(proj);
+
+    leafProg.setTime(this.currentTime);
+
+    barkProg.setViewProjMatrix(viewProj);
+    barkProg.setGeometryColor(color);
+    barkProg.setViewMatrix(view);
+    barkProg.setProjMatrix(proj);
+
+    barkProg.setTime(this.currentTime);
+
     for (let drawable of drawables) {
+      if(drawable.type == 0){
+        gbProg.setModelMatrix(drawable.modelMat);
+        gbProg.bindTexToUnit("AlbedoMap", drawable.albedoMap, 0);
+        gbProg.bindTexToUnit("SpecularMap", drawable.specularMap, 1);
+        gbProg.bindTexToUnit("NormalMap", drawable.normalMap, 2);
 
-      gbProg.setModelMatrix(drawable.modelMat);
-      gbProg.bindTexToUnit("AlbedoMap", drawable.albedoMap, 0);
-      gbProg.bindTexToUnit("SpecularMap", drawable.specularMap, 1);
-      gbProg.bindTexToUnit("NormalMap", drawable.normalMap, 2);
+        gbProg.draw(drawable);
+      }
+      else if(drawable.type == 1){
+        //Leaf
+        leafProg.setModelMatrix(drawable.modelMat);
+        leafProg.setCenter(drawable.center);
+        leafProg.bindTexToUnit("AlbedoMap", drawable.albedoMap, 0);
+        leafProg.bindTexToUnit("SpecularMap", drawable.specularMap, 1);
+        leafProg.bindTexToUnit("NormalMap", drawable.normalMap, 2);
 
-      gbProg.draw(drawable);
+        leafProg.draw(drawable);
+      }
+      else if(drawable.type == 2){
+        //Bark
+        barkProg.setModelMatrix(drawable.modelMat);
+        barkProg.setCenter(drawable.center);
+        barkProg.bindTexToUnit("AlbedoMap", drawable.albedoMap, 0);
+        barkProg.bindTexToUnit("SpecularMap", drawable.specularMap, 1);
+        barkProg.bindTexToUnit("NormalMap", drawable.normalMap, 2);
+
+        barkProg.draw(drawable);
+      }
     }
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -402,7 +438,7 @@ class OpenGLRenderer {
 
   }
 
-  renderToShadowDepth(camera: Camera, shadowProg: ShaderProgram, lightViewProjMat : mat4, drawables: Array<Drawable>){
+  renderToShadowDepth(camera: Camera, shadowProg: ShaderProgram, leafProg: ShaderProgram, barkProg: ShaderProgram, lightViewProjMat : mat4, drawables: Array<Drawable>){
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ShadowPass]);
 
     gl.clearDepth(1.0);
@@ -412,11 +448,31 @@ class OpenGLRenderer {
     gl.viewport(0, 0, gShadowMapSize, gShadowMapSize);
        
     shadowProg.setViewProjMatrix(lightViewProjMat);
+    leafProg.setViewProjMatrix(lightViewProjMat);
+    leafProg.setTime(this.currentTime);
+    barkProg.setViewProjMatrix(lightViewProjMat);
+    barkProg.setTime(this.currentTime);
 
     for (var i =0; i< drawables.length ; i++)
     {
-      shadowProg.setModelMatrix(drawables[i].modelMat);  
-      shadowProg.draw(drawables[i]);
+      if(drawables[i].type == 0){
+        shadowProg.setModelMatrix(drawables[i].modelMat);
+        shadowProg.draw(drawables[i]);
+      }
+      else if(drawables[i].type == 1){
+        //Leaf
+        leafProg.setModelMatrix(drawables[i].modelMat);
+        leafProg.setCenter(drawables[i].center);
+
+        leafProg.draw(drawables[i]);
+      }
+      else if(drawables[i].type == 2){
+        //Bark
+        barkProg.setModelMatrix(drawables[i].modelMat);
+        barkProg.setCenter(drawables[i].center);
+
+        barkProg.draw(drawables[i]);
+      }
     }
 
     // bind default frame buffer

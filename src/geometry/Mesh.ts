@@ -1,8 +1,9 @@
-import {vec3, vec4} from 'gl-matrix';
+import {vec3, vec4, mat4} from 'gl-matrix';
 import Drawable from '../rendering/gl/Drawable';
 import {gl} from '../globals';
 import Texture from '../rendering/gl/Texture';
 import * as Loader from 'webgl-obj-loader';
+import {PlyLoader} from './PlyLoaders';
 
 class Mesh extends Drawable {
   indices: Uint32Array;
@@ -10,7 +11,6 @@ class Mesh extends Drawable {
   normals: Float32Array;
   colors: Float32Array;
   uvs: Float32Array;
-  center: vec4;
 
   objString: string;
 
@@ -26,6 +26,9 @@ class Mesh extends Drawable {
   }
 
   create() {  
+    //Update Model Matrix
+    mat4.translate(this.modelMat, this.modelMat, vec3.fromValues(this.center[0],this.center[1],this.center[2]));
+    
     let posTemp: Array<number> = [];
     let norTemp: Array<number> = [];
     let uvsTemp: Array<number> = [];
@@ -88,6 +91,86 @@ class Mesh extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
 
     console.log(`Created Mesh from OBJ`);
+    this.objString = ""; // hacky clear
+  }
+
+  createByPly(type:number){
+    this.type = type;
+    //Update Model Matrix
+    mat4.translate(this.modelMat, this.modelMat, vec3.fromValues(this.center[0],this.center[1],this.center[2]));
+    
+    let posTemp: Array<number> = [];
+    let norTemp: Array<number> = [];
+    let colTemp: Array<number> = [];
+    let uvsTemp: Array<number> = [];
+    let idxTemp: Array<number> = [];
+
+    var PLYLoader = new PlyLoader();
+    PLYLoader.load(this.objString);
+
+    //posTemp = loadedMesh.vertices;
+    let idx = 0;
+    for (var i = 0; i < PLYLoader.arrayVertex.length; i++) {
+      posTemp.push(PLYLoader.arrayVertex[i]);
+      if (i % 3 == 2) {
+        posTemp.push(1.0);
+        idxTemp.push(idx);
+        idx ++;
+      }
+    }
+
+    for (var i = 0; i < PLYLoader.arrayNormal.length; i++) {
+      norTemp.push(PLYLoader.arrayNormal[i]);
+      if (i % 3 == 2) norTemp.push(0.0);
+    }
+
+    for (var i = 0; i < PLYLoader.arrayColor.length; i++) {
+      colTemp.push(PLYLoader.arrayColor[i]/255);
+      if (i % 3 == 2) colTemp.push(1.0);
+    }
+
+    for (var i = 0; i < PLYLoader.arrayTexture.length; i++) {
+      if(i % 2 == 0)
+        uvsTemp.push(PLYLoader.arrayTexture[i]);
+      else
+        uvsTemp.push(-PLYLoader.arrayTexture[i] + 1.0); //V filpped
+    }
+
+    // white vert color for now
+    this.colors = new Float32Array(posTemp.length);
+    for (var i = 0; i < posTemp.length; ++i){
+      this.colors[i] = 1.0;
+    }
+
+    this.indices = new Uint32Array(idxTemp);
+    this.normals = new Float32Array(norTemp);
+    this.positions = new Float32Array(posTemp);
+    this.colors = new Float32Array(colTemp);
+    this.uvs = new Float32Array(uvsTemp);
+
+    this.generateIdx();
+    this.generatePos();
+    this.generateNor();
+    this.generateUV();
+    this.generateCol();
+
+    this.count = this.indices.length;
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufNor);
+    gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
+    gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUV);
+    gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
+
+    console.log(`Created Mesh from PLY`);
     this.objString = ""; // hacky clear
   }
 };

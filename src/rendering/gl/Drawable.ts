@@ -1,8 +1,10 @@
-import {vec3, mat4} from 'gl-matrix';
+import {vec3, vec4, mat4} from 'gl-matrix';
 import {gl} from '../../globals';
 import Texture from '../../rendering/gl/Texture';
 
 abstract class Drawable {
+  type: number = 0;
+  center: vec4;
   count: number = 0;
 
   bufIdx: WebGLBuffer;

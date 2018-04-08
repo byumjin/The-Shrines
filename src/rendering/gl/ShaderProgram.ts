@@ -63,6 +63,7 @@ class ShaderProgram {
 
   unifLightViewProj: WebGLUniformLocation;
   unifShadowMap: WebGLUniformLocation;
+  unifCenter: WebGLUniformLocation;
 
   unifTexUnits: Map<string, WebGLUniformLocation>;
   
@@ -118,6 +119,8 @@ class ShaderProgram {
     
     this.unifLightViewProj = gl.getUniformLocation(this.prog, "u_LightViewProj");
     this.unifShadowMap = gl.getUniformLocation(this.prog, "u_ShadowMap");
+    
+    this.unifCenter = gl.getUniformLocation(this.prog, "u_Center");
 
     this.unifTexUnits = new Map<string, WebGLUniformLocation>();
   }
@@ -376,6 +379,14 @@ class ShaderProgram {
     this.use();
     if (this.unifSSRInfo !== -1) {
       gl.uniform4fv(this.unifSSRInfo, info);
+    }
+  }
+
+  setCenter(center: vec4)
+  {
+    this.use();
+    if (this.unifCenter !== -1) {
+      gl.uniform4fv(this.unifCenter, center);
     }
   }
 

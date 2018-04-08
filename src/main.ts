@@ -9,6 +9,7 @@ import {setGL} from './globals';
 import {readTextFile} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import Texture from './rendering/gl/Texture';
+import {PlyLoader, loadPLY} from './geometry/PlyLoaders';
 
 // Define an object with application parameters and button callbacks
 const controls = {
@@ -45,6 +46,16 @@ let mesh_B_Inner: Mesh;
 let obj_B_Glass: string;
 let mesh_B_Glass: Mesh;
 
+let ply_Leaf: string;
+let ply_Bark: string;
+let ply_Leaf2: string;
+let ply_Bark2: string;
+
+let mesh_Leaf: Mesh;
+let mesh_Bark: Mesh;
+let mesh_Leaf2: Mesh;
+let mesh_Bark2: Mesh;
+
 let skyCubeMap: Texture;
 
 
@@ -66,11 +77,15 @@ function loadOBJText() {
   obj_lake = readTextFile('./src/resources/objs/lake/models/lake.obj');
   obj_holodeck = readTextFile('./src/resources/objs/holodeck/models/holodeck.obj');
 
-  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter.obj');
+  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter_new.obj');
   obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner.obj');
-  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass.obj');
-}
+  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass_new.obj');
 
+  ply_Leaf = readTextFile('./src/resources/objs/tree/models/leaf01.ply');
+  ply_Bark = readTextFile('./src/resources/objs/tree/models/bark01.ply');
+  ply_Leaf2 = readTextFile('./src/resources/objs/tree/models/leaf02.ply');
+  ply_Bark2 = readTextFile('./src/resources/objs/tree/models/bark02.ply');
+}
 
 function loadScene() {
   square && square.destroy();
@@ -146,8 +161,28 @@ function loadScene() {
 
     mesh_B_Glass.scale(vec3.fromValues(3, 3, 3));
 
- 
-  
+// Create By PLY format
+   mesh_Leaf = new Mesh(ply_Leaf, vec3.fromValues(-50, 2, 25),
+    new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree0.png', false),
+    new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
+    new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree0.png', false));
+   mesh_Leaf.createByPly(1);
+   mesh_Bark = new Mesh(ply_Bark, vec3.fromValues(-50, 2, 25),
+    new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree0.png', false),
+    new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
+    new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree0.png', false));
+   mesh_Bark.createByPly(2);
+
+   mesh_Leaf2 = new Mesh(ply_Leaf2, vec3.fromValues(0,0,0),
+    new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree2.png', false),
+    new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
+    new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree2.png', false));
+   mesh_Leaf2.createByPly(1);
+   mesh_Bark2 = new Mesh(ply_Bark2, vec3.fromValues(0,0,0),
+    new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree2.png', false),
+    new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
+    new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree2.png', false));
+   mesh_Bark2.createByPly(2);
 }
 
 
@@ -201,6 +236,20 @@ function main() {
 
   standardDeferred.setupTexUnits(["AlbedoMap", "SpecularMap", "NormalMap"]);
 
+  const leafDeferred = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/leaf-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/standard-frag.glsl')),
+    ]);
+
+  leafDeferred.setupTexUnits(["AlbedoMap", "SpecularMap", "NormalMap"]);
+
+  const barkDeferred = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/bark-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/standard-frag.glsl')),
+    ]);
+
+  barkDeferred.setupTexUnits(["AlbedoMap", "SpecularMap", "NormalMap"]);
+
 
   const translucentDeferred = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/standard-vert.glsl')),
@@ -213,6 +262,17 @@ function main() {
       new Shader(gl.VERTEX_SHADER, require('./shaders/standard-vert.glsl')),
       new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
       ]);
+
+  const leafShadowMapping = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/leaf-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
+    ]);
+
+
+  const barkShadowMapping = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/bark-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
+    ]);
 
   let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0);
   let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
@@ -250,8 +310,8 @@ function main() {
     renderer.clear();
     renderer.clearGB();
 
-    renderer.renderToGBuffer(camera, standardDeferred, [mesh_B_Outter, mesh_B_Inner, mesh1]);
-    renderer.renderToShadowDepth(camera, standardShadowMapping, lightViewProj, [mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh1]);
+    renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
     renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
