@@ -250,8 +250,8 @@ function main() {
     renderer.clear();
     renderer.clearGB();
 
-    renderer.renderToGBuffer(camera, standardDeferred, [mesh_B_Outter, mesh1]);
-    renderer.renderToShadowDepth(camera, standardShadowMapping, lightViewProj, [mesh_B_Outter, mesh_B_Glass, mesh1]);
+    renderer.renderToGBuffer(camera, standardDeferred, [mesh_B_Outter, mesh_B_Inner, mesh1]);
+    renderer.renderToShadowDepth(camera, standardShadowMapping, lightViewProj, [mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh1]);
     renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);

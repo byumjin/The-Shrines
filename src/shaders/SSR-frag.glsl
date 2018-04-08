@@ -211,13 +211,30 @@ void main() {
 
 	//We are not going to make inner pool scene. Thus, this is fine
 	
+	vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
+	SkyColor = pow(SkyColor, vec4(2.2));
+
 	if(!bHit) //SkyBox
 	{
-		vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
-		SkyColor = pow(SkyColor, vec4(2.2));
-
 		reflectionColor = SkyColor;
 		fadeFactor = 1.0;		
+	}
+	else
+	{
+		if(!trans)
+			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);			
+	}
+
+	if(bWater)
+	{
+		//fresnel
+		float NoV = clamp( dot(-viewVec.xyz, WorldNormal.xyz), 0.0, 1.0);
+		NoV = 1.0 - NoV;
+
+		vec3 reflVec = reflect(viewVec, WorldNormal.xyz);
+        vec4 skyCol = texture(u_SkyCubeMap, reflVec);
+
+		reflectionColor += SkyColor * pow(NoV, 20.0) * 3.0;
 	}
 	
 

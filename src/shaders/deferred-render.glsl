@@ -141,7 +141,8 @@ void main() {
 	if(depth >= 1.0) //SkyBox
 	{			
 		 //inverse gamma correct
-		vec4 col = texture(u_SkyCubeMap, -viewVec);
+		vec3 reflVec = reflect(-viewVec, normal.xyz);
+		vec4 col = texture(u_SkyCubeMap, reflVec);
     	col = pow(col, vec4(2.2));
 		out_Col = col;
 		out_Col.w = 1.0;
