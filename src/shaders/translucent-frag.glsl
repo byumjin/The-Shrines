@@ -170,16 +170,9 @@ void main() {
 
 		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
 
-        float Opacity = 0.1;
+        float Opacity = 0.1;		
 
-		//fresnel
-		float NoV = clamp( dot(viewVec.xyz, normal.xyz), 0.0, 1.0);
-		NoV = 1.0 - NoV;
-
-		vec3 reflVec = reflect(-viewVec, normal.xyz);
-        vec4 skyCol = texture(u_SkyCubeMap, reflVec);
-
-		fragColor[0] = vec4( (bWater ? (pbrColor.xyz + skyCol.xyz * pow(NoV, 20.0) * 3.0 )  : pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
+		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
         
 		fragColor[1] = vec4(normal.xyz, Roughness);
 

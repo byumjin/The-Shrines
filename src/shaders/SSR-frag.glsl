@@ -222,7 +222,19 @@ void main() {
 	else
 	{
 		if(!trans)
-			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);		
+			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);			
+	}
+
+	if(bWater)
+	{
+		//fresnel
+		float NoV = clamp( dot(-viewVec.xyz, WorldNormal.xyz), 0.0, 1.0);
+		NoV = 1.0 - NoV;
+
+		vec3 reflVec = reflect(viewVec, WorldNormal.xyz);
+        vec4 skyCol = texture(u_SkyCubeMap, reflVec);
+
+		reflectionColor += SkyColor * pow(NoV, 20.0) * 3.0;
 	}
 	
 
