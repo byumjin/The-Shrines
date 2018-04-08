@@ -139,7 +139,8 @@ void main() {
 
 	if(depth >= 1.0) //SkyBox
 	{			
-        vec4 col = texture(u_SkyCubeMap, -viewVec);
+		vec3 reflVec = reflect(-viewVec, normal.xyz);
+        vec4 col = texture(u_SkyCubeMap, reflVec);
     	col = pow(col, vec4(2.2));
 
 		fragColor[0] = col;
@@ -171,8 +172,16 @@ void main() {
 
         float Opacity = 0.1;
 
-		fragColor[0] = vec4(pbrColor.xyz * Opacity, bWater ? (Depth + 20.0) : Depth);
-        fragColor[1] = vec4(normal.xyz, Roughness);
+		//fresnel
+		float NoV = clamp( dot(viewVec.xyz, normal.xyz), 0.0, 1.0);
+		NoV = 1.0 - NoV;
+
+		vec3 reflVec = reflect(-viewVec, normal.xyz);
+        vec4 skyCol = texture(u_SkyCubeMap, reflVec);
+
+		fragColor[0] = vec4( (bWater ? (pbrColor.xyz + skyCol.xyz * pow(NoV, 20.0) * 3.0 )  : pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
+        
+		fragColor[1] = vec4(normal.xyz, Roughness);
 
 	}
 }
