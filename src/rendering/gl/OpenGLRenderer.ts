@@ -1,4 +1,4 @@
-import {mat4, vec4, vec3} from 'gl-matrix';
+import {mat4, vec4, vec3, vec2} from 'gl-matrix';
 import Drawable from './Drawable';
 import Camera from '../../Camera';
 import {gl} from '../../globals';
@@ -10,7 +10,7 @@ import Square from '../../geometry/Square';
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
-const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "ShadowPass": 4,
+const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "ShadowPass": 4, "ExtractHighLight" : 5, "HorizonBlur" : 6, "VerticalBlur" : 7,
                      "ToneMapping": 0};
 
 
@@ -53,6 +53,8 @@ class OpenGLRenderer {
 
   SSRDownSampling: number = 0.5;
 
+  BloomDownSampling: number = 0.25;
+
   // the shader that renders from the gbuffers into the postbuffers
   deferredShader :  PostProcess = new PostProcess(
     new Shader(gl.FRAGMENT_SHADER, require('../../shaders/deferred-render.glsl'))
@@ -62,20 +64,32 @@ class OpenGLRenderer {
     new Shader(gl.FRAGMENT_SHADER, require('../../shaders/translucentAdd-frag.glsl'))
     );
 
-  // shader that maps 32-bit color to 8-bit color
+  
   SSRPass : PostProcess = new PostProcess(
     new Shader(gl.FRAGMENT_SHADER, require('../../shaders/SSR-frag.glsl'))
     );
   
-  // shader that maps 32-bit color to 8-bit color
+ 
   SSRMipPass : PostProcess = new PostProcess(
     new Shader(gl.FRAGMENT_SHADER, require('../../shaders/SSRMip-frag.glsl'))
     );
 
-  // shader that maps 32-bit color to 8-bit color
+
   savePass : PostProcess = new PostProcess(
       new Shader(gl.FRAGMENT_SHADER, require('../../shaders/save-frag.glsl'))
    );
+
+  highLightPass : PostProcess = new PostProcess(
+    new Shader(gl.FRAGMENT_SHADER, require('../../shaders/highLight-frag.glsl'))
+ );
+
+ VblurPass : PostProcess = new PostProcess(
+  new Shader(gl.FRAGMENT_SHADER, require('../../shaders/Blur_Vertical-frag.glsl'))
+);
+
+HblurPass : PostProcess = new PostProcess(
+  new Shader(gl.FRAGMENT_SHADER, require('../../shaders/Blur_Horizontal-frag.glsl'))
+);
 
   // shader that maps 32-bit color to 8-bit color
   tonemapPass : PostProcess = new PostProcess(
@@ -106,8 +120,8 @@ class OpenGLRenderer {
     this.post8Targets = [undefined, undefined];
     this.post8Passes = [];
 
-    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined];
-    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
     this.post32Passes = [];
 
     if (!gl.getExtension("OES_texture_float_linear")) {
@@ -308,6 +322,16 @@ class OpenGLRenderer {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gShadowMapSize, gShadowMapSize, 0, gl.RGBA, gl.FLOAT, null); 
+      }
+      else if(i == PipelineEnum.HorizonBlur){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling, 0, gl.RGBA, gl.FLOAT, null); 
+      }
+      else if(i == PipelineEnum.VerticalBlur){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling, 0, gl.RGBA, gl.FLOAT, null); 
       }
       else
       {
@@ -667,6 +691,61 @@ class OpenGLRenderer {
 
   }
 
+  renderforHighLightCurrentFrame(camera: Camera) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ExtractHighLight]);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.disable(gl.DEPTH_TEST);
+    
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    this.highLightPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
+   
+    this.highLightPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
+  }
+
+  renderforHorizontalBlur(camera: Camera, index : number) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.HorizonBlur]);
+    gl.viewport(0, 0, gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling);
+    gl.disable(gl.DEPTH_TEST);
+    
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    this.HblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) )
+
+    if(index == 0)
+      this.HblurPass.setFrame00(this.post32Targets[PipelineEnum.ExtractHighLight]);
+    else
+      this.HblurPass.setFrame00(this.post32Targets[PipelineEnum.VerticalBlur]);
+
+    this.HblurPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
+  }
+
+  renderforVerticalBlur(camera: Camera) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.VerticalBlur]);
+    gl.viewport(0, 0, gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling);
+    gl.disable(gl.DEPTH_TEST);
+    
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    this.VblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) )
+    this.VblurPass.setFrame00(this.post32Targets[PipelineEnum.HorizonBlur]);
+   
+    this.VblurPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
+  }
+
+
+
+  
+
   renderTonemapping(camera: Camera) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.ToneMapping]);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -676,6 +755,7 @@ class OpenGLRenderer {
     
 
     this.tonemapPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
+    this.tonemapPass.setFrame01(this.post32Targets[PipelineEnum.VerticalBlur]);
    
     this.tonemapPass.draw();
     // bind default frame buffer
@@ -691,7 +771,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00(this.post32Targets[PipelineEnum.SSR]);
+    //this.presentPass.setFrame00(this.post32Targets[PipelineEnum.VerticalBlur]);
     this.presentPass.draw();
 
     // bind default frame buffer

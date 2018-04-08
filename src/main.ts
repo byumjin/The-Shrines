@@ -103,7 +103,7 @@ function loadScene() {
   square.create();
 
   mesh0 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
-   new Texture('./src/resources/objs/mario/textures/wahoo.bmp', false),
+   new Texture('./src/resources/objs/mario/textures/wahoo.png', false),
     new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
      new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
   mesh0.create();
@@ -111,7 +111,7 @@ function loadScene() {
   mesh0.translate( vec3.fromValues(-100.0, 30.0, 0.0) );
 
   mesh1 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
-  new Texture('./src/resources/objs/mario/textures/wahoo.bmp', false),
+  new Texture('./src/resources/objs/mario/textures/wahoo.png', false),
    new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
     new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
   mesh1.create();
@@ -323,6 +323,17 @@ function main() {
     renderer.renderSSRMip();
 
     renderer.renderforSavingCurrentFrame(camera);
+
+    renderer.renderforHighLightCurrentFrame(camera);
+
+    for(var  i = 0; i< 16; i++)
+    {
+      renderer.renderforHorizontalBlur(camera, i);
+      renderer.renderforVerticalBlur(camera);
+    }
+   
+
+
     renderer.renderTonemapping(camera);
    
     renderer.renderPresent(camera);

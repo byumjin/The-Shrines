@@ -149,30 +149,39 @@ void main() {
 	}
 	else
 	{
-		vec4 diffuseColor = vec4(albedo.xyz, 1.0);
+			vec4 diffuseColor = vec4(albedo.xyz, 1.0);
 
-		float diffuseTerm = clamp( dot(lightDir, normal.xyz), 0.0, 1.0);
+			float diffuseTerm = clamp( dot(lightDir, normal.xyz), 0.0, 1.0);
+			
+			halfVec = normalize(halfVec);
+			
+			float LoH = clamp(dot( lightDir, halfVec ), 0.0, 1.0);
+
+			vec3 specularTerm = vec3(0.0);
+			vec3 SpecularColor = specular.xyz;
+			
+			float energyConservation = 1.0 - Roughness * Roughness;
+
+			specularTerm = GGX_Spec(normal.xyz, halfVec, Roughness, diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, Roughness)) *energyConservation;
+
+			//specularTerm = clamp(specularTerm, 0.0, 2.0);
+
+			float ambientTerm = 0.1;
+
+			vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
+
+			pbrColor.xyz *= shadow * u_lightColor.xyz * u_lightColor.w;
+
+			out_Col = vec4(pbrColor.xyz, depth);
+
+			//Emissive
+			if(normal.a > 0.8)
+			{
+				out_Col.xyz += albedo.xyz;
+			}
 		
-		halfVec = normalize(halfVec);
+
 		
-		float LoH = clamp(dot( lightDir, halfVec ), 0.0, 1.0);
-
-		vec3 specularTerm = vec3(0.0);
-		vec3 SpecularColor = specular.xyz;
-		
-		float energyConservation = 1.0 - Roughness * Roughness;
-
-		specularTerm = GGX_Spec(normal.xyz, halfVec, Roughness, diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, Roughness)) *energyConservation;
-
-		//specularTerm = clamp(specularTerm, 0.0, 2.0);
-
-		float ambientTerm = 0.1;
-
-		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
-
-		pbrColor.xyz *= shadow * u_lightColor.xyz * u_lightColor.w;
-
-		out_Col = vec4(pbrColor.xyz, depth);
 	}
 
 	
