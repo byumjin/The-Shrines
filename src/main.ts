@@ -77,9 +77,9 @@ function loadOBJText() {
   obj_lake = readTextFile('./src/resources/objs/lake/models/lake.obj');
   obj_holodeck = readTextFile('./src/resources/objs/holodeck/models/holodeck.obj');
 
-  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter_new.obj');
+  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter.obj');
   obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner.obj');
-  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass_new.obj');
+  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass.obj');
 
   ply_Leaf = readTextFile('./src/resources/objs/tree/models/leaf01.ply');
   ply_Bark = readTextFile('./src/resources/objs/tree/models/bark01.ply');
