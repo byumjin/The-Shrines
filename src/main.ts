@@ -9,7 +9,7 @@ import {setGL} from './globals';
 import {readTextFile} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import Texture from './rendering/gl/Texture';
-import {PlyLoader, loadPLY} from './geometry/PlyLoaders';
+import {PlyLoader} from './geometry/PlyLoaders';
 
 // Define an object with application parameters and button callbacks
 const controls = {
