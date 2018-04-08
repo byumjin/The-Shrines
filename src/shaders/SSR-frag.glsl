@@ -190,7 +190,7 @@ void main() {
 					break;
 				}
 
-				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), clamp(u_deltaTime * 40.0, 0.0, 1.0) ); //temporal Blend
+				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), 0.5 ); //temporal Blend
 				//reflectionColor = texture(u_frame0, lerpedScreenSpaceCoords);
 				//reflectionColor = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
 
@@ -237,7 +237,7 @@ void main() {
 		vec3 reflVec = reflect(viewVec, WorldNormal.xyz);
         vec4 skyCol = texture(u_SkyCubeMap, reflVec);
 
-		reflectionColor += SkyColor * pow(NoV, 20.0) * 3.0;
+		reflectionColor += SkyColor * pow(NoV, 30.0) * 6.0;
 	}
 	
 
