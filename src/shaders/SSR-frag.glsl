@@ -169,7 +169,8 @@ void main() {
 				
 				vec2 lerpedScreenSpaceCoords = vec2((lerpedPos_SS.x + 1.0) * 0.5, ( lerpedPos_SS.y + 1.0)*0.5);
 
-				if(lerpedScreenSpaceCoords.x > 1.0 || lerpedScreenSpaceCoords.x < 0.0 || lerpedScreenSpaceCoords.y > 1.0 || lerpedScreenSpaceCoords.y < 0.0 || depth_SS >= 1.0)
+				//out of screen
+				if(lerpedScreenSpaceCoords.x > 1.0 || lerpedScreenSpaceCoords.x < 0.0 || lerpedScreenSpaceCoords.y > 1.0 || lerpedScreenSpaceCoords.y < 0.0 || lerpedPos_SS.z >= 1.0)
 				{
 					reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -177,6 +178,7 @@ void main() {
 					bHit = true;
 					break;
 				}
+
 
 				if( dot(relfectVec, texture(u_Gbuffer_Specular, lerpedScreenSpaceCoords).xyz) > 0.0 || dot(relfectVec, -viewVec ) > 0.0 )
 				{					
@@ -189,6 +191,7 @@ void main() {
 				}
 
 				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), clamp(u_deltaTime * 40.0, 0.0, 1.0) ); //temporal Blend
+				//reflectionColor = texture(u_frame0, lerpedScreenSpaceCoords);
 				//reflectionColor = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
 
 				fadeFactor = fade(lerpedScreenSpaceCoords);
