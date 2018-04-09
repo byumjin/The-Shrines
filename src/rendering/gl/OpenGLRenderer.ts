@@ -481,6 +481,8 @@ HblurPass : PostProcess = new PostProcess(
     {
       if(drawables[i].type == 0){
         shadowProg.setModelMatrix(drawables[i].modelMat);
+
+        shadowProg.setAlbedoMap( drawables[i].albedoMap.texture );
         shadowProg.draw(drawables[i]);
       }
       else if(drawables[i].type == 1){
@@ -488,11 +490,14 @@ HblurPass : PostProcess = new PostProcess(
         leafProg.setModelMatrix(drawables[i].modelMat);
         leafProg.setCenter(drawables[i].center);
 
+        leafProg.setAlbedoMap( drawables[i].albedoMap.texture );
         leafProg.draw(drawables[i]);
       }
       else if(drawables[i].type == 2){
         //Bark
         barkProg.setModelMatrix(drawables[i].modelMat);
+
+        barkProg.setAlbedoMap( drawables[i].albedoMap.texture );
         barkProg.setCenter(drawables[i].center);
 
         barkProg.draw(drawables[i]);
