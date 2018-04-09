@@ -31,8 +31,14 @@ void main() {
 	
 	vec3 finalColor = vec3(0.0);
 
+	if(clamp(SSRMask, 0.0, 1.0) <= 0.0)
+		finalColor = sceneImagecolor;
+	else
+		finalColor = SSRMipColor.xyz + sceneImagecolor;
+		
 	//finalColor = SSRMipColor.xyz * clamp(SSRMask, 0.0, 1.0) + sceneImagecolor;// mix(sceneImagecolor, SSRColor + sceneImagecolor, SSRMask);
-	finalColor = SSRMipColor.xyz + sceneImagecolor;
+	//finalColor = SSRMipColor.xyz + sceneImagecolor;
+
 
 	out_Col = vec4( finalColor, 1.0);
 }

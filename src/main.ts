@@ -15,9 +15,11 @@ import {PlyLoader} from './geometry/PlyLoaders';
 const controls = {
    
   SSR_MaxStep : 128,
-  SSR_Opaque_Intensity : 0.1,
-  SSR_Trans_Intensity : 0.2,
-  SSR_Threshold : 1.0
+  SSR_Opaque_Intensity : 0.05,
+  SSR_Trans_Intensity : 0.1,
+  SSR_Threshold : 0.5,
+
+  Bloom_Iteration : 12,
   
 };
 
@@ -98,7 +100,7 @@ function loadScene() {
   skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 3);
   skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 4);
   skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 5);
-  
+
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
 
@@ -205,6 +207,10 @@ function main() {
   SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 0.2).step(0.01);
   SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.01);
   SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
+
+  var BLOOM = gui.addFolder('BLOOM');  
+  BLOOM.add(controls, 'Bloom_Iteration', 0, 32).step(1);
+  
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -327,7 +333,7 @@ function main() {
 
     renderer.renderforHighLightCurrentFrame(camera);
 
-    for(var  i = 0; i< 16; i++)
+    for(var  i = 0; i< controls.Bloom_Iteration; i++)
     {
       renderer.renderforHorizontalBlur(camera, i);
       renderer.renderforVerticalBlur(camera);

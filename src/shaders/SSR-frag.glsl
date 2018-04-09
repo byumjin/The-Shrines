@@ -86,7 +86,7 @@ void main() {
 	vec4 reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 	float threshold = 2.0;
-	float stepSize =  (1.0 + roughness) * (bWater ? u_SSRInfo.w * 10.0 : u_SSRInfo.w);
+	float stepSize =  (1.0 + roughness) * (bWater ? u_SSRInfo.w * 20.0 : u_SSRInfo.w);
 	float prevDepth;
 	float prevDepthFromDepthBuffer;
 
@@ -182,6 +182,7 @@ void main() {
 				}
 
 				//reflection with backface
+				/*
 				if( dot(relfectVec, texture(u_Gbuffer_Specular, lerpedScreenSpaceCoords).xyz) > 0.0 || dot(relfectVec, -viewVec ) > 0.0 )
 				{					
 
@@ -191,6 +192,7 @@ void main() {
 					bHit = true;
 					break;
 				}
+				*/
 
 				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), 0.5 ); //temporal Blend
 				//reflectionColor = texture(u_frame0, lerpedScreenSpaceCoords);
@@ -239,14 +241,14 @@ void main() {
 		vec3 reflVec = reflect(viewVec, WorldNormal.xyz);
         vec4 skyCol = texture(u_SkyCubeMap, reflVec);
 
-		reflectionColor += SkyColor * pow(NoV, 30.0) * 6.0;
+		reflectionColor += SkyColor * pow(NoV, 30.0) * 10.0;
 	}
 	
 
 	float energyConservation = 1.0 - roughness * roughness;
 
 	out_Col = reflectionColor * Intensity * energyConservation;
-	out_Col = out_Col;//clamp(out_Col, 0.0, 1.0);
+	out_Col = clamp(out_Col, 0.0, 1.0);
 
 	out_Col.w = fadeFactor; //SSR_Mask
 
