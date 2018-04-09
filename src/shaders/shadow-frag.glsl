@@ -25,8 +25,8 @@ void main() {
 
     float depth = POS.z;
     // VSM
- //    float dx = dFdx(depth);
-	// float dy = dFdy(depth);
- //    out_Color = vec4(depth, pow(depth, 2.0) + 0.25*(dx*dx + dy*dy), 0.0, 1.0);
- 	out_Color = vec4(depth, 0.0, 0.0, 1.0);
+    float dx = dFdx(POS.z);
+	float dy = dFdy(POS.z);
+    out_Color = vec4(depth, dx, dy, 1.0);
+ 	// out_Color = vec4(depth, 0.0, 0.0, 1.0);
 }

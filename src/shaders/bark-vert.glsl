@@ -47,8 +47,8 @@ void main()
 	vPos -= objectPosition;	// Reset the vertex to base-zero
 	//Wind
 	vec3 wind_dir = normalize(vec3(0.5, 0, 0));
-    float wind_speed = 8.0;
-    float wave_division_width = 5.0;
+    float wind_speed = 1.0;
+    float wave_division_width = 1.0;
     float wave_info = (cos((dot(objectPosition, wind_dir) - wind_speed * u_Time) / wave_division_width) + 0.7);
 	
 	float wind_power = 15.0f;

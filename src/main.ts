@@ -83,7 +83,7 @@ function loadOBJText() {
   obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner.obj');
   obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass.obj');
 
-  ply_Leaf = readTextFile('./src/resources/objs/tree/models/leaf01.ply');
+  ply_Leaf = readTextFile('./src/resources/objs/tree/models/pruned_leaf01.ply');
   ply_Bark = readTextFile('./src/resources/objs/tree/models/bark01.ply');
   ply_Leaf2 = readTextFile('./src/resources/objs/tree/models/leaf02.ply');
   ply_Bark2 = readTextFile('./src/resources/objs/tree/models/bark02.ply');
