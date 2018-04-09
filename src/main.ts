@@ -165,7 +165,7 @@ function loadScene() {
 
 // Create By PLY format
    mesh_Leaf = new Mesh(ply_Leaf, vec3.fromValues(-50, 2, 25),
-    new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree0.png', false),
+    new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree22.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree0.png', false));
    mesh_Leaf.createByPly(1);
