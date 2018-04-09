@@ -8,6 +8,8 @@ out vec4 out_Col;
 
 uniform sampler2D u_frame0; //Scene
 uniform sampler2D u_frame1; //Bloom
+uniform vec2 u_screenSize;
+uniform vec4 u_chromaticInfo; //x:dispersal, y:distortion
 
 float bloomCalculation(float x, float A, float B, float C, float D, float E, float F)
 {
@@ -126,13 +128,34 @@ vec3 RGBtoHSL(vec3 RGB)
     return vec3(HCV.x, S, L);
 }
 
+vec4 textureDistorted(sampler2D tex, vec2 texcoord,  vec2 direction, // direction of distortion
+              vec3 distortion)
+  {
+    return vec4
+      (
+		texture(tex, texcoord + direction * distortion.r).r,
+		texture(tex, texcoord + direction * distortion.g).g,
+		texture(tex, texcoord + direction * distortion.b).b,
+        0.0
+      );
+  }
 
 void main() {
 		
     float u_Temperature = 6500.0;
 
     vec2 reverseUV = vec2(fs_UV.x, 1.0 - fs_UV.y);
-	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + texture(u_frame1, reverseUV).xyz) * ColorTemperatureToRGB(u_Temperature);
+
+     vec3 distortion = vec3(-1.0/u_screenSize.x * u_chromaticInfo.y, 0.0, 1.0/u_screenSize.x * u_chromaticInfo.y);  
+    // ghost vector to image centre:
+
+    vec2 ghostVec = (vec2(0.5, 0.5) - reverseUV) * u_chromaticInfo.x;
+    
+    vec3 direction = normalize(vec3(ghostVec, 0.0));
+
+    vec3 bloomColor = textureDistorted(u_frame1, reverseUV, direction.xy, distortion).xyz;
+
+	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + bloomColor) * ColorTemperatureToRGB(u_Temperature);
 
 	out_Col = vec4( RomBinDaHouseToneMapping(toneMappedColor), 1.0);
 }

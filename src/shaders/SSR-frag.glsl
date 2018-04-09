@@ -232,18 +232,6 @@ void main() {
 			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);			
 	}
 
-	if(bWater)
-	{
-		//fresnel
-		float NoV = clamp( dot(-viewVec.xyz, WorldNormal.xyz), 0.0, 1.0);
-		NoV = 1.0 - NoV;
-
-		vec3 reflVec = reflect(viewVec, WorldNormal.xyz);
-        vec4 skyCol = texture(u_SkyCubeMap, reflVec);
-
-		reflectionColor += SkyColor * pow(NoV, 30.0) * 10.0;
-	}
-	
 
 	float energyConservation = 1.0 - roughness * roughness;
 

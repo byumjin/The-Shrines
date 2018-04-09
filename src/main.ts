@@ -19,7 +19,10 @@ const controls = {
   SSR_Trans_Intensity : 0.1,
   SSR_Threshold : 0.5,
 
-  Bloom_Iteration : 12,
+  Bloom_Iteration : 16,
+  Bloom_Dispersal : 0.5,
+  Bloom_Distortion : 3.0,
+  
   
 };
 
@@ -210,7 +213,8 @@ function main() {
 
   var BLOOM = gui.addFolder('BLOOM');  
   BLOOM.add(controls, 'Bloom_Iteration', 0, 32).step(1);
-  
+  BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
+  BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -338,10 +342,8 @@ function main() {
       renderer.renderforHorizontalBlur(camera, i);
       renderer.renderforVerticalBlur(camera);
     }
-   
 
-
-    renderer.renderTonemapping(camera);
+    renderer.renderTonemapping(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion );
    
     renderer.renderPresent(camera);
     

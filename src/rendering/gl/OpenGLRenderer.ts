@@ -5,8 +5,6 @@ import {gl} from '../../globals';
 import ShaderProgram, {Shader} from './ShaderProgram';
 import PostProcess from './PostProcess'
 import Square from '../../geometry/Square';
-//import { fromValues } from 'gl-matrix/src/gl-matrix/mat2d';
-
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
@@ -754,7 +752,7 @@ HblurPass : PostProcess = new PostProcess(
 
   
 
-  renderTonemapping(camera: Camera) {
+  renderTonemapping(camera: Camera, dispersal : number, distortion : number) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.ToneMapping]);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.disable(gl.DEPTH_TEST);
@@ -764,7 +762,8 @@ HblurPass : PostProcess = new PostProcess(
 
     this.tonemapPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
     this.tonemapPass.setFrame01(this.post32Targets[PipelineEnum.VerticalBlur]);
-   
+    this.tonemapPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling));
+    this.tonemapPass.setChromaticInfo( vec4.fromValues(dispersal, distortion, 0.0, 0.0 ) );
     this.tonemapPass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    

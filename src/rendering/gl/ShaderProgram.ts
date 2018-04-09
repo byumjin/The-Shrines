@@ -66,6 +66,7 @@ class ShaderProgram {
   unifCenter: WebGLUniformLocation;
 
   unifScreenSize: WebGLUniformLocation;
+  unifChromaticInfo: WebGLUniformLocation;
 
   unifTexUnits: Map<string, WebGLUniformLocation>;
   
@@ -126,6 +127,7 @@ class ShaderProgram {
     this.unifCenter = gl.getUniformLocation(this.prog, "u_Center");
 
     this.unifScreenSize = gl.getUniformLocation(this.prog, "u_screenSize");
+    this.unifChromaticInfo = gl.getUniformLocation(this.prog, "u_chromaticInfo");
 
     this.unifTexUnits = new Map<string, WebGLUniformLocation>();
   }
@@ -299,6 +301,13 @@ class ShaderProgram {
     this.use();
     if (this.unifScreenSize !== -1) {
       gl.uniform2fv(this.unifScreenSize, screenSize);
+    }
+  }
+
+  setChromaticInfo(info: vec4){
+    this.use();
+    if (this.unifChromaticInfo !== -1) {
+      gl.uniform4fv(this.unifChromaticInfo, info);
     }
   }
 
