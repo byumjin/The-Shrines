@@ -5,6 +5,7 @@ in vec2 fs_UV;
 out vec4 out_Col;
 
 uniform sampler2D u_frame0; //Scene
+uniform sampler2D u_frame1; //Scene
 uniform float u_Time;
 
 float LinearDepth(float d)
@@ -16,9 +17,9 @@ float LinearDepth(float d)
 
 
 void main() {
+	vec2 ReUV = vec2(fs_UV.x, 1.0 - fs_UV.y);
+	
 	out_Col = texture(u_frame0, fs_UV);
-
-	//out_Col = vec4( LinearDepth(out_Col.a));
-
+	
 	out_Col.w = 1.0;
 }

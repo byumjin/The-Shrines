@@ -771,7 +771,8 @@ HblurPass : PostProcess = new PostProcess(
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00(this.post32Targets[PipelineEnum.VerticalBlur]);
+    //this.presentPass.setFrame00( this.tDTargets[0] /* this.post32Targets[PipelineEnum.SSR] */);
+    //this.presentPass.setFrame01( this.post32Targets[PipelineEnum.SceneImage] );
     this.presentPass.draw();
 
     // bind default frame buffer

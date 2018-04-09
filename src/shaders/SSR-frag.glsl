@@ -82,7 +82,7 @@ void main() {
 	vec3 relfectVec = reflect(viewVec , WorldNormal);
 
 	vec3 currentPos = worldPos.xyz;
-	vec3 prevPos;
+	vec3 prevPos = currentPos;
 	vec4 reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 	float threshold = 2.0;
@@ -159,9 +159,11 @@ void main() {
 				}
 
 				float lerpVal = (prevIndicatedLinearDepth - prevLinearDepth) / denom;
+
 				lerpVal = clamp(lerpVal, 0.0, 1.0);
 
 				lerpVal = sqrt(lerpVal);
+				//lerpVal = 1.0;
 				vec3 lerpedPos = prevPos + relfectVec * stepSize * lerpVal;
 
 				vec4 lerpedPos_SS = u_ViewProj * vec4(lerpedPos, 1.0);
@@ -179,7 +181,7 @@ void main() {
 					break;
 				}
 
-
+				//reflection with backface
 				if( dot(relfectVec, texture(u_Gbuffer_Specular, lerpedScreenSpaceCoords).xyz) > 0.0 || dot(relfectVec, -viewVec ) > 0.0 )
 				{					
 

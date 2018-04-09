@@ -15,8 +15,8 @@ import {PlyLoader} from './geometry/PlyLoaders';
 const controls = {
    
   SSR_MaxStep : 128,
-  SSR_Opaque_Intensity : 0.05,
-  SSR_Trans_Intensity : 0.1,
+  SSR_Opaque_Intensity : 0.1,
+  SSR_Trans_Intensity : 1.0,
   SSR_Threshold : 1.0
   
 };
@@ -167,18 +167,19 @@ function loadScene() {
     new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree0.png', false));
    mesh_Leaf.createByPly(1);
+   
    mesh_Bark = new Mesh(ply_Bark, vec3.fromValues(-50, 2, 25),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree0.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree0.png', false));
    mesh_Bark.createByPly(2);
 
-   mesh_Leaf2 = new Mesh(ply_Leaf2, vec3.fromValues(0,0,0),
+   mesh_Leaf2 = new Mesh(ply_Leaf2, vec3.fromValues(10,0,0),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree2.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree2.png', false));
    mesh_Leaf2.createByPly(1);
-   mesh_Bark2 = new Mesh(ply_Bark2, vec3.fromValues(0,0,0),
+   mesh_Bark2 = new Mesh(ply_Bark2, vec3.fromValues(10,0,0),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree2.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree2.png', false));
@@ -310,8 +311,8 @@ function main() {
     renderer.clear();
     renderer.clearGB();
 
-    renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
-    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+    renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [mesh1, mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [mesh1, mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
     renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);

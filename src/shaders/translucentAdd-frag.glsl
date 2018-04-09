@@ -74,7 +74,7 @@ void main() {
 	float transDepth =  texture(u_frame1, reverseUV).w;
 	vec4 transInfo = texture(u_frame2, reverseUV);
 
-	bool bWater = false;
+	bool bWater;
 
 	if(transDepth >= 19.0)
 	{
@@ -84,7 +84,7 @@ void main() {
 	else if(transDepth >= 9.0)
 	{
 		transDepth = transDepth - 10.0;
-		bWater = true;
+		bWater = false;
 	}
 	
 	

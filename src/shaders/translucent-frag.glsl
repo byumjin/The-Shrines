@@ -144,7 +144,7 @@ void main() {
     	col = pow(col, vec4(2.2));
 
 		fragColor[0] = col;
-        fragColor[0].w =  bWater ? 21.0 : 1.0;
+        fragColor[0].w =  bWater ? 21.0 : 11.0;
         fragColor[1] = vec4(normal.xyz, Roughness);
 	}
 	else
