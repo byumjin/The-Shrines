@@ -130,12 +130,18 @@ void main() {
 	float Roughness = specular.w;
 	Roughness = clamp(Roughness, 0.05, 0.95);
 
+	
+	
+
 	float depth = albedo.w;
 
     vec4 worldPos = u_Model * fs_Pos;
 
 	vec3 viewVec = normalize(u_CameraWPos - worldPos.xyz);
 	vec3 halfVec = viewVec + u_LightDir.xyz;
+
+	
+	
 
 	if(depth >= 1.0) //SkyBox
 	{			
@@ -162,7 +168,7 @@ void main() {
 		
 		float energyConservation = 1.0 - Roughness * Roughness;
 
-		specularTerm = GGX_Spec(normal.xyz, halfVec, Roughness, diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, Roughness)) *energyConservation;
+		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? 0.4 :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? 0.4 :Roughness))) * (bWater ? 0.86 : energyConservation);
 
 		//specularTerm = clamp(specularTerm, 0.0, 2.0);
 
@@ -170,11 +176,22 @@ void main() {
 
 		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
 
+		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
+
+		if(bWater)
+		{
+			//fresnel
+			float NoV = clamp( dot(viewVec.xyz, worldNormal), 0.0, 1.0);
+			NoV = 1.0 - NoV;
+			NoV = pow(NoV, 30.0);	
+
+			pbrColor.xyz += NoV *  u_lightColor.xyz * u_lightColor.a * 2.0;
+		}
+
         float Opacity = 0.1;		
 
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
         
 		fragColor[1] = vec4(normal.xyz, Roughness);
-
 	}
 }
