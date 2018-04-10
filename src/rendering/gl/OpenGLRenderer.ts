@@ -5,11 +5,13 @@ import {gl} from '../../globals';
 import ShaderProgram, {Shader} from './ShaderProgram';
 import PostProcess from './PostProcess'
 import Square from '../../geometry/Square';
+import Quad from '../../geometry/Quad';
+import Particle from '../../particle/Particle';
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
 const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "ShadowPass": 4, "ExtractHighLight" : 5, "HorizonBlur" : 6, "VerticalBlur" : 7,
-                     "ToneMapping": 0};
+                     "ToneMapping": 0, "Particle" : 1};
 
 
 var gShadowMapSize = 2048;
@@ -118,8 +120,8 @@ HblurPass : PostProcess = new PostProcess(
     this.post8Targets = [undefined, undefined];
     this.post8Passes = [];
 
-    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
     this.post32Passes = [];
 
     if (!gl.getExtension("OES_texture_float_linear")) {
@@ -285,6 +287,13 @@ HblurPass : PostProcess = new PostProcess(
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.drawingBufferWidth, gl.drawingBufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.post8Targets[i], 0);
 
+      
+      if(i == PipelineEnum.Particle)
+      {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depthTexture, 0);
+
+      }
+
       FBOstatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
       if (FBOstatus != gl.FRAMEBUFFER_COMPLETE) {
         console.error("GL_FRAMEBUFFER_COMPLETE failed, CANNOT use 8 bit FBO\n");
@@ -330,7 +339,7 @@ HblurPass : PostProcess = new PostProcess(
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling, 0, gl.RGBA, gl.FLOAT, null); 
-      }
+      }     
       else
       {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -341,8 +350,9 @@ HblurPass : PostProcess = new PostProcess(
       gl.bindTexture(gl.TEXTURE_2D, null);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.post32Targets[i], 0);
 
+      // depth attachment
       if(i == PipelineEnum.ShadowPass){
-         // depth attachment
+         
          this.shadowDepthTexture = gl.createTexture();
          gl.bindTexture(gl.TEXTURE_2D, this.shadowDepthTexture);
          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
@@ -676,6 +686,69 @@ HblurPass : PostProcess = new PostProcess(
     gl.bindTexture(gl.TEXTURE_2D, null);    
   }
 
+  renderParticle(camera: Camera, quad: Quad, particleSystem: Particle, feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram)
+  {    
+    //transformation Feedback
+    feedbackShader.use();
+    feedbackShader.setdeltaTime(this.deltaTime);
+
+    var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;
+
+    //gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
+    //particleSystem.setBuffers(particleSystem.currentBufferSetIndex, destinationIdx);
+
+    
+
+    gl.bindVertexArray(particleSystem.getVAO(particleSystem.currentBufferSetIndex));
+
+    
+    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
+    particleSystem.bindBufferBase(destinationIdx);
+    //particleSystem.setAttribDivisor();
+    
+
+    // Turn off rasterization - we are not drawing
+    gl.enable(gl.RASTERIZER_DISCARD);
+
+    // Update position and rotation using transform feedback
+    gl.beginTransformFeedback(gl.POINTS);
+    gl.drawArrays(gl.POINTS, 0, particleSystem.count);
+    gl.endTransformFeedback();
+    
+    // Restore state
+    gl.disable(gl.RASTERIZER_DISCARD);
+    gl.useProgram(null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+    gl.bindVertexArray(null);
+    
+    particleSystem.switchBufferSet();
+    
+    //render    
+   
+    quad.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.Particle]);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    //gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE);
+    //this.setClearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    particleRenderShader.setViewMatrix(camera.viewMatrix);
+    particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
+    particleRenderShader.drawInstance(quad, particleSystem.count);
+
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    gl.blendFunc(gl.ONE, gl.ZERO);
+    gl.disable(gl.BLEND);
+   
+    
+  }
+
   renderforSavingCurrentFrame(camera: Camera) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SaveFrame]);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -746,17 +819,13 @@ HblurPass : PostProcess = new PostProcess(
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
     gl.bindTexture(gl.TEXTURE_2D, null); 
-  }
-
-
-
-  
+  }  
 
   renderTonemapping(camera: Camera, dispersal : number, distortion : number) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.ToneMapping]);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.disable(gl.DEPTH_TEST);
-    gl.enable(gl.BLEND);
+    //gl.enable(gl.BLEND);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
 
@@ -774,11 +843,11 @@ HblurPass : PostProcess = new PostProcess(
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.disable(gl.DEPTH_TEST);
-    gl.enable(gl.BLEND);
+    //gl.enable(gl.BLEND);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00( this.tDTargets[0] /* this.post32Targets[PipelineEnum.SSR] */);
+    //this.presentPass.setFrame00(  this.post8Targets[PipelineEnum.Particle]);
     //this.presentPass.setFrame01( this.post32Targets[PipelineEnum.SceneImage] );
     this.presentPass.draw();
 

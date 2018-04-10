@@ -26,6 +26,7 @@ class ShaderProgram {
   attrNor: number;
   attrCol: number;
   attrUV: number;
+  attrTrans: number;
 
   //Matrix
   unifModel: WebGLUniformLocation;
@@ -72,12 +73,17 @@ class ShaderProgram {
   
   
 
-  constructor(shaders: Array<Shader>) {
+  constructor(shaders: Array<Shader>, isTransformFeedback: boolean = false, varyings: string[] = []) {
     this.prog = gl.createProgram();
 
     for (let shader of shaders) {
       gl.attachShader(this.prog, shader.shader);
     }
+
+    if(isTransformFeedback){
+      gl.transformFeedbackVaryings(this.prog, varyings, gl.SEPARATE_ATTRIBS);
+    }
+
     gl.linkProgram(this.prog);
     if (!gl.getProgramParameter(this.prog, gl.LINK_STATUS)) {
       throw gl.getProgramInfoLog(this.prog);
@@ -87,6 +93,7 @@ class ShaderProgram {
     this.attrNor = gl.getAttribLocation(this.prog, "vs_Nor");
     this.attrCol = gl.getAttribLocation(this.prog, "vs_Col");
     this.attrUV = gl.getAttribLocation(this.prog, "vs_UV");
+    this.attrTrans = gl.getAttribLocation(this.prog, "vs_Translate");
 
     this.unifModel = gl.getUniformLocation(this.prog, "u_Model");
     this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
@@ -425,10 +432,8 @@ class ShaderProgram {
     }
   }
 
-
-  
-
-  draw(d: Drawable) {
+  draw(d: Drawable) 
+  {
     this.use();
 
     if (this.attrPos != -1 && d.bindPos()) {
@@ -459,6 +464,70 @@ class ShaderProgram {
     if (this.attrCol != -1) gl.disableVertexAttribArray(this.attrCol);
     if (this.attrUV != -1) gl.disableVertexAttribArray(this.attrUV);
   }
+
+  drawInstance(d: Drawable, numInstances: number) 
+  {
+    this.use();
+
+    if (this.attrPos != -1 && d.bindPos()) {
+      gl.enableVertexAttribArray(this.attrPos);
+      gl.vertexAttribPointer(this.attrPos, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(this.attrPos, 0);
+    }
+
+    if (this.attrNor != -1 && d.bindNor()) {
+      gl.enableVertexAttribArray(this.attrNor);
+      gl.vertexAttribPointer(this.attrNor, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(this.attrNor, 0);
+    }
+
+    if (this.attrCol != -1 && d.bindCol()) {
+      gl.enableVertexAttribArray(this.attrCol);
+      gl.vertexAttribPointer(this.attrCol, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(this.attrCol, 1);
+    }
+
+    if (this.attrUV != -1 && d.bindUV()) {
+      gl.enableVertexAttribArray(this.attrUV);
+      gl.vertexAttribPointer(this.attrUV, 2, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(this.attrUV, 0);
+    }
+
+    if (this.attrTrans != -1 && d.bindTrans()) {
+      gl.enableVertexAttribArray(this.attrTrans);
+      gl.vertexAttribPointer(this.attrTrans, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(this.attrTrans, 1);   
+    }
+
+    d.bindIdx();
+    gl.drawElementsInstanced(d.drawMode(), d.elemCount(), gl.UNSIGNED_INT, 0, numInstances);
+
+    if (this.attrPos != -1)
+    {
+     gl.disableVertexAttribArray(this.attrPos);
+    }
+    if (this.attrNor != -1)
+    {
+     gl.disableVertexAttribArray(this.attrNor);
+    }
+    if (this.attrCol != -1)
+    {
+     gl.disableVertexAttribArray(this.attrCol);
+     gl.vertexAttribDivisor(this.attrCol, 0);
+    }
+    if (this.attrUV != -1)
+    {
+     gl.disableVertexAttribArray(this.attrUV);
+    }
+    if (this.attrTrans != -1)
+    {
+     gl.disableVertexAttribArray(this.attrTrans);
+     gl.vertexAttribDivisor(this.attrTrans, 0);      
+    }
+
+    
+  }
+
 };
 
 export default ShaderProgram;

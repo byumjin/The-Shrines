@@ -11,7 +11,7 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import Texture from './rendering/gl/Texture';
 import {PlyLoader} from './geometry/PlyLoaders';
 import Particle from './particle/Particle';
-
+import Quad from './geometry/Quad';
 // Define an object with application parameters and button callbacks
 const controls = {
    
@@ -27,7 +27,7 @@ const controls = {
 };
 
 let square: Square;
-
+let particleQuad: Quad;
 // TODO: replace with your scene's stuff
 
 let obj0: string;
@@ -68,6 +68,7 @@ let mesh_Test: Mesh;
 
 let skyCubeMap: Texture;
 
+let numParticle: number = 8192;
 
 var timer = {
   deltaTime: 0.0,
@@ -117,6 +118,10 @@ function loadScene() {
 
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
+
+  particleQuad = new Quad(vec3.fromValues(0, 0, 0));
+  particleQuad.create();
+
 
   mesh0 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/mario/textures/wahoo.png', false),
@@ -241,7 +246,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const particleSys = new Particle(1024);
+  const particleSys = new Particle(numParticle);
   particleSys.initialize();
 
   const camera = new Camera();
@@ -300,6 +305,18 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
     ]);
 
+    const feedBackShader = new ShaderProgram([
+      new Shader(gl.VERTEX_SHADER, require('./shaders/state-vert.glsl')),
+      new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
+      ],
+      true,
+      ['o_position', 'o_velocity', 'o_color', 'o_attract']);
+  
+    const particleRenderShader = new ShaderProgram([
+      new Shader(gl.VERTEX_SHADER, require('./shaders/particle-vert.glsl')),
+      new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-frag.glsl')),
+        ]);
+
   let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0);
   let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
   let lightDirection : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 0.0);
@@ -347,6 +364,8 @@ function main() {
     renderer.renderSSR(camera, skyCubeMap.cubemap_texture,
                        controls.SSR_MaxStep, controls.SSR_Opaque_Intensity, controls.SSR_Trans_Intensity, controls.SSR_Threshold);
     renderer.renderSSRMip();
+
+    renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader);
 
     renderer.renderforSavingCurrentFrame(camera);
 

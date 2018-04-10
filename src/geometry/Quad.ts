@@ -8,6 +8,8 @@ class Quad extends Drawable {
   normals: Float32Array;
   colors: Float32Array;
   uvs: Float32Array;
+  trans: Float32Array;
+
   center: vec4;
 
   constructor(center: vec3) {
@@ -31,18 +33,29 @@ class Quad extends Drawable {
                                  1.0, 1.0,
                                   1.0, 0.0,
                                 0.0, 0.0]);     
+  /*                              
   this.colors = new Float32Array([
     1.0, 0.5, 0.5, 1.0,
     1.0, 0.5, 0.5, 1.0,
     1.0, 0.5, 0.5, 1.0,
     1.0, 0.5, 0.5, 1.0
     ]);
+
+    this.trans = new Float32Array([
+      0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0,
+      ]);
+      */
     
     this.generateIdx();
     this.generatePos();
     this.generateNor();
     this.generateUV();
+    
     this.generateCol();
+    this.generateTrans();
 
     this.count = this.indices.length;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
@@ -54,13 +67,36 @@ class Quad extends Drawable {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
     gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+    //gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    //gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUV);
     gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
 
+    //gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTrans);
+    //gl.bufferData(gl.ARRAY_BUFFER, this.trans, gl.STATIC_DRAW);
+
   }
+
+  setInstanceVBOs(colors: Float32Array, offsets: Float32Array)
+   {
+
+    this.colors = colors;
+    this.trans = offsets;
+
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.DYNAMIC_COPY);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTrans);
+    gl.bufferData(gl.ARRAY_BUFFER, this.trans, gl.DYNAMIC_COPY);
+  }
+
+  setCopyVBOs(bufferColors: WebGLBuffer, bufferOffsets: WebGLBuffer)
+  {  
+   this.bufCol = bufferColors;  
+   this.bufTrans = bufferOffsets;
+ }
 };
 
 export default Quad;
