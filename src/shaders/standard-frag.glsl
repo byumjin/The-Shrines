@@ -17,6 +17,7 @@ uniform sampler2D AlbedoMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D NormalMap;
 
+
 uniform mat4 u_Model;
 uniform mat4 u_ModelInvTr;  
 uniform mat4 u_ViewProj;

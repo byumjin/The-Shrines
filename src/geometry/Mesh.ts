@@ -94,7 +94,7 @@ class Mesh extends Drawable {
     this.objString = ""; // hacky clear
   }
 
-  createByPly(type:number){
+  createByPly(type:number, plyText:string){
     this.type = type;
     //Update Model Matrix
     mat4.translate(this.modelMat, this.modelMat, vec3.fromValues(this.center[0],this.center[1],this.center[2]));
@@ -105,41 +105,34 @@ class Mesh extends Drawable {
     let uvsTemp: Array<number> = [];
     let idxTemp: Array<number> = [];
 
+    var loadedMesh = new Loader.Mesh(this.objString);
+
     var PLYLoader = new PlyLoader();
-    PLYLoader.load(this.objString);
+    PLYLoader.loadColorsOnly(plyText);
 
     //posTemp = loadedMesh.vertices;
     let idx = 0;
-    for (var i = 0; i < PLYLoader.arrayVertex.length; i++) {
-      posTemp.push(PLYLoader.arrayVertex[i]);
-      if (i % 3 == 2) {
-        posTemp.push(1.0);
-        idxTemp.push(idx);
-        idx ++;
-      }
-    }
+    for (var i = 0; i < loadedMesh.indices.length; i++) {
+      posTemp.push(loadedMesh.vertices[3*loadedMesh.indices[i]]);
+      posTemp.push(loadedMesh.vertices[3*loadedMesh.indices[i]+1]);
+      posTemp.push(loadedMesh.vertices[3*loadedMesh.indices[i]+2]);
+      posTemp.push(1.0);
+      idxTemp.push(idx);
+      idx ++;
 
-    for (var i = 0; i < PLYLoader.arrayNormal.length; i++) {
-      norTemp.push(PLYLoader.arrayNormal[i]);
-      if (i % 3 == 2) norTemp.push(0.0);
-    }
+      norTemp.push(loadedMesh.vertexNormals[3*loadedMesh.indices[i]]);
+      norTemp.push(loadedMesh.vertexNormals[3*loadedMesh.indices[i]+1]);
+      norTemp.push(loadedMesh.vertexNormals[3*loadedMesh.indices[i]+2]);
+      norTemp.push(0);
 
-    for (var i = 0; i < PLYLoader.arrayColor.length; i++) {
-      colTemp.push(PLYLoader.arrayColor[i]/255);
-      if (i % 3 == 2) colTemp.push(1.0);
-    }
+      uvsTemp.push(loadedMesh.textures[2*loadedMesh.indices[i]]);
+      uvsTemp.push(-loadedMesh.textures[2*loadedMesh.indices[i]+1] + 1.0); //V filpped
 
-    for (var i = 0; i < PLYLoader.arrayTexture.length; i++) {
-      if(i % 2 == 0)
-        uvsTemp.push(PLYLoader.arrayTexture[i]);
-      else
-        uvsTemp.push(-PLYLoader.arrayTexture[i] + 1.0); //V filpped
-    }
-
-    // white vert color for now
-    this.colors = new Float32Array(posTemp.length);
-    for (var i = 0; i < posTemp.length; ++i){
-      this.colors[i] = 1.0;
+    //load colors
+      colTemp.push(PLYLoader.arrayColor[3*loadedMesh.indices[i]]/255);
+      colTemp.push(PLYLoader.arrayColor[3*loadedMesh.indices[i]+1]/255);
+      colTemp.push(PLYLoader.arrayColor[3*loadedMesh.indices[i]+2]/255);
+      colTemp.push(1);
     }
 
     this.indices = new Uint32Array(idxTemp);

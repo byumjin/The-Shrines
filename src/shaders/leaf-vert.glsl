@@ -21,10 +21,10 @@ out vec4 fs_Nor;
 out vec4 fs_Col;           
 out vec2 fs_UV;
 
-#define SIDE_TO_SIDE_FREQ1 1.475
-#define SIDE_TO_SIDE_FREQ2 0.593
-#define UP_AND_DOWN_FREQ1 0.275
-#define UP_AND_DOWN_FREQ2 0.123
+#define SIDE_TO_SIDE_FREQ1 0.675
+#define SIDE_TO_SIDE_FREQ2 0.293
+#define UP_AND_DOWN_FREQ1 0.175
+#define UP_AND_DOWN_FREQ2 0.063
 
 vec4 SmoothCurve( vec4 x ) {
   return x * x * ( vec4(3.0f,3.0f,3.0f,3.0f) - 2.0 * x ) ;

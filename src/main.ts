@@ -51,6 +51,10 @@ let mesh_B_Inner: Mesh;
 let obj_B_Glass: string;
 let mesh_B_Glass: Mesh;
 
+let obj_Leaf: string;
+let obj_Bark: string;
+let obj_Leaf2: string;
+let obj_Bark2: string;
 let ply_Leaf: string;
 let ply_Bark: string;
 let ply_Leaf2: string;
@@ -60,6 +64,7 @@ let mesh_Leaf: Mesh;
 let mesh_Bark: Mesh;
 let mesh_Leaf2: Mesh;
 let mesh_Bark2: Mesh;
+let mesh_Test: Mesh;
 
 let skyCubeMap: Texture;
 
@@ -86,11 +91,17 @@ function loadOBJText() {
   obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner.obj');
   obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass.obj');
 
-  ply_Leaf = readTextFile('./src/resources/objs/tree/models/pruned_leaf01.ply');
+  ply_Leaf = readTextFile('./src/resources/objs/tree/models/leaf01.ply');
   ply_Bark = readTextFile('./src/resources/objs/tree/models/bark01.ply');
   ply_Leaf2 = readTextFile('./src/resources/objs/tree/models/leaf02.ply');
   ply_Bark2 = readTextFile('./src/resources/objs/tree/models/bark02.ply');
+
+  obj_Leaf = readTextFile('./src/resources/objs/tree/models/leaf01.obj');
+  obj_Bark = readTextFile('./src/resources/objs/tree/models/bark01.obj');
+  obj_Leaf2 = readTextFile('./src/resources/objs/tree/models/leaf02.obj');
+  obj_Bark2 = readTextFile('./src/resources/objs/tree/models/bark02.obj');
 }
+
 
 function loadScene() {
   square && square.destroy();
@@ -167,28 +178,29 @@ function loadScene() {
     mesh_B_Glass.scale(vec3.fromValues(3, 3, 3));
 
 // Create By PLY format
-   mesh_Leaf = new Mesh(ply_Leaf, vec3.fromValues(-50, 2, 25),
+   mesh_Leaf = new Mesh(obj_Leaf, vec3.fromValues(-50, 2, 25),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree22.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree0.png', false));
-   mesh_Leaf.createByPly(1);
+   mesh_Leaf.createByPly(1, ply_Leaf);
    
-   mesh_Bark = new Mesh(ply_Bark, vec3.fromValues(-50, 2, 25),
+   mesh_Bark = new Mesh(obj_Bark, vec3.fromValues(-50, 2, 25),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree0.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree0.png', false));
-   mesh_Bark.createByPly(2);
+   mesh_Bark.createByPly(2, ply_Bark);
 
-   mesh_Leaf2 = new Mesh(ply_Leaf2, vec3.fromValues(10,0,0),
+   mesh_Leaf2 = new Mesh(obj_Leaf2, vec3.fromValues(10,0,0),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree2.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree2.png', false));
-   mesh_Leaf2.createByPly(1);
-   mesh_Bark2 = new Mesh(ply_Bark2, vec3.fromValues(10,0,0),
+   mesh_Leaf2.createByPly(1, ply_Leaf2);
+
+   mesh_Bark2 = new Mesh(obj_Bark2, vec3.fromValues(10,0,0),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree2.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree2.png', false));
-   mesh_Bark2.createByPly(2);
+   mesh_Bark2.createByPly(2, ply_Bark2);
 }
 
 
