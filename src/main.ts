@@ -10,6 +10,7 @@ import {readTextFile} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import Texture from './rendering/gl/Texture';
 import {PlyLoader} from './geometry/PlyLoaders';
+import Particle from './particle/Particle';
 
 // Define an object with application parameters and button callbacks
 const controls = {
@@ -21,8 +22,7 @@ const controls = {
 
   Bloom_Iteration : 16,
   Bloom_Dispersal : 0.5,
-  Bloom_Distortion : 3.0,
-  
+  Bloom_Distortion : 8.0,
   
 };
 
@@ -153,7 +153,7 @@ function loadScene() {
   mesh_B_Inner = new Mesh(obj_B_Inner, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/B_Side/textures/Inner_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Inner_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Inner_Normal.png', false));
    mesh_B_Inner.create();
 
    mesh_B_Inner.scale(vec3.fromValues(3, 3, 3));
@@ -228,6 +228,9 @@ function main() {
 
   // Initial call to load scene
   loadScene();
+
+  const particleSys = new Particle(1024);
+  particleSys.initialize();
 
   const camera = new Camera();
   camera.updateOrbit(0.0, -60.0);

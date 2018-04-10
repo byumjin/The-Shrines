@@ -30,12 +30,14 @@ void main() {
 
 	vec4 OpaqueSSRInfo = texture(u_Gbuffer_Albedo, fs_UV);
 	
+	bool bWater0 = false;
+
 	//water
 	if(transColor.a > 19.0)
 	{
 		transColor.a -= 20.0;
-	}
-	
+		bWater0 = true;
+	}	
 	else if(transColor.a > 9.0)
 	{
 		transColor.a -= 10.0;
@@ -49,13 +51,20 @@ void main() {
 	{
 		if(opaqueColor.a < 1.0)
 		{
-			float depthDistance = clamp( LinearDepth(OpaqueSSRInfo.a) - LinearDepth(transColor.a), 0.0, 1.0);
-			depthDistance *= 10.0;
-			depthDistance = clamp(depthDistance, 0.0, 1.0);
-			fragColor[0].xyz =  mix( opaqueColor.xyz , transColor.xyz, depthDistance);
+			if(bWater0)
+			{
+				float depthDistance = clamp( LinearDepth(opaqueColor.a), 0.0, 1.0);
+				depthDistance *= 5.0;
+				depthDistance = clamp(depthDistance, 0.0, 1.0);
+				fragColor[0].xyz =  mix( opaqueColor.xyz , transColor.xyz, depthDistance);
 
-			//fragColor[0].xyz = opaqueColor.xyz;
-			//fragColor[0].xyz =  mix(  vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), pow(depthDistance, 0.7));
+				//fragColor[0].xyz = opaqueColor.xyz;
+				//fragColor[0].xyz =  mix(  vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), pow(depthDistance, 1.0));
+			}
+			else
+			{
+				fragColor[0].xyz =  opaqueColor.xyz;
+			}			
 		}
 		else
 		{
