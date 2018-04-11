@@ -218,8 +218,15 @@ void main() {
 
 	//We are not going to make inner pool scene. Thus, this is fine
 	
+	
+
+	//vec3 farPos = worldPos.xyz + relfectVec * 100000.0;
+	//vec4 farPos_SS = u_ViewProj * vec4(farPos, 1.0);
+	//farPos_SS /= farPos_SS.w;
+	//vec4 SkyColor =  texture(u_frame1, vec2( farPos_SS.xy));
+
 	vec4 SkyColor = texture(u_SkyCubeMap, relfectVec);
-	SkyColor = pow(SkyColor, vec4(2.2));
+	SkyColor = pow(SkyColor, vec4(2.2));	
 
 	if(!bHit) //SkyBox
 	{

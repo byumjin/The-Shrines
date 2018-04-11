@@ -7,9 +7,12 @@ out vec4 out_Col;
 uniform sampler2D u_frame0; //Scene
 uniform sampler2D u_frame1; //SSR_Mask
 uniform sampler2D u_frame2; //SSR
+uniform sampler2D u_frame3; //Particle
 
 uniform sampler2D u_Gbuffer_Specular;
 uniform sampler2D u_Gbuffer_Albedo;
+
+
 
 void main() {
 
@@ -17,7 +20,7 @@ void main() {
 	reverseUV.y = 1.0 - reverseUV.y;
 
 	float roughness = texture(u_Gbuffer_Specular, reverseUV).a;
-	vec3 sceneImagecolor = texture(u_frame0, fs_UV).xyz;
+	vec4 sceneImagecolor = texture(u_frame0, fs_UV);
 
 	
 	float opaqueDepth = texture(u_Gbuffer_Albedo, reverseUV).a;
@@ -32,12 +35,14 @@ void main() {
 	vec3 finalColor = vec3(0.0);
 
 	if(clamp(SSRMask, 0.0, 1.0) <= 0.0)
-		finalColor = sceneImagecolor;
+		finalColor = sceneImagecolor.xyz;
 	else
-		finalColor = SSRMipColor.xyz + sceneImagecolor;
+		finalColor = SSRMipColor.xyz + sceneImagecolor.xyz;
 		
-	//finalColor = SSRMipColor.xyz * clamp(SSRMask, 0.0, 1.0) + sceneImagecolor;// mix(sceneImagecolor, SSRColor + sceneImagecolor, SSRMask);
-	//finalColor = SSRMipColor.xyz + sceneImagecolor;
+	vec4 particleColor = texture(u_frame3, reverseUV);
+
+	
+	finalColor.xyz += particleColor.xyz;
 
 
 	out_Col = vec4( finalColor, 1.0);

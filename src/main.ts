@@ -23,6 +23,10 @@ const controls = {
   Bloom_Iteration : 16,
   Bloom_Dispersal : 0.5,
   Bloom_Distortion : 8.0,
+
+  Particle_FireFly : false,
+  Weather_Rain : false,
+  
   
 };
 
@@ -68,7 +72,7 @@ let mesh_Test: Mesh;
 
 let skyCubeMap: Texture;
 
-let numParticle: number = 8192;
+let numParticle: number = 32768;
 
 var timer = {
   deltaTime: 0.0,
@@ -233,6 +237,15 @@ function main() {
   BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
   BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
 
+  var FIREFLY = gui.addFolder('FireFly');  
+  FIREFLY.add(controls, 'Particle_FireFly');
+
+  var WEATHER = gui.addFolder('Weather');  
+  WEATHER.add(controls, 'Weather_Rain');
+
+
+  
+
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
   const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
@@ -365,7 +378,8 @@ function main() {
                        controls.SSR_MaxStep, controls.SSR_Opaque_Intensity, controls.SSR_Trans_Intensity, controls.SSR_Threshold);
     renderer.renderSSRMip();
 
-    renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader);
+    renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader,
+      controls.Particle_FireFly, controls.Weather_Rain);
 
     renderer.renderforSavingCurrentFrame(camera);
 

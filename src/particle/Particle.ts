@@ -1,4 +1,5 @@
 import {gl} from '../globals';
+import {vec2} from 'gl-matrix';
 
 const POSITION_LOCATION = 0;
 const VELOCITY_LOCATION = 1;
@@ -76,15 +77,60 @@ class Particle
     gl.vertexAttribDivisor(ATTRACT_LOCATION, 0);
   }
 
+  squareToDiskConcentric(sample : vec2) : vec2 
+ {
+    var M_PI = 3.1415926535897932384626433832795;
+    //TODO
+    let phi : number;
+    let radius : number;
+
+        var a = 2.0*sample[0]-1.0; // (a,b) is now on [-1,1]ˆ2
+        var b = 2.0*sample[1]-1.0;
+
+        if (a > -b) // region 1 or 2
+        {
+            if (a > b) // region 1, also |a| > |b|
+            {
+                radius = a;
+                phi = (M_PI/4 ) * (b/a);
+            }
+            else // region 2, also |b| > |a|
+            {
+                radius = b;
+                phi = (M_PI/4) * (2 - (a/b));
+            }
+        }
+        else // region 3 or 4
+        {
+            if (a < b) // region 3, also |a| >= |b|, a != 0
+            {
+                radius = -a;
+                phi = (M_PI/4) * (4 + (b/a));
+            }
+            else // region 4, |b| >= |a|, but a==0 and b==0 could occur.
+            {
+                radius = -b;
+                if (b != 0)
+                    phi = (M_PI/4) * (6 - (a/b));
+                else
+                    phi = 0;
+            }
+        }
+
+
+        return vec2.fromValues(radius * Math.cos(phi), radius * Math.sin(phi));
+}
+
   initialize()
   {
     
     for (let p = 0; p < this.count; ++p)
     {
-      this.position[p * 4] = (Math.random() - 0.5) *  10.0;
-      this.position[p * 4 + 1] = (Math.random() - 0.5) *  10.0;
-      this.position[p * 4 + 2] = (Math.random() - 0.5) *  10.0;
-      this.position[p * 4 + 3] = 1.0;
+      var posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));
+      this.position[p * 4] = posXZ[0] *  150.0;
+      this.position[p * 4 + 1] = (Math.random()) *  100.0;
+      this.position[p * 4 + 2] = posXZ[1] *  150.0;
+      
       
       this.velocity[p * 4] = 0.0;
       this.velocity[p * 4 + 1] = 0.0;
@@ -95,11 +141,17 @@ class Particle
       this.color[p * 4 + 1] = Math.random();
       this.color[p * 4 + 2] = Math.random();
       this.color[p * 4 + 3] = 1.0;
-      
-      this.attract[p * 4] = (Math.random() - 0.5) *  50.0;
-      this.attract[p * 4 + 1] = (Math.random() - 0.5) *  50.0;
-      this.attract[p * 4 + 2] = (Math.random() - 0.5) *  50.0;
-      this.attract[p * 4 + 3] = 1.0;
+
+      posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));   
+
+      this.attract[p * 4] = posXZ[0] *  150.0;
+      this.attract[p * 4 + 1] = (Math.random()) * 100.0;
+      this.attract[p * 4 + 2] = posXZ[1] * 150.0;
+
+      //save original Gap
+      this.position[p * 4 + 3] = this.attract[p * 4];
+      this.velocity[p * 4 + 3] = this.attract[p * 4 + 1];
+      this.attract[p * 4 + 3] = this.attract[p * 4 + 2];
     }
 
     this.VBOs = new Array(this.VAOs.length);

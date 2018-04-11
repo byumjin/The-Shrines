@@ -21,7 +21,7 @@ void main()
 {
     fs_Col = vs_Col;
     fs_Pos = vs_Pos;
-    fs_UV = vs_UV;
+    //fs_UV = vs_UV;
 
     vec3 offset =vs_Translate.xyz;
     //offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;
@@ -37,8 +37,24 @@ void main()
     CameraAxes[1][1] = u_View[1][1];
     CameraAxes[1][2] = u_View[2][1];
 
-    vec3 billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * CameraAxes[1];
+     //Forward
+    CameraAxes[2][0] = u_View[0][2];
+    CameraAxes[2][1] = u_View[1][2];
+    CameraAxes[2][2] = u_View[2][2];
+
+    vec3 billboardPos;
+
+    if(fs_Col.a > 4000.0)
+    {
+      billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * CameraAxes[1];
+    }
+    else
+    {
+      billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * CameraAxes[1];
+    }
 
     gl_Position = u_ViewProj * vec4(billboardPos, 1.0);
-    //gl_Position = vec4(billboardPos, 1.0);
+    gl_Position /= gl_Position.w;
+    fs_UV = vec2( (gl_Position.x + 1.0)* 0.5, (gl_Position.y + 1.0) * 0.5);
+    fs_Pos.a = gl_Position.z;
 }
