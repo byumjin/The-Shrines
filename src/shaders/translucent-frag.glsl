@@ -168,13 +168,13 @@ void main() {
 		
 		float energyConservation = 1.0 - Roughness * Roughness;
 
-		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? 0.4 :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? 0.4 :Roughness))) * (bWater ? 0.86 : energyConservation);
+		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? 0.3 :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? 0.3 :Roughness))) * (bWater ? 0.91 : energyConservation);
 
 		//specularTerm = clamp(specularTerm, 0.0, 2.0);
 
 		float ambientTerm = 0.1;
 
-		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
+		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * (bWater ? specularTerm * 8.0 : specularTerm) ) * (diffuseTerm + ambientTerm), diffuseColor.a);
 
 		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 
