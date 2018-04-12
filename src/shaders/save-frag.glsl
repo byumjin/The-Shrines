@@ -8,6 +8,7 @@ uniform sampler2D u_frame0; //Scene
 uniform sampler2D u_frame1; //SSR_Mask
 uniform sampler2D u_frame2; //SSR
 uniform sampler2D u_frame3; //Particle
+uniform sampler2D u_frame4; //ParticleMesh
 
 uniform sampler2D u_Gbuffer_Specular;
 uniform sampler2D u_Gbuffer_Albedo;
@@ -21,7 +22,9 @@ void main() {
 
 	float roughness = texture(u_Gbuffer_Specular, reverseUV).a;
 	vec4 sceneImagecolor = texture(u_frame0, fs_UV);
+ 	vec4 meshParticle = texture(u_frame4, reverseUV);
 
+	sceneImagecolor = mix(sceneImagecolor, meshParticle, meshParticle.a);
 	
 	float opaqueDepth = texture(u_Gbuffer_Albedo, reverseUV).a;
 

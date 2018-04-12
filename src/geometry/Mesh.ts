@@ -11,6 +11,7 @@ class Mesh extends Drawable {
   normals: Float32Array;
   colors: Float32Array;
   uvs: Float32Array;
+  trans: Float32Array;
 
   objString: string;
 
@@ -74,6 +75,8 @@ class Mesh extends Drawable {
     this.generateUV();
     this.generateCol();
 
+    this.generateTrans();
+
     this.count = this.indices.length;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
@@ -92,6 +95,12 @@ class Mesh extends Drawable {
 
     console.log(`Created Mesh from OBJ`);
     this.objString = ""; // hacky clear
+  }
+
+  setCopyVBOs(bufferColors: WebGLBuffer, bufferOffsets: WebGLBuffer)
+  {  
+   this.bufCol = bufferColors;  
+   this.bufTrans = bufferOffsets;
   }
 
   createByPly(type:number, plyText:string){

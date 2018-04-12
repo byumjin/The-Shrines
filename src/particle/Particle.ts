@@ -6,6 +6,7 @@ const VELOCITY_LOCATION = 1;
 const COLOR_LOCATION = 2;
 const ATTRACT_LOCATION = 3;
 
+
 const NUM_OUTPUT = 4;
 
 class Particle
@@ -17,6 +18,7 @@ class Particle
   color : Float32Array;
 
   attract : Float32Array;
+  life : Float32Array;
   
   currentBufferSetIndex : number;
 
@@ -33,6 +35,7 @@ class Particle
     this.color     = new Float32Array(this.count * 4);
 
     this.attract     = new Float32Array(this.count * 4);
+    
 
     //ping-pong
     this.VAOs = [gl.createVertexArray(), gl.createVertexArray()];         
@@ -63,10 +66,10 @@ class Particle
 
   bindBufferBase(index : number)
   {
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.VBOs[index][POSITION_LOCATION]);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, this.VBOs[index][VELOCITY_LOCATION]);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 2, this.VBOs[index][COLOR_LOCATION]);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 3, this.VBOs[index][ATTRACT_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, POSITION_LOCATION, this.VBOs[index][POSITION_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, VELOCITY_LOCATION, this.VBOs[index][VELOCITY_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, COLOR_LOCATION, this.VBOs[index][COLOR_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, ATTRACT_LOCATION, this.VBOs[index][ATTRACT_LOCATION]);
   }
 
   setAttribDivisor()
@@ -135,12 +138,12 @@ class Particle
       this.velocity[p * 4] = 0.0;
       this.velocity[p * 4 + 1] = 0.0;
       this.velocity[p * 4 + 2] = 0.0;
-      this.velocity[p * 4 + 3] = 0.0;
 
-      this.color[p * 4] = Math.random();
-      this.color[p * 4 + 1] = Math.random();
-      this.color[p * 4 + 2] = Math.random();
-      this.color[p * 4 + 3] = 1.0;
+      this.color[p * 4] = Math.random() * 0.5 + 0.5;
+      this.color[p * 4 + 1] = Math.random() * 0.7 + 0.3;
+      this.color[p * 4 + 2] = Math.random() - 3.0; // Life
+
+      this.color[p * 4 + 3] = 0.0; //Index
 
       posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));   
 
@@ -196,19 +199,19 @@ class Particle
   {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[a][POSITION_LOCATION]);
     gl.vertexAttribPointer(POSITION_LOCATION, 4, gl.FLOAT, false, 0, 0);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.VBOs[b][POSITION_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, POSITION_LOCATION, this.VBOs[b][POSITION_LOCATION]);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[a][VELOCITY_LOCATION]);
     gl.vertexAttribPointer(VELOCITY_LOCATION, 4, gl.FLOAT, false, 0, 0);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, this.VBOs[b][VELOCITY_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, VELOCITY_LOCATION, this.VBOs[b][VELOCITY_LOCATION]);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[a][COLOR_LOCATION]);
     gl.vertexAttribPointer(COLOR_LOCATION, 4, gl.FLOAT, false, 0, 0);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 2, this.VBOs[b][COLOR_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, COLOR_LOCATION, this.VBOs[b][COLOR_LOCATION]);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[a][ATTRACT_LOCATION]);
     gl.vertexAttribPointer(ATTRACT_LOCATION, 4, gl.FLOAT, false, 0, 0);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 3, this.VBOs[b][ATTRACT_LOCATION]);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, ATTRACT_LOCATION, this.VBOs[b][ATTRACT_LOCATION]);
   }
   
   

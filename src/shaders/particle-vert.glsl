@@ -16,16 +16,20 @@ in vec4 vs_Translate; // Another instance rendering attribute used to position e
 out vec4 fs_Col;
 out vec4 fs_Pos;
 out vec2 fs_UV;
+out vec2 fs_UV_SS;
+
+
+const int rainIndex = 16384;
+const int rainStainIndex = 1024;
 
 void main()
 {
     fs_Col = vs_Col;
     fs_Pos = vs_Pos;
-    //fs_UV = vs_UV;
+    fs_UV = vs_UV;
 
-    vec3 offset =vs_Translate.xyz;
-    //offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;
-
+    vec3 offset = vs_Translate.xyz;
+    
     mat3 CameraAxes;
 
     //Right
@@ -44,17 +48,23 @@ void main()
 
     vec3 billboardPos;
 
-    if(fs_Col.a > 4000.0)
+    if(fs_Col.a > float(rainIndex))
     {
-      billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * CameraAxes[1];
+      billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * vec3(0.0, 1.4, 0.0);
     }
+    else if(fs_Col.a > float(rainStainIndex) )
+    {
+      billboardPos = offset + vs_Pos.x * 0.2 * vec3(1.0, 0.0, 0.0) + vs_Pos.y * 0.2 * vec3(0.0, 0.0, 1.0);
+    }   
     else
     {
-      billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * CameraAxes[1];
+      billboardPos = offset + vs_Pos.x * 0.1 * CameraAxes[0] + vs_Pos.y * 0.1  * CameraAxes[1];
     }
 
     gl_Position = u_ViewProj * vec4(billboardPos, 1.0);
-    gl_Position /= gl_Position.w;
-    fs_UV = vec2( (gl_Position.x + 1.0)* 0.5, (gl_Position.y + 1.0) * 0.5);
-    fs_Pos.a = gl_Position.z;
+
+    vec4 normalizedPos = gl_Position / gl_Position.w;
+
+    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);
+    fs_Pos.a = normalizedPos.z;
 }

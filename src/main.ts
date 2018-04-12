@@ -24,8 +24,9 @@ const controls = {
   Bloom_Dispersal : 0.5,
   Bloom_Distortion : 8.0,
 
-  Particle_FireFly : false,
-  Weather_Rain : false,
+  FireFly : true,
+  Rain : false,
+  Lantern : false,
   
   
 };
@@ -64,15 +65,20 @@ let ply_Bark: string;
 let ply_Leaf2: string;
 let ply_Bark2: string;
 
+let obj_Lantern: string;
+
 let mesh_Leaf: Mesh;
 let mesh_Bark: Mesh;
 let mesh_Leaf2: Mesh;
 let mesh_Bark2: Mesh;
 let mesh_Test: Mesh;
 
+let mesh_Lantern: Mesh;
+
 let skyCubeMap: Texture;
 
-let numParticle: number = 32768;
+let numParticle: number = 32768; //Bilboard
+let numLatern: number = 1024;
 
 var timer = {
   deltaTime: 0.0,
@@ -105,6 +111,8 @@ function loadOBJText() {
   obj_Bark = readTextFile('./src/resources/objs/tree/models/bark01.obj');
   obj_Leaf2 = readTextFile('./src/resources/objs/tree/models/leaf02.obj');
   obj_Bark2 = readTextFile('./src/resources/objs/tree/models/bark02.obj');
+
+  obj_Lantern = readTextFile('./src/resources/objs/lantern/models/lantern.obj');
 }
 
 
@@ -210,6 +218,15 @@ function loadScene() {
     new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree2.png', false));
    mesh_Bark2.createByPly(2, ply_Bark2);
+
+
+
+
+   mesh_Lantern  = new Mesh(obj_Lantern, vec3.fromValues(10,0,0),
+   new Texture('./src/resources/objs/lantern/textures/lantern.png', false),
+    new Texture('./src/resources/objs/lantern/textures/lantern.png', false),
+    new Texture('./src/resources/objs/lantern/textures/Normal.png', false));
+    mesh_Lantern.create();
 }
 
 
@@ -237,12 +254,10 @@ function main() {
   BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
   BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
 
-  var FIREFLY = gui.addFolder('FireFly');  
-  FIREFLY.add(controls, 'Particle_FireFly');
-
-  var WEATHER = gui.addFolder('Weather');  
-  WEATHER.add(controls, 'Weather_Rain');
-
+  var PARTICLE = gui.addFolder('Particle');  
+  PARTICLE.add(controls, 'FireFly');
+  PARTICLE.add(controls, 'Rain');
+  PARTICLE.add(controls, 'Lantern');
 
   
 
@@ -261,6 +276,9 @@ function main() {
 
   const particleSys = new Particle(numParticle);
   particleSys.initialize();
+
+  const particleLanternSys = new Particle(numLatern);
+  particleLanternSys.initialize();
 
   const camera = new Camera();
   camera.updateOrbit(0.0, -60.0);
@@ -330,9 +348,25 @@ function main() {
       new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-frag.glsl')),
         ]);
 
+
+        const feedBackLanternShader = new ShaderProgram([
+          new Shader(gl.VERTEX_SHADER, require('./shaders/state-Lantern-vert.glsl')),
+          new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
+          ],
+          true,
+          ['o_position', 'o_velocity', 'o_color', 'o_attract']);
+      
+        const particleLanternRenderShader = new ShaderProgram([
+          new Shader(gl.VERTEX_SHADER, require('./shaders/particle-Lantern-vert.glsl')),
+          new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Lantern-frag.glsl')),
+            ]);
+
   let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0);
   let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
-  let lightDirection : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 0.0);
+  let lightD : vec3 = vec3.create();
+  vec3.normalize(lightD, vec3.fromValues(1.0, 0.5, 1.0));
+
+  let lightDirection : vec4 = vec4.fromValues(lightD[0], lightD[1], lightD[2], 0.0);
 
   function getDirLightViewProj(lightDirection: vec4, lightPosition: vec4, projectionWidth: number, projectionHeight: number, near:number, far:number){
     let lightViewProj = mat4.create();
@@ -372,14 +406,17 @@ function main() {
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
-    renderer.renderAddTranslucent();    
+    renderer.renderAddTranslucent();  
 
     renderer.renderSSR(camera, skyCubeMap.cubemap_texture,
                        controls.SSR_MaxStep, controls.SSR_Opaque_Intensity, controls.SSR_Trans_Intensity, controls.SSR_Threshold);
     renderer.renderSSRMip();
 
+    renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader,
+      controls.Lantern);
+      
     renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader,
-      controls.Particle_FireFly, controls.Weather_Rain);
+      controls.FireFly, controls.Rain);    
 
     renderer.renderforSavingCurrentFrame(camera);
 

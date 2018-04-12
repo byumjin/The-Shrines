@@ -67,15 +67,8 @@ class Quad extends Drawable {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
     gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
 
-    //gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    //gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUV);
     gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
-
-    //gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTrans);
-    //gl.bufferData(gl.ARRAY_BUFFER, this.trans, gl.STATIC_DRAW);
-
   }
 
   setInstanceVBOs(colors: Float32Array, offsets: Float32Array)
@@ -86,17 +79,17 @@ class Quad extends Drawable {
 
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.DYNAMIC_COPY);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTrans);
-    gl.bufferData(gl.ARRAY_BUFFER, this.trans, gl.DYNAMIC_COPY);
+    gl.bufferData(gl.ARRAY_BUFFER, this.trans, gl.STATIC_DRAW);
   }
 
   setCopyVBOs(bufferColors: WebGLBuffer, bufferOffsets: WebGLBuffer)
   {  
    this.bufCol = bufferColors;  
    this.bufTrans = bufferOffsets;
- }
+  }
 };
 
 export default Quad;

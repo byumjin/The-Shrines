@@ -7,11 +7,12 @@ import PostProcess from './PostProcess'
 import Square from '../../geometry/Square';
 import Quad from '../../geometry/Quad';
 import Particle from '../../particle/Particle';
+import Mesh from '../../geometry/Mesh';
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
 const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "ShadowPass": 4,
-                      "ExtractHighLight" : 5, "HorizonBlur" : 6, "VerticalBlur" : 7, "Particle" : 8,
+                      "ExtractHighLight" : 5, "HorizonBlur" : 6, "VerticalBlur" : 7, "Particle" : 8, "ParticleMesh" : 9,
                      "ToneMapping": 0};
 
 
@@ -121,8 +122,8 @@ HblurPass : PostProcess = new PostProcess(
     this.post8Targets = [undefined, undefined];
     this.post8Passes = [];
 
-    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
     this.post32Passes = [];
 
     if (!gl.getExtension("OES_texture_float_linear")) {
@@ -352,6 +353,10 @@ HblurPass : PostProcess = new PostProcess(
          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
          gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F, gShadowMapSize, gShadowMapSize, 0, gl.DEPTH_COMPONENT, gl.FLOAT, null);
          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.shadowDepthTexture, 0);
+      }
+      else if(i == PipelineEnum.ParticleMesh)
+      {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depthTexture, 0);
       }
 
       FBOstatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -682,24 +687,16 @@ HblurPass : PostProcess = new PostProcess(
     //transformation Feedback
     feedbackShader.use();
     feedbackShader.setdeltaTime(this.deltaTime);
+    feedbackShader.setTime(this.currentTime);    
     feedbackShader.setCameraWPos(camera.position);
-
     feedbackShader.setParticleInfo(vec4.fromValues(Weather_Rain ? 1.0 : 0.0, FireFly ? 1.0 : 0.0, 0.0, 0.0));
 
-    var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;
-
-    //gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
-    //particleSystem.setBuffers(particleSystem.currentBufferSetIndex, destinationIdx);
-
-    
+    var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;   
 
     gl.bindVertexArray(particleSystem.getVAO(particleSystem.currentBufferSetIndex));
-
     
     gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
-    particleSystem.bindBufferBase(destinationIdx);
-    //particleSystem.setAttribDivisor();
-    
+    particleSystem.bindBufferBase(destinationIdx);    
 
     // Turn off rasterization - we are not drawing
     gl.enable(gl.RASTERIZER_DISCARD);
@@ -718,8 +715,7 @@ HblurPass : PostProcess = new PostProcess(
     
     particleSystem.switchBufferSet();
     
-    //render    
-   
+    //render       
     quad.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.Particle]);
@@ -738,12 +734,74 @@ HblurPass : PostProcess = new PostProcess(
 
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-    gl.blendFunc(gl.ONE, gl.ZERO);
-    //gl.disable(gl.BLEND);
-   
-    
+    gl.blendFunc(gl.ONE, gl.ZERO);    
+    gl.disable(gl.BLEND);   
   }
+
+
+  renderLanternParticle(camera: Camera, mesh: Mesh, particleSystem: Particle, feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram,
+    Lantern: boolean)
+    {
+       //transformation Feedback
+      feedbackShader.use();
+      feedbackShader.setdeltaTime(this.deltaTime);
+      feedbackShader.setTime(this.currentTime);    
+      feedbackShader.setCameraWPos(camera.position);
+      feedbackShader.setParticleInfo(vec4.fromValues(0.0, 0.0, Lantern ? 1.0 : 0.0, 0.0));
+
+      var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;   
+
+      gl.bindVertexArray(particleSystem.getVAO(particleSystem.currentBufferSetIndex));
+      
+      gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
+      particleSystem.bindBufferBase(destinationIdx);    
+
+      // Turn off rasterization - we are not drawing
+      gl.enable(gl.RASTERIZER_DISCARD);
+
+      // Update position and rotation using transform feedback
+      gl.beginTransformFeedback(gl.POINTS);
+      gl.drawArrays(gl.POINTS, 0, particleSystem.count);
+      gl.endTransformFeedback();
+      
+      // Restore state
+      gl.disable(gl.RASTERIZER_DISCARD);
+      gl.useProgram(null);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+      gl.bindVertexArray(null);
+      
+      particleSystem.switchBufferSet();
+      
+      //render       
+      mesh.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ParticleMesh]);
+      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      gl.enable(gl.DEPTH_TEST);
+      //gl.enable(gl.BLEND);
+      //gl.blendFunc(gl.ONE, gl.ZERO); 
+      this.setClearColor(0.0, 0.0, 0.0, 0.0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      this.setClearColor(0.0, 0.0, 0.0, 1.0);
+
+      //if(Lantern)
+      //{
+        particleRenderShader.setViewMatrix(camera.viewMatrix);
+        particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
+        particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
+        particleRenderShader.setFrame00(this.tDTargets[0]);
+        particleRenderShader.setFrame01(mesh.albedoMap.texture);
+        particleRenderShader.drawInstance(mesh, particleSystem.count);
+      //}
+
+     
+
+      // bind default frame buffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      //gl.blendFunc(gl.ONE, gl.ZERO); 
+      gl.disable(gl.DEPTH_TEST);   
+    }
 
   renderforSavingCurrentFrame(camera: Camera) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SaveFrame]);
@@ -759,6 +817,7 @@ HblurPass : PostProcess = new PostProcess(
     this.savePass.setFrame01(this.post32Targets[PipelineEnum.SSR]);
     this.savePass.setFrame02(this.post32Targets[PipelineEnum.SSR_MIP]);
     this.savePass.setFrame03(this.post32Targets[PipelineEnum.Particle]);
+    this.savePass.setFrame04(this.post32Targets[PipelineEnum.ParticleMesh]);
    
     this.savePass.draw();
     // bind default frame buffer
