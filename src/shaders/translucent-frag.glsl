@@ -174,13 +174,14 @@ void main() {
 		
 		float energyConservation = 1.0 - Roughness * Roughness;
 
-		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? 0.2 :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? 0.2 :Roughness))) * (bWater ? 0.96 : energyConservation);
+		float waterRoughness = 0.2;
 
-		//specularTerm = clamp(specularTerm, 0.0, 2.0);
+		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? waterRoughness :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? waterRoughness :Roughness))) * (bWater ? 1.0 - waterRoughness*waterRoughness : energyConservation);
+
 
 		float ambientTerm = 0.1;
 
-		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * (bWater ? specularTerm * 6.0 : specularTerm) ) * (diffuseTerm + ambientTerm), diffuseColor.a);
+		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm ) * (diffuseTerm + ambientTerm), diffuseColor.a);
 
 
 		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
@@ -190,9 +191,11 @@ void main() {
 			//fresnel
 			float NoV = clamp( dot(viewVec.xyz, worldNormal), 0.0, 1.0);
 			NoV = 1.0 - NoV;
-			NoV = pow(NoV, 20.0);
-			pbrColor.xyz *= NoV;
-			pbrColor.xyz += NoV *  u_lightColor.xyz * u_lightColor.a;
+			float wNoV = pow(NoV, 20.0);
+			pbrColor.xyz *= wNoV;
+
+			float fNoV = pow(NoV, 50.0);
+			pbrColor.xyz += fNoV *  u_lightColor.xyz;
 		}
 
         float Opacity = 0.1;		

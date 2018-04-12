@@ -24,9 +24,9 @@ const controls = {
   Bloom_Dispersal : 0.5,
   Bloom_Distortion : 8.0,
 
-  FireFly : true,
-  Rain : true,
-  Lantern : true,
+  FireFly : false,
+  Rain : false,
+  Lantern : false,
 
   Temperature : 10000,
   
@@ -367,10 +367,10 @@ function main() {
             ]);
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0);
+  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0);
   let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
-  vec3.normalize(lightD, vec3.fromValues(1.0, 0.3, 1.0));
+  vec3.normalize(lightD, vec3.fromValues(-0.53, 0.2, 1.0));
 
   let lightDirection : vec4 = vec4.fromValues(lightD[0], lightD[1], lightD[2], 0.0);
 
