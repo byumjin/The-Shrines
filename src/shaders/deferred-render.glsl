@@ -213,6 +213,12 @@ float getShadow(vec4 lightSpacePos){
 	return shadow;
 }
 
+float LinearDepth(float d, float f)
+{
+	float n = 0.1;
+	return (2.0 * n) / (f + n - d * (f - n));
+}
+
 void main() { 
 
 	// read from GBuffers
@@ -239,7 +245,7 @@ void main() {
 	{			
 		 //inverse gamma correct
 		//vec3 reflVec = -viewVec;//reflect(-viewVec, normal.xyz);
-		vec4 col = texture(u_SkyCubeMap, -viewVec);
+		vec4 col = texture(u_SkyCubeMap, normalize( -viewVec  + vec3(0.0, u_CameraWPos.y, 0.0)*0.001 ) );
     	col = pow(col, vec4(2.2));
 		out_Col = col;
 		out_Col.w = 1.0;
@@ -280,6 +286,14 @@ void main() {
 			{
 				out_Col.xyz += albedo.xyz;
 			}
+
+			vec3 fogColor = vec3(93.0/255.0, 84.0/255.0, 86.0/255.0);
+			fogColor = pow(fogColor, vec3(2.2));
+
+			float linearDepth = LinearDepth(depth, 100.0);
+
+				
+			out_Col.xyz = mix(out_Col.xyz, fogColor, pow(linearDepth, 2.0) );
 		
 
 		

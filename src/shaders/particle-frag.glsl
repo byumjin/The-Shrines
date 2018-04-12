@@ -15,9 +15,8 @@ out vec4 out_Col;
 const int rainIndex = 16384;
 const int rainStainIndex = 1024;
 
-float LinearDepth(float d)
+float LinearDepth(float d, float f)
 {
-	float f= 1000.0;
 	float n = 0.1;
 	return (2.0 * n) / (f + n - d * (f - n));
 }
@@ -36,14 +35,15 @@ void main()
 	}
 
     float PerticleIndex = fs_Col.a;
+    float particleDepth = fs_Pos.a;
 
-    if(sceneDepth > fs_Pos.a)
+    if(sceneDepth > particleDepth)
     {
         if(PerticleIndex > float(rainIndex) )
         {
             //Forward
             float dist = pow(smoothstep(0.0, 1.0, 1.0 - pow(fs_Pos.x * 10.0, 2.0)), 10.0) * clamp(1.0 - pow(fs_Pos.y, 4.0 ), 0.0, 1.0);
-            float closeFade = clamp(LinearDepth(fs_Pos.a) * 100.0, 0.0, 1.0);
+            float closeFade = clamp(LinearDepth(particleDepth, 1000.0) * 100.0, 0.0, 1.0);
 
             out_Col = vec4(0.2, 0.2, 0.2, 0.0) * dist * closeFade;
         }
@@ -63,11 +63,11 @@ void main()
             out_Col = vec4(dist) * clamp( fs_Col, 0.0, 1.0) * 4.0;
         }
 
-        float diff = clamp( LinearDepth(sceneDepth) - LinearDepth(fs_Pos.a), 0.0, 1.0);
+        float diff = clamp( LinearDepth(sceneDepth, 1000.0) - LinearDepth(particleDepth, 1000.0), 0.0, 1.0);
              out_Col.xyz *= pow(smoothstep(0.0, 1.0, diff), 0.3);
 
        
-        out_Col.a = fs_Pos.a;
+        out_Col.a = particleDepth;
 
         
     }
@@ -75,6 +75,9 @@ void main()
     {   
         out_Col = vec4(0.0);
     }
+
+    float linearDepth = LinearDepth(particleDepth, 50.0);
+	out_Col.a *= 1.0 - pow(linearDepth, 2.0);
 
    
 

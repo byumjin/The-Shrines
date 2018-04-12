@@ -79,6 +79,13 @@ vec3 GGX_Spec(vec3 Normal, vec3 HalfVec, float Roughness, vec3 BaseColor, vec3 S
 	return D * FV;
 }
 
+float LinearDepth(float d, float f)
+{
+	//float f= 1000.0;
+	float n = 0.1;
+	return (2.0 * n) / (f + n - d * (f - n));
+}
+
 void main() {
  
     // fragment info is in view space
@@ -120,7 +127,6 @@ void main() {
     vec3 worldNormal = applyNormalMap(vertexNormal.xyz, waterNormal);
 
 
-    vec3 u_LightDir = normalize(vec3(1.0, 1.0, 1.0));
 
 	// read from GBuffers
 	vec4 albedo = vec4(col.xyz, Depth);
@@ -138,7 +144,7 @@ void main() {
     vec4 worldPos = u_Model * fs_Pos;
 
 	vec3 viewVec = normalize(u_CameraWPos - worldPos.xyz);
-	vec3 halfVec = viewVec + u_LightDir.xyz;
+	vec3 halfVec = viewVec + u_lightDirection.xyz;
 
 	
 	
@@ -157,24 +163,25 @@ void main() {
 	{
 		vec4 diffuseColor = vec4(albedo.xyz, 1.0);
 
-		float diffuseTerm = clamp( dot(u_LightDir.xyz, normal.xyz), 0.0, 1.0);
+		float diffuseTerm = clamp( dot(u_lightDirection.xyz, normal.xyz), 0.0, 1.0);
 		
 		halfVec = normalize(halfVec);
 		
-		float LoH = clamp(dot( u_LightDir.xyz, halfVec ), 0.0, 1.0);
+		float LoH = clamp(dot( u_lightDirection.xyz, halfVec ), 0.0, 1.0);
 
 		vec3 specularTerm = vec3(0.0);
 		vec3 SpecularColor = specular.xyz;
 		
 		float energyConservation = 1.0 - Roughness * Roughness;
 
-		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? 0.3 :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? 0.3 :Roughness))) * (bWater ? 0.91 : energyConservation);
+		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? 0.2 :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? 0.2 :Roughness))) * (bWater ? 0.96 : energyConservation);
 
 		//specularTerm = clamp(specularTerm, 0.0, 2.0);
 
 		float ambientTerm = 0.1;
 
-		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * (bWater ? specularTerm * 8.0 : specularTerm) ) * (diffuseTerm + ambientTerm), diffuseColor.a);
+		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * (bWater ? specularTerm * 6.0 : specularTerm) ) * (diffuseTerm + ambientTerm), diffuseColor.a);
+
 
 		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 
@@ -183,14 +190,30 @@ void main() {
 			//fresnel
 			float NoV = clamp( dot(viewVec.xyz, worldNormal), 0.0, 1.0);
 			NoV = 1.0 - NoV;
-			NoV = pow(NoV, 30.0);	
-
-			pbrColor.xyz += NoV *  u_lightColor.xyz * u_lightColor.a * 2.0;
+			NoV = pow(NoV, 20.0);
+			pbrColor.xyz *= NoV;
+			pbrColor.xyz += NoV *  u_lightColor.xyz * u_lightColor.a;
 		}
 
         float Opacity = 0.1;		
 
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
+
+		vec3 fogColor = vec3(93.0/255.0, 84.0/255.0, 86.0/255.0);
+		fogColor = pow(fogColor, vec3(2.2));
+		
+		
+
+		if(bWater)
+		{		
+			float linearDepth = LinearDepth(Depth, 1000.0);	
+			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, pow(linearDepth, 1.5) );
+		}
+		else
+		{
+			float linearDepth = LinearDepth(Depth, 100.0);
+			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, pow(linearDepth, 2.0) );
+		}
         
 		fragColor[1] = vec4(normal.xyz, Roughness);
 	}

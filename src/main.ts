@@ -17,7 +17,7 @@ const controls = {
    
   SSR_MaxStep : 128,
   SSR_Opaque_Intensity : 0.05,
-  SSR_Trans_Intensity : 0.1,
+  SSR_Trans_Intensity : 0.2,
   SSR_Threshold : 0.5,
 
   Bloom_Iteration : 16,
@@ -25,8 +25,10 @@ const controls = {
   Bloom_Distortion : 8.0,
 
   FireFly : true,
-  Rain : false,
-  Lantern : false,
+  Rain : true,
+  Lantern : true,
+
+  Temperature : 10000,
   
   
 };
@@ -120,13 +122,13 @@ function loadScene() {
   square && square.destroy();
   mesh0 && mesh0.destroy();
 
-  skyCubeMap = new Texture('./src/resources/objs/skybox/middaySky_', true);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 0);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 1);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 2);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 3);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 4);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/middaySky_', 5);
+  skyCubeMap = new Texture('./src/resources/objs/skybox/nightSky_', true);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 0);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 1);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 2);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 3);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 4);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 5);
 
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
@@ -259,6 +261,9 @@ function main() {
   PARTICLE.add(controls, 'Rain');
   PARTICLE.add(controls, 'Lantern');
 
+  var ENVIRONMENT = gui.addFolder('Environment');
+  ENVIRONMENT.add(controls, 'Temperature', 0, 10000).step(1);
+
   
 
   // get canvas and webgl context
@@ -361,10 +366,11 @@ function main() {
           new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Lantern-frag.glsl')),
             ]);
 
+  //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
   let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0);
   let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
-  vec3.normalize(lightD, vec3.fromValues(1.0, 0.5, 1.0));
+  vec3.normalize(lightD, vec3.fromValues(1.0, 0.3, 1.0));
 
   let lightDirection : vec4 = vec4.fromValues(lightD[0], lightD[1], lightD[2], 0.0);
 
@@ -428,7 +434,7 @@ function main() {
       renderer.renderforVerticalBlur(camera);
     }
 
-    renderer.renderTonemapping(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion );
+    renderer.renderTonemapping(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion, controls.Temperature );
    
     renderer.renderPresent(camera);
     

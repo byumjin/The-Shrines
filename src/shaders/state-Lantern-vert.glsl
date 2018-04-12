@@ -88,7 +88,7 @@ void main()
         else if(o_position.y < 0.0)
         {
             o_position.x = i_position.x;
-            o_position.y = i_velocity.a - 200.0;
+            o_position.y = i_velocity.a * 1.8 - 200.0;
             o_position.z = i_position.z;
             o_attract = i_attract;
         }

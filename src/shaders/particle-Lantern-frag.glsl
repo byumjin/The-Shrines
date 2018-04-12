@@ -14,9 +14,9 @@ in vec2 fs_UV_SS;
 
 out vec4 out_Col;
 
-float LinearDepth(float d)
+float LinearDepth(float d, float f)
 {
-	float f= 1000.0;
+	//float f= 1000.0;
 	float n = 0.1;
 	return (2.0 * n) / (f + n - d * (f - n));
 }
@@ -24,6 +24,7 @@ float LinearDepth(float d)
 void main()
 {
     float sceneDepth = texture(u_frame0, fs_UV_SS).a;
+    float particleDepth = fs_Pos.a;
 
     if(sceneDepth > 19.0)
 	{
@@ -34,11 +35,12 @@ void main()
 		sceneDepth -= 10.0;
 	}
 
-    if(sceneDepth > fs_Pos.a)
+    if(sceneDepth > particleDepth)
     {
         out_Col.xyz = texture(u_frame1, fs_UV).xyz;
-
-        //out_Col.xyz *= 0.5;
+        
+        //float alpha = texture(u_frame1, fs_UV).a;        
+        //out_Col.xyz *= (1.0 +  (alpha - 0.5) * 2.0);
         
 
         if(fs_Pos.y < 5.0)
@@ -52,12 +54,13 @@ void main()
         else
             out_Col.a = 1.0;
 
-        out_Col.a = min(out_Col.a, 0.8);
+        out_Col.a = min(out_Col.a, 0.9);
     }
     else
     {   
         out_Col = vec4(0.0);
     }
-    
-    out_Col = clamp(out_Col, 0.0, 1.0);
+
+    float linearDepth = LinearDepth(particleDepth, 50.0);
+	out_Col.a *= 1.0 - pow(linearDepth, 2.0);
 }

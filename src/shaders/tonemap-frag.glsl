@@ -9,7 +9,7 @@ out vec4 out_Col;
 uniform sampler2D u_frame0; //Scene
 uniform sampler2D u_frame1; //Bloom
 uniform vec2 u_screenSize;
-uniform vec4 u_chromaticInfo; //x:dispersal, y:distortion
+uniform vec4 u_chromaticInfo; //x:dispersal, y:distortion, w : ColorTemp
 
 float bloomCalculation(float x, float A, float B, float C, float D, float E, float F)
 {
@@ -142,7 +142,7 @@ vec4 textureDistorted(sampler2D tex, vec2 texcoord,  vec2 direction, // directio
 
 void main() {
 		
-    float u_Temperature = 6500.0;
+    float u_Temperature = u_chromaticInfo.w;
 
     vec2 reverseUV = vec2(fs_UV.x, 1.0 - fs_UV.y);
 

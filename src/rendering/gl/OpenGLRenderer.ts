@@ -877,7 +877,7 @@ HblurPass : PostProcess = new PostProcess(
     gl.bindTexture(gl.TEXTURE_2D, null); 
   }  
 
-  renderTonemapping(camera: Camera, dispersal : number, distortion : number) {
+  renderTonemapping(camera: Camera, dispersal : number, distortion : number, colorTemp : number) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.ToneMapping]);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.disable(gl.DEPTH_TEST);
@@ -888,7 +888,7 @@ HblurPass : PostProcess = new PostProcess(
     this.tonemapPass.setFrame00(this.post32Targets[PipelineEnum.SaveFrame]);
     this.tonemapPass.setFrame01(this.post32Targets[PipelineEnum.VerticalBlur]);
     this.tonemapPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling));
-    this.tonemapPass.setChromaticInfo( vec4.fromValues(dispersal, distortion, 0.0, 0.0 ) );
+    this.tonemapPass.setChromaticInfo( vec4.fromValues(dispersal, distortion, 0.0, colorTemp ) );
     this.tonemapPass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
