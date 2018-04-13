@@ -18,7 +18,7 @@ const controls = {
   SSR_MaxStep : 128,
   SSR_Opaque_Intensity : 0.2,
   SSR_Trans_Intensity : 0.2,
-  SSR_Threshold : 0.5,
+  SSR_Threshold : 3.0,
 
   Bloom_Iteration : 16,
   Bloom_Dispersal : 0.5,

@@ -86,7 +86,7 @@ void main() {
 	vec4 reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 	float threshold = 2.0;
-	float stepSize =  (1.0 + roughness) * (bWater ? u_SSRInfo.w * 20.0 : u_SSRInfo.w);
+	float stepSize =  (1.0 + roughness) * (bWater ? 10.0 : u_SSRInfo.w);
 	float prevDepth;
 	float prevDepthFromDepthBuffer;
 
@@ -194,9 +194,9 @@ void main() {
 				}
 				*/
 
-				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), 0.8 ); //temporal Blend
+				//reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), 0.5 ); //temporal Blend
 				//reflectionColor = texture(u_frame0, lerpedScreenSpaceCoords);
-				//reflectionColor = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
+				reflectionColor = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
 
 				fadeFactor = fade(lerpedScreenSpaceCoords);
 				fadeFactor = min(pow(1.0 -  (i + 1.0)/maxStep, 0.05), fadeFactor);
