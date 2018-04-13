@@ -194,7 +194,7 @@ void main() {
 				}
 				*/
 
-				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), 0.5 ); //temporal Blend
+				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), 0.8 ); //temporal Blend
 				//reflectionColor = texture(u_frame0, lerpedScreenSpaceCoords);
 				//reflectionColor = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
 

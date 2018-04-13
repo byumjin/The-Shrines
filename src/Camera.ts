@@ -19,6 +19,9 @@ function mulMatVec4(a : mat4, b : vec4 ) : vec4
 class Camera {
   projectionMatrix: mat4 = mat4.create();
   invProjMatrix: mat4 = mat4.create();
+
+  cloudProjectionMatrix: mat4 = mat4.create();
+
   viewProjectionMatrix: mat4 = mat4.create();
   invViewProjectionMatrix: mat4 = mat4.create();
   viewMatrix: mat4 = mat4.create();
@@ -66,7 +69,8 @@ class Camera {
   updateProjectionMatrix() {
     mat4.perspective(this.projectionMatrix, this.fovy, this.aspectRatio, this.near, this.far);
     mat4.invert(this.invProjMatrix, this.projectionMatrix);
-    //mat4.mul(this.viewProjectionMatrix, this.projectionMatrix, this.viewMatrix);
+
+    mat4.perspective(this.cloudProjectionMatrix, this.fovy, this.aspectRatio, this.near, this.far * this.far );   
   }
 
   Translate(delta : number)

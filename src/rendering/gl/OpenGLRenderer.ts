@@ -12,7 +12,7 @@ import Mesh from '../../geometry/Mesh';
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
 const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "ShadowPass": 4,
-                      "ExtractHighLight" : 5, "HorizonBlur" : 6, "VerticalBlur" : 7, "Particle" : 8, "ParticleMesh" : 9,
+                      "ExtractHighLight" : 5, "HorizonBlur" : 6, "VerticalBlur" : 7, "Particle" : 8, "ParticleMesh" : 9, "Clouds" : 10,
                      "ToneMapping": 0};
 
 
@@ -102,6 +102,11 @@ HblurPass : PostProcess = new PostProcess(
       new Shader(gl.FRAGMENT_SHADER, require('../../shaders/present-frag.glsl'))
       );
 
+      /*
+  couldPass : PostProcess = new PostProcess(
+        new Shader(gl.FRAGMENT_SHADER, require('../../shaders/clouds-frag.glsl'))
+        );
+*/
 
   add8BitPass(pass: PostProcess) {
     this.post8Passes.push(pass);
@@ -122,8 +127,8 @@ HblurPass : PostProcess = new PostProcess(
     this.post8Targets = [undefined, undefined];
     this.post8Passes = [];
 
-    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
     this.post32Passes = [];
 
     if (!gl.getExtension("OES_texture_float_linear")) {
@@ -600,15 +605,14 @@ HblurPass : PostProcess = new PostProcess(
     //gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
   }
 
+  
+
   renderAddTranslucent()
   {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.tDBuffer);
-    //gl.enable(gl.BLEND);
-    //gl.blendFunc(gl.ONE, gl.ONE);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.tDBuffer);    
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-    //gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.translucentAddPass.setFrame00(this.post32Targets[PipelineEnum.SceneImage]);
     this.translucentAddPass.setFrame01(this.tTargets[0]);
@@ -723,7 +727,7 @@ HblurPass : PostProcess = new PostProcess(
     //gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE);
-    //this.setClearColor(0.0, 0.0, 0.0, 1.0);
+    this.setClearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     particleRenderShader.setViewMatrix(camera.viewMatrix);
@@ -785,23 +789,96 @@ HblurPass : PostProcess = new PostProcess(
       gl.clear(gl.COLOR_BUFFER_BIT);
       this.setClearColor(0.0, 0.0, 0.0, 1.0);
 
-      //if(Lantern)
-      //{
-        particleRenderShader.setViewMatrix(camera.viewMatrix);
-        particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
-        particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
-        particleRenderShader.setFrame00(this.tDTargets[0]);
-        particleRenderShader.setFrame01(mesh.albedoMap.texture);
-        particleRenderShader.drawInstance(mesh, particleSystem.count);
-      //}
-
-     
+      particleRenderShader.setViewMatrix(camera.viewMatrix);
+      particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
+      particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
+      particleRenderShader.setFrame00(this.tDTargets[0]);
+      particleRenderShader.setFrame01(mesh.albedoMap.texture);
+      particleRenderShader.drawInstance(mesh, particleSystem.count);
 
       // bind default frame buffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       //gl.blendFunc(gl.ONE, gl.ZERO); 
       gl.disable(gl.DEPTH_TEST);   
     }
+
+
+    renderClouds(camera: Camera, quad: Quad, particleSystem: Particle, lightColor : vec4, lightDir : vec4, cloudTex : WebGLTexture, normalTex : WebGLTexture, noiseTex : WebGLTexture,
+       feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram, clouds : Boolean)
+  {
+    //transformation Feedback
+    feedbackShader.use();
+    feedbackShader.setdeltaTime(this.deltaTime);
+      feedbackShader.setTime(this.currentTime);    
+      feedbackShader.setCameraWPos(camera.position);
+    feedbackShader.setParticleInfo(vec4.fromValues(0.0, 0.0, 0.0, clouds ? 1.0 : 0.0));
+
+    var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;   
+
+    gl.bindVertexArray(particleSystem.getVAO(particleSystem.currentBufferSetIndex));
+    
+    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
+    particleSystem.bindBufferBase(destinationIdx);    
+
+    // Turn off rasterization - we are not drawing
+    gl.enable(gl.RASTERIZER_DISCARD);
+
+    // Update position and rotation using transform feedback
+    gl.beginTransformFeedback(gl.POINTS);
+    gl.drawArrays(gl.POINTS, 0, particleSystem.count);
+    gl.endTransformFeedback();
+    
+    // Restore state
+    gl.disable(gl.RASTERIZER_DISCARD);
+    gl.useProgram(null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+    gl.bindVertexArray(null);
+    
+    particleSystem.switchBufferSet();
+    
+    //render       
+    quad.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
+
+    
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.Clouds]);
+      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      //gl.enable(gl.DEPTH_TEST);
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.ONE, gl.ONE);
+      this.setClearColor(0.0, 0.0, 0.0, 0.0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      if(clouds)
+     {
+
+      particleRenderShader.setViewMatrix(camera.viewMatrix);
+      particleRenderShader.setProjMatrix(camera.cloudProjectionMatrix);
+
+        particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
+        particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
+        particleRenderShader.setFrame00(this.tDTargets[0]);
+        particleRenderShader.setFrame01(cloudTex);
+        particleRenderShader.setFrame02(normalTex);
+        particleRenderShader.setFrame03(noiseTex);
+
+        particleRenderShader.setLightDirection(lightDir);
+        particleRenderShader.setCameraWPos(camera.position)
+
+        particleRenderShader.setTime(this.currentTime * 0.6);
+
+      particleRenderShader.drawInstance(quad, particleSystem.count);
+    }
+
+    
+
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.blendFunc(gl.ONE, gl.ZERO);    
+    gl.disable(gl.BLEND);   
+
+    
+  }
 
   renderforSavingCurrentFrame(camera: Camera) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SaveFrame]);
@@ -818,6 +895,7 @@ HblurPass : PostProcess = new PostProcess(
     this.savePass.setFrame02(this.post32Targets[PipelineEnum.SSR_MIP]);
     this.savePass.setFrame03(this.post32Targets[PipelineEnum.Particle]);
     this.savePass.setFrame04(this.post32Targets[PipelineEnum.ParticleMesh]);
+    this.savePass.setDepthMap(this.post32Targets[PipelineEnum.Clouds]);
    
     this.savePass.draw();
     // bind default frame buffer
@@ -903,7 +981,7 @@ HblurPass : PostProcess = new PostProcess(
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00(  this.post32Targets[PipelineEnum.Particle]);
+    //this.presentPass.setFrame00(  this.post32Targets[PipelineEnum.Clouds]);
     //this.presentPass.setFrame01( this.post32Targets[PipelineEnum.SceneImage] );
     this.presentPass.draw();
 

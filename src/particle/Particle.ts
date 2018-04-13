@@ -124,32 +124,34 @@ class Particle
         return vec2.fromValues(radius * Math.cos(phi), radius * Math.sin(phi));
 }
 
-  initialize()
+  initialize(width : number, xOffset : number, height : number, yOffset : number, depth : number, zOffset : number,
+              Rrange : number, Rbias : number, Grange : number, Gbias : number, Brange : number, Bbias : number            
+  )
   {
     
     for (let p = 0; p < this.count; ++p)
     {
       var posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));
-      this.position[p * 4] = posXZ[0] *  150.0;
-      this.position[p * 4 + 1] = (Math.random()) *  100.0;
-      this.position[p * 4 + 2] = posXZ[1] *  150.0;
+      this.position[p * 4] = posXZ[0] * width + xOffset;
+      this.position[p * 4 + 1] = (Math.random()) *  height + yOffset;
+      this.position[p * 4 + 2] = posXZ[1] *  depth + zOffset;
       
       
       this.velocity[p * 4] = 0.0;
       this.velocity[p * 4 + 1] = 0.0;
       this.velocity[p * 4 + 2] = 0.0;
 
-      this.color[p * 4] = Math.random() * 0.5 + 0.5;
-      this.color[p * 4 + 1] = Math.random() * 0.7 + 0.3;
-      this.color[p * 4 + 2] = Math.random() - 3.0; // Life
+      this.color[p * 4] = Math.random() * Rrange + Rbias;
+      this.color[p * 4 + 1] = Math.random() * Grange + Gbias;
+      this.color[p * 4 + 2] = Math.random() * Brange + Bbias; // Life
 
       this.color[p * 4 + 3] = 0.0; //Index
 
       posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));   
 
-      this.attract[p * 4] = posXZ[0] *  150.0;
-      this.attract[p * 4 + 1] = (Math.random()) * 100.0;
-      this.attract[p * 4 + 2] = posXZ[1] * 150.0;
+      this.attract[p * 4] = posXZ[0] * width + xOffset;
+      this.attract[p * 4 + 1] = (Math.random()) *  height + yOffset;
+      this.attract[p * 4 + 2] = posXZ[1] *  depth + zOffset;
 
       //save original Gap
       this.position[p * 4 + 3] = this.attract[p * 4];

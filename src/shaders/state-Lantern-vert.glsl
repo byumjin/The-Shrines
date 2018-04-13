@@ -69,7 +69,7 @@ void main()
     o_position = vec4(prevPosition.xyz + (u_deltaTime * 0.5) * (positionPrime + PredictPosPrime), i_position.a);
 
     o_color = i_color;
-    o_color.a = float(gl_VertexID);
+    o_color.a = float(gl_VertexID)  + 0.1;
 
 
 

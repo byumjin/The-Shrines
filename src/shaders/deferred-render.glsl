@@ -287,10 +287,10 @@ void main() {
 				out_Col.xyz += albedo.xyz;
 			}
 
-			vec3 fogColor = vec3(93.0/255.0, 84.0/255.0, 86.0/255.0);
+			vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
 			fogColor = pow(fogColor, vec3(2.2));
 
-			float linearDepth = LinearDepth(depth, 100.0);
+			float linearDepth = LinearDepth(depth, 200.0);
 
 				
 			out_Col.xyz = mix(out_Col.xyz, fogColor, pow(linearDepth, 2.0) );

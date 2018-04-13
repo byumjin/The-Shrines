@@ -157,5 +157,5 @@ void main() {
 
 	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + bloomColor) * ColorTemperatureToRGB(u_Temperature);
 
-	out_Col = vec4( RomBinDaHouseToneMapping(toneMappedColor), 1.0);
+	out_Col = vec4( filmicToneMapping(toneMappedColor), 1.0);
 }

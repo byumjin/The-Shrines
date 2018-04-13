@@ -9,6 +9,7 @@ uniform sampler2D u_frame1; //SSR_Mask
 uniform sampler2D u_frame2; //SSR
 uniform sampler2D u_frame3; //Particle
 uniform sampler2D u_frame4; //ParticleMesh
+uniform sampler2D u_DepthMap; //Cloud
 
 uniform sampler2D u_Gbuffer_Specular;
 uniform sampler2D u_Gbuffer_Albedo;
@@ -46,6 +47,11 @@ void main() {
 
 	
 	finalColor.xyz += particleColor.xyz;
+
+	vec4 cloudColor = texture(u_DepthMap, reverseUV);
+
+
+	finalColor.xyz += cloudColor.xyz;
 
 
 	out_Col = clamp( vec4( finalColor, 1.0), 0.0, 1.0);

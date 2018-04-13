@@ -202,7 +202,7 @@ void main() {
 
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
 
-		vec3 fogColor = vec3(93.0/255.0, 84.0/255.0, 86.0/255.0);
+		vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
 		fogColor = pow(fogColor, vec3(2.2));
 		
 		
@@ -214,7 +214,7 @@ void main() {
 		}
 		else
 		{
-			float linearDepth = LinearDepth(Depth, 100.0);
+			float linearDepth = LinearDepth(Depth, 200.0);
 			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, pow(linearDepth, 2.0) );
 		}
         

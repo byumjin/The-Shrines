@@ -16,7 +16,7 @@ import Quad from './geometry/Quad';
 const controls = {
    
   SSR_MaxStep : 128,
-  SSR_Opaque_Intensity : 0.05,
+  SSR_Opaque_Intensity : 0.2,
   SSR_Trans_Intensity : 0.2,
   SSR_Threshold : 0.5,
 
@@ -26,7 +26,8 @@ const controls = {
 
   FireFly : false,
   Rain : false,
-  Lantern : false,
+  Lantern : true,
+  Clouds : true,
 
   Temperature : 10000,
   
@@ -35,6 +36,7 @@ const controls = {
 
 let square: Square;
 let particleQuad: Quad;
+let cloudQuad: Quad;
 // TODO: replace with your scene's stuff
 
 let obj0: string;
@@ -78,8 +80,12 @@ let mesh_Test: Mesh;
 let mesh_Lantern: Mesh;
 
 let skyCubeMap: Texture;
+let cloudsTexture: Texture;
+let cloudsNormalTexture: Texture;
 
 let numParticle: number = 32768; //Bilboard
+let numCloud: number = 2048;
+
 let numLatern: number = 1024;
 
 var timer = {
@@ -130,11 +136,17 @@ function loadScene() {
   skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 4);
   skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 5);
 
+  cloudsTexture = new Texture('./src/resources/clouds/clouds.png', false);
+  cloudsNormalTexture = new Texture('./src/resources/clouds/clouds_Normal.png', false);
+
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
 
   particleQuad = new Quad(vec3.fromValues(0, 0, 0));
   particleQuad.create();
+
+  cloudQuad = new Quad(vec3.fromValues(0, 0, 0));
+  cloudQuad.create();
 
 
   mesh0 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
@@ -247,7 +259,7 @@ function main() {
 
   var SSR = gui.addFolder('SSR');  
   SSR.add(controls, 'SSR_MaxStep', 16.0, 256.0).step(1);
-  SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 0.2).step(0.01);
+  SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 1.0).step(0.01);
   SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.01);
   SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
 
@@ -260,6 +272,7 @@ function main() {
   PARTICLE.add(controls, 'FireFly');
   PARTICLE.add(controls, 'Rain');
   PARTICLE.add(controls, 'Lantern');
+  PARTICLE.add(controls, 'Clouds');
 
   var ENVIRONMENT = gui.addFolder('Environment');
   ENVIRONMENT.add(controls, 'Temperature', 0, 10000).step(1);
@@ -280,10 +293,14 @@ function main() {
   loadScene();
 
   const particleSys = new Particle(numParticle);
-  particleSys.initialize();
+  particleSys.initialize(150.0, 0.0, 100.0, 0.0, 150.0, 0.0, 0.5, 0.5, 0.7, 0.3, 1.0, -3.0);
+
+  
+  const particleCloud = new Particle(numCloud);
+  particleCloud.initialize(50000.0, 0.0, 3000.0, 3000.0, 50000.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0 );
 
   const particleLanternSys = new Particle(numLatern);
-  particleLanternSys.initialize();
+  particleLanternSys.initialize(150.0, 0.0, 100.0, 0.0, 150.0, 0.0, 0.5, 0.5, 0.7, 0.3, 1.0, -3.0);
 
   const camera = new Camera();
   camera.updateOrbit(0.0, -60.0);
@@ -326,9 +343,9 @@ function main() {
   translucentDeferred.setupTexUnits(["AlbedoMap", "SpecularMap", "NormalMap"]);
 
   const standardShadowMapping = new ShaderProgram([
-      new Shader(gl.VERTEX_SHADER, require('./shaders/standard-vert.glsl')),
-      new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
-      ]);
+    new Shader(gl.VERTEX_SHADER, require('./shaders/standard-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
+    ]);
 
   const leafShadowMapping = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/leaf-vert.glsl')),
@@ -341,30 +358,46 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/shadow-frag.glsl')),
     ]);
 
-    const feedBackShader = new ShaderProgram([
+  const feedBackShader = new ShaderProgram([
       new Shader(gl.VERTEX_SHADER, require('./shaders/state-vert.glsl')),
       new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
       ],
       true,
       ['o_position', 'o_velocity', 'o_color', 'o_attract']);
   
-    const particleRenderShader = new ShaderProgram([
+  const particleRenderShader = new ShaderProgram([
       new Shader(gl.VERTEX_SHADER, require('./shaders/particle-vert.glsl')),
       new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-frag.glsl')),
         ]);
 
 
-        const feedBackLanternShader = new ShaderProgram([
-          new Shader(gl.VERTEX_SHADER, require('./shaders/state-Lantern-vert.glsl')),
-          new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
-          ],
-          true,
-          ['o_position', 'o_velocity', 'o_color', 'o_attract']);
+  const feedBackLanternShader = new ShaderProgram([
+      new Shader(gl.VERTEX_SHADER, require('./shaders/state-Lantern-vert.glsl')),
+      new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
+      ],
+      true,
+      ['o_position', 'o_velocity', 'o_color', 'o_attract']);
       
-        const particleLanternRenderShader = new ShaderProgram([
-          new Shader(gl.VERTEX_SHADER, require('./shaders/particle-Lantern-vert.glsl')),
-          new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Lantern-frag.glsl')),
-            ]);
+  const particleLanternRenderShader = new ShaderProgram([
+      new Shader(gl.VERTEX_SHADER, require('./shaders/particle-Lantern-vert.glsl')),
+      new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Lantern-frag.glsl')),
+      ]);
+
+
+      const feedBackCloudShader = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/state-Cloud-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
+        ],
+        true,
+        ['o_position', 'o_velocity', 'o_color', 'o_attract']);
+        
+    const particleCloudRenderShader = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/particle-Cloud-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Cloud-frag.glsl')),
+        ]);
+ 
+
+
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
   let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0);
@@ -412,6 +445,9 @@ function main() {
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
+    
+    
+
     renderer.renderAddTranslucent();  
 
     renderer.renderSSR(camera, skyCubeMap.cubemap_texture,
@@ -420,6 +456,11 @@ function main() {
 
     renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader,
       controls.Lantern);
+
+    renderer.renderClouds(camera, cloudQuad, particleCloud, lightColor, lightDirection, cloudsTexture.texture, cloudsNormalTexture.texture, mesh_lake.normalMap.texture, feedBackCloudShader, particleCloudRenderShader,
+    controls.Clouds);
+
+      
       
     renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader,
       controls.FireFly, controls.Rain);    
