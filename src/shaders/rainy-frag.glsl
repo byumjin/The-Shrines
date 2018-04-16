@@ -181,7 +181,7 @@ void main()
         col = col/(Z*Z);
     }
     
-    col *= mix(vec3(1.0), vec3(0.925), focus);
+    col *= mix(vec3(1.0), vec3(0.9), focus);
 
     t = (T+3.)*.5;										// make time sync with first lightnoing
     float colFade = sin(t*.2)*.5+.5+story;
