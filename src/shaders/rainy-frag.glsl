@@ -138,7 +138,7 @@ void main()
     float cy = Drops(uv+e.yx, t, staticDrops, layer1, layer2).x;
     vec2 n = vec2(cx-c.x, cy-c.x);		// expensive normals
     //vignette
-    const vec2 lensRadius 	= vec2(0.65*1.5, 0.05);
+    const vec2 lensRadius   = vec2(0.85*1.5, 0.05);
     float dist = distance(uv.xy, vec2(0.0,0.0));
     float vigfin = pow(1.-smoothstep(lensRadius.x, lensRadius.y, dist),2.);
    
