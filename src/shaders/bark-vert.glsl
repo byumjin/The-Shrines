@@ -56,7 +56,7 @@ void main()
 	vec3 w=wind_dir * wind_power * wave_info*0.05;
 	vec2 Wind=vec2(w.x,w.z);
 
-	float BendScale=0.024;
+	float BendScale=0.0125;
 	ApplyMainBending(vPos, Wind, BendScale);
 	vPos += objectPosition;
 

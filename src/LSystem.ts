@@ -214,12 +214,13 @@ export class LSystem extends Drawable{
 					turtle.pos[0]+this.center[0], 
 					turtle.pos[1]+this.center[1], 
 					turtle.pos[2]+this.center[2]);
-				mat4.rotate(rotMat, rotMat, Math.random()*Math.PI, vec3.fromValues(0,1,0));
+				mat4.rotate(rotMat, rotMat, this.InitAngle/180*Math.PI, vec3.fromValues(0,1,0));
 				mat4.translate(transMat, transMat, midpos);
 				mat4.multiply(model, rotMat, model);
 			    mat4.multiply(model, transMat, model);
-			    let meshNo = Math.floor(Math.random()*road_Mesh_Map.get("conn").length);
-			    console.log(meshNo);
+			    let meshNo = 0;
+			    if (Math.random()>0.65)
+			    	meshNo = Math.floor(Math.random()*road_Mesh_Map.get("conn").length);
 			    let mesh = road_Mesh_Map.get("conn")[meshNo];
 			    this.add(mesh, model);
 	        }
