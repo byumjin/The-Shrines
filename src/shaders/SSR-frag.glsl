@@ -245,20 +245,16 @@ void main() {
 	vec4 SkyColor;
 
 	//out of screen
-	if(farPos_SS.x > 1.0 || farPos_SS.x < 0.0 || farPos_SS.y > 1.0 || farPos_SS.y < 0.0)
+	if(farPos_SS.x > 1.0 || farPos_SS.x < 0.0 || farPos_SS.y > 1.0 || farPos_SS.y < 0.0 || LDepth < 1.0 || relfectVec_VS.z >= 0.0)
 	{
 		SkyColor = texture(u_SkyCubeMap, relfectVec);
-	}
-	else if(LDepth < 1.0 || relfectVec_VS.z >= 0.0)
-	{
-		SkyColor = vec4(0.0);
 	}
 	else
 	{
 
 		if(bHit && currentDepth < 1.0)
 		{
-			SkyColor = vec4(0.0);
+			SkyColor = texture(u_SkyCubeMap, relfectVec);
 		}
 		else
 		{
