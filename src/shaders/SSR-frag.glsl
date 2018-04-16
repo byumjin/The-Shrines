@@ -161,9 +161,11 @@ void main() {
 				float lerpVal = (prevIndicatedLinearDepth - prevLinearDepth) / denom;
 
 				lerpVal = clamp(lerpVal, 0.0, 1.0);
-
-				lerpVal = sqrt(lerpVal);
-				//lerpVal = 1.0;
+				
+				//exception
+				if(i < 0.5)
+					lerpVal = 1.0;
+					
 				vec3 lerpedPos = prevPos + relfectVec * stepSize * lerpVal;
 
 				vec4 lerpedPos_SS = u_ViewProj * vec4(lerpedPos, 1.0);
