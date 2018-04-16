@@ -74,7 +74,7 @@ float texture2DCompare(sampler2D depths, vec2 uv, vec2 offset, float compare){
     //vec2 gradient = vec2(texture(depths, uv).g, texture(depths, uv).b);
     compare = compare - bias;
     if(depth < compare)
-    	return 0.25;
+    	return 0.1;
     else
     	return 1.0;
 }

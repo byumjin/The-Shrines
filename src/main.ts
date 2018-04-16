@@ -574,7 +574,7 @@ function main() {
     return lightViewProjMat;
   }
 
-  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 400, 400, -100, 450);
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 400, 400, -300, 450);
 
   function tick() {
 
