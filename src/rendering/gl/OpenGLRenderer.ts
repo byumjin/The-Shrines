@@ -666,6 +666,7 @@ HblurPass : PostProcess = new PostProcess(
 
     //this.SSRPass.setDepthMap( this.tDTargets[0] /* this.gbTargets[GbufferEnum.Albedo] */);
     
+    this.SSRPass.setViewMatrix(camera.viewMatrix);
     this.SSRPass.setViewProjMatrix(camera.viewProjectionMatrix);
     this.SSRPass.setInvViewProjMatrix(camera.invViewProjectionMatrix);
 
