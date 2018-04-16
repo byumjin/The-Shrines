@@ -79,6 +79,8 @@ void main()
 
        out_Col.a = 1.0;
 
+       vec3 tintColor = vec3(1.0, 0.6, 0.4);
+       out_Col.xyz *= tintColor;
        out_Col = clamp(out_Col, 0.0, 1.0);
        
     }

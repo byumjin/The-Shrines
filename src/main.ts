@@ -12,6 +12,8 @@ import Texture from './rendering/gl/Texture';
 import {PlyLoader} from './geometry/PlyLoaders';
 import Particle from './particle/Particle';
 import Quad from './geometry/Quad';
+import {LSystem} from './LSystem';
+
 // Define an object with application parameters and button callbacks
 const controls = {
    
@@ -26,12 +28,13 @@ const controls = {
 
   FireFly : false,
   Rain : false,
+  Snow : false,
   Lantern : true,
   Clouds : true,
 
   Temperature : 10000,
   
-  
+  Vignette_Effect: true,
 };
 
 let square: Square;
@@ -71,6 +74,9 @@ let ply_Bark2: string;
 
 let obj_Lantern: string;
 
+//Road
+export let road_Mesh_Map: Map<string, Array<Mesh>>;
+
 let mesh_Leaf: Mesh;
 let mesh_Bark: Mesh;
 let mesh_Leaf2: Mesh;
@@ -87,6 +93,11 @@ let numParticle: number = 32768; //Bilboard
 let numCloud: number = 2048;
 
 let numLatern: number = 1024;
+
+let LS: LSystem;
+let LS1: LSystem;
+let LS2: LSystem;
+
 
 var timer = {
   deltaTime: 0.0,
@@ -106,9 +117,9 @@ function loadOBJText() {
   obj_lake = readTextFile('./src/resources/objs/lake/models/lake.obj');
   obj_holodeck = readTextFile('./src/resources/objs/holodeck/models/holodeck.obj');
 
-  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter.obj');
-  obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner.obj');
-  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass.obj');
+  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter_v2.obj');
+  obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner_v2.obj');
+  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass_v2.obj');
 
   ply_Leaf = readTextFile('./src/resources/objs/tree/models/leaf01.ply');
   ply_Bark = readTextFile('./src/resources/objs/tree/models/bark01.ply');
@@ -123,6 +134,97 @@ function loadOBJText() {
   obj_Lantern = readTextFile('./src/resources/objs/lantern/models/lantern.obj');
 }
 
+function loadRoadMap(){
+  road_Mesh_Map = new Map();
+  let Array_Road = new Array<Mesh>();
+  let objText = readTextFile('./src/resources/objs/road/models/road0.obj');
+  let mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Road.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/road1.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Road.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/road2.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Road.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/road3.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Road.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/road4.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Road.push(mesh);
+
+  road_Mesh_Map.set("road", Array_Road);
+
+  let Array_Conn = new Array<Mesh>();
+  objText = readTextFile('./src/resources/objs/road/models/conn0.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Conn.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/conn1.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Conn.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/conn2.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Conn.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/conn3.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Conn.push(mesh);
+  road_Mesh_Map.set("conn", Array_Conn);
+  Array_Conn.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/conn4.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Conn.push(mesh);
+  road_Mesh_Map.set("conn", Array_Conn);
+  Array_Conn.push(mesh);
+  objText = readTextFile('./src/resources/objs/road/models/conn5.obj');
+  mesh = new Mesh(objText, vec3.fromValues(0,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  mesh.create();
+  Array_Conn.push(mesh);
+  road_Mesh_Map.set("conn", Array_Conn);
+  console.log(road_Mesh_Map);
+}
 
 function loadScene() {
   square && square.destroy();
@@ -233,14 +335,41 @@ function loadScene() {
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree2.png', false));
    mesh_Bark2.createByPly(2, ply_Bark2);
 
-
-
-
    mesh_Lantern  = new Mesh(obj_Lantern, vec3.fromValues(10,0,0),
    new Texture('./src/resources/objs/lantern/textures/lantern.png', false),
     new Texture('./src/resources/objs/lantern/textures/lantern.png', false),
     new Texture('./src/resources/objs/lantern/textures/Normal.png', false));
     mesh_Lantern.create();
+
+   loadRoadMap();
+
+   LS = new LSystem(vec3.fromValues(62,0,0),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+    new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   let program = "X\nX->F*[+F][-F]F*[+F]F\nF->FF\n";
+   LS.loadProgramFromString(program);
+   LS.setDefaultStep(20.5);
+   LS.setDefaultAngle(75);
+   LS.setInitialDirection(90);
+   LS.process(1);
+   LS.create();
+   console.log(LS);
+
+   LS1 = new LSystem(vec3.fromValues(-0.53*64,0,-0.8*64),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   program = "X\nX->F+*[[FX]-FX]-F*[-FX]+X\nF->FF\n";
+   LS1.loadProgramFromString(program);
+   LS1.setDefaultStep(20.5);
+   LS1.setDefaultAngle(75);
+   LS1.setInitialDirection(-150)
+   LS1.process(1);
+   LS1.create();
+   console.log(LS1);
+
+
 }
 
 
@@ -271,13 +400,15 @@ function main() {
   var PARTICLE = gui.addFolder('Particle');  
   PARTICLE.add(controls, 'FireFly');
   PARTICLE.add(controls, 'Rain');
+  PARTICLE.add(controls, 'Snow');
   PARTICLE.add(controls, 'Lantern');
   PARTICLE.add(controls, 'Clouds');
 
   var ENVIRONMENT = gui.addFolder('Environment');
   ENVIRONMENT.add(controls, 'Temperature', 0, 10000).step(1);
 
-  
+  var VIGNETTE = gui.addFolder('Vignette');
+  VIGNETTE.add(controls, 'Vignette_Effect');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -312,6 +443,7 @@ function main() {
   renderer.setClearColor(0, 0, 0, 1);
   gl.enable(gl.DEPTH_TEST);
   gl.frontFace(gl.CCW);
+  renderer.setFrostNoiseTexture(new Texture("./src/resources/Noise/lichen_noise.jpg", false).texture);
 
   const standardDeferred = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/standard-vert.glsl')),
@@ -426,7 +558,7 @@ function main() {
     return lightViewProjMat;
   }
 
-  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 250, 250, -100, 100);
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 400, 400, -100, 450);
 
   function tick() {
 
@@ -439,8 +571,10 @@ function main() {
     renderer.clear();
     renderer.clearGB();
 
-    renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [mesh1, mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
-    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [mesh1, mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+    renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
+      [LS, LS1, mesh1, mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
+      [LS, LS1, mesh1, mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
     renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
@@ -476,8 +610,13 @@ function main() {
     }
 
     renderer.renderTonemapping(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion, controls.Temperature );
-   
-    renderer.renderPresent(camera);
+    
+    if(controls.Vignette_Effect && controls.Rain)
+      renderer.renderRainy();   
+    else if(controls.Vignette_Effect && controls.Rain, controls.Snow)
+      renderer.renderFrost();
+    else
+      renderer.renderPresent(camera);
     
     stats.end();
     requestAnimationFrame(tick);

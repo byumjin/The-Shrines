@@ -8,6 +8,7 @@ import Square from '../../geometry/Square';
 import Quad from '../../geometry/Quad';
 import Particle from '../../particle/Particle';
 import Mesh from '../../geometry/Mesh';
+import Texture from '../../rendering/gl/Texture';
 
 const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
@@ -37,6 +38,8 @@ class OpenGLRenderer {
   depthTexture: WebGLTexture; // You don't need to interact with this, it's just
                               // so the OpenGL pipeline can do depth sorting
   shadowDepthTexture: WebGLTexture; // Shadow Depth tex for shadow mapping
+
+  frostNoiseTexture: WebGLTexture;
 
   // post-processing buffers pre-tonemapping (32-bit color)
   post32Buffers: WebGLFramebuffer[];
@@ -107,6 +110,15 @@ HblurPass : PostProcess = new PostProcess(
         new Shader(gl.FRAGMENT_SHADER, require('../../shaders/clouds-frag.glsl'))
         );
 */
+  
+  // Vignette Effects
+  frostPass : PostProcess = new PostProcess(
+    new Shader(gl.FRAGMENT_SHADER, require('../../shaders/frost-frag.glsl'))
+    );
+
+  rainyPass : PostProcess = new PostProcess(
+    new Shader(gl.FRAGMENT_SHADER, require('../../shaders/rainy-frag.glsl'))
+    );
 
   add8BitPass(pass: PostProcess) {
     this.post8Passes.push(pass);
@@ -117,6 +129,9 @@ HblurPass : PostProcess = new PostProcess(
     this.post32Passes.push(pass);
   }
 
+  setFrostNoiseTexture(tex: WebGLTexture){
+    this.frostNoiseTexture = tex;
+  }
 
   constructor(public canvas: HTMLCanvasElement) {
     this.currentTime = 0.0;
@@ -142,6 +157,7 @@ HblurPass : PostProcess = new PostProcess(
     var gb0loc = gl.getUniformLocation(this.deferredShader.prog, "u_Gbuffer_Albedo");
     var gb1loc = gl.getUniformLocation(this.deferredShader.prog, "u_Gbuffer_Specular");
     var gb2loc = gl.getUniformLocation(this.deferredShader.prog, "u_Gbuffer_Normal");
+
 
     this.deferredShader.use();
     gl.uniform1i(gb0loc, 0);
@@ -378,6 +394,7 @@ HblurPass : PostProcess = new PostProcess(
 
   updateTime(deltaTime: number, currentTime: number) {
     this.deferredShader.setTime(currentTime);
+    this.rainyPass.setTime(currentTime);
     for (let pass of this.post8Passes) pass.setTime(currentTime);
     for (let pass of this.post32Passes) pass.setTime(currentTime);
     this.currentTime = currentTime;
@@ -971,6 +988,35 @@ HblurPass : PostProcess = new PostProcess(
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
     gl.bindTexture(gl.TEXTURE_2D, null); 
+  }
+  
+  renderFrost(){
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    
+    gl.disable(gl.DEPTH_TEST);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    this.frostPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
+    this.frostPass.setFrame01(this.frostNoiseTexture);
+    this.frostPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
+    this.frostPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+  }
+
+  renderRainy(){
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    
+    gl.disable(gl.DEPTH_TEST);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    this.rainyPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
+    this.rainyPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
+    this.rainyPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
   }
 
   renderPresent(camera: Camera) {

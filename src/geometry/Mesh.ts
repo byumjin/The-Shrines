@@ -13,6 +13,11 @@ class Mesh extends Drawable {
   uvs: Float32Array;
   trans: Float32Array;
 
+  posArray: Array<number> = [];
+  norArray: Array<number> = [];
+  uvsArray: Array<number> = [];
+  idxArray: Array<number> = [];
+
   objString: string;
 
   constructor(objString: string, center: vec3, albedoTexture: Texture, specularTexture: Texture, normalTexture: Texture ) {
@@ -175,6 +180,36 @@ class Mesh extends Drawable {
     console.log(`Created Mesh from PLY`);
     this.objString = ""; // hacky clear
   }
+
+  loadMeshData(){
+    //Update Model Matrix
+    mat4.translate(this.modelMat, this.modelMat, vec3.fromValues(this.center[0],this.center[1],this.center[2]));
+
+    var loadedMesh = new Loader.Mesh(this.objString);
+
+    //posTemp = loadedMesh.vertices;
+    for (var i = 0; i < loadedMesh.vertices.length; i++) {
+      this.posArray.push(loadedMesh.vertices[i]);
+      if (i % 3 == 2) this.posArray.push(1.0);
+    }
+
+    for (var i = 0; i < loadedMesh.vertexNormals.length; i++) {
+      this.norArray.push(loadedMesh.vertexNormals[i]);
+      if (i % 3 == 2) this.norArray.push(0.0);
+    }
+
+    for (var i = 0; i < loadedMesh.textures.length; i++) {
+      if(i % 2 == 0)
+        this.uvsArray.push(loadedMesh.textures[i]);
+      else
+        this.uvsArray.push(-loadedMesh.textures[i] + 1.0); //V filpped
+    }
+
+    //uvsTemp = loadedMesh.textures;
+    this.idxArray = loadedMesh.indices;
+  }
+
+
 };
 
 export default Mesh;
