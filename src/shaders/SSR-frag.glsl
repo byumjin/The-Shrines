@@ -242,24 +242,24 @@ void main() {
 		LDepth -= 10.0;
 	}
 
-	vec4 SkyColor;
+	vec4 SkyColor = texture(u_SkyCubeMap, relfectVec) * 0.3;
 
 	//out of screen
 	if(farPos_SS.x > 1.0 || farPos_SS.x < 0.0 || farPos_SS.y > 1.0 || farPos_SS.y < 0.0 || LDepth < 1.0 || relfectVec_VS.z >= 0.0)
 	{
-		SkyColor = texture(u_SkyCubeMap, relfectVec);
+		//SkyColor = texture(u_SkyCubeMap, relfectVec);
 	}
 	else
 	{
 
 		if(bHit && currentDepth < 1.0)
 		{
-			SkyColor = texture(u_SkyCubeMap, relfectVec);
+			//SkyColor = texture(u_SkyCubeMap, relfectVec);
 		}
 		else
 		{
 			fadeFactor = fade(farPos_SS.xy);
-			SkyColor = mix(texture(u_SkyCubeMap, relfectVec), mix( texture(u_frame0, farPos_SS.xy), texture(u_frame1, vec2( farPos_SS.x, 1.0 - farPos_SS.y)), 0.8 ), fadeFactor);	
+			SkyColor = mix(SkyColor, mix( texture(u_frame0, farPos_SS.xy), texture(u_frame1, vec2( farPos_SS.x, 1.0 - farPos_SS.y)), 0.8 ), fadeFactor);	
 		}
 				
 	}
@@ -271,7 +271,7 @@ void main() {
 	}
 	else
 	{
-		if(!trans)
+		//if(!trans)
 			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);			
 	}
 

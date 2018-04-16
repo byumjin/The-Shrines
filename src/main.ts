@@ -90,7 +90,7 @@ let cloudsTexture: Texture;
 let cloudsNormalTexture: Texture;
 
 let numParticle: number = 32768; //Bilboard
-let numCloud: number = 2048;
+let numCloud: number = 256;
 
 let numLatern: number = 1024;
 
