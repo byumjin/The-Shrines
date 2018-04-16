@@ -53,7 +53,7 @@ void main()
 
     vec3 billboardPos;
     
-    float scale =  vs_Translate.w * 0.01 + 1000.0;
+    float scale =  vs_Translate.w * 0.01 + 2000.0;
 
     vec4 depthPos = u_Proj * u_View * vec4(offset, 1.0);
     depthPos /= depthPos.w;
