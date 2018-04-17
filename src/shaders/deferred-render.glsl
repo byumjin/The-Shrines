@@ -288,6 +288,7 @@ void main() {
 			}
 
 			vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
+			fogColor *= 0.7;
 			fogColor = pow(fogColor, vec3(2.2));
 
 			float linearDepth = LinearDepth(depth, 200.0);

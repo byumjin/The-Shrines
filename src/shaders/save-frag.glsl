@@ -54,5 +54,5 @@ void main() {
 	finalColor.xyz += cloudColor.xyz;
 
 
-	out_Col = clamp( vec4( finalColor, 1.0), 0.0, 1.0);
+	out_Col = vec4( finalColor, 1.0);
 }

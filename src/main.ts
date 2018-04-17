@@ -447,7 +447,7 @@ function main() {
   particleCloud.initialize(50000.0, 0.0, 3000.0, 3000.0, 50000.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0 );
 
   const particleLanternSys = new Particle(numLatern);
-  particleLanternSys.initialize(150.0, 0.0, 100.0, 0.0, 150.0, 0.0, 0.5, 0.5, 0.7, 0.3, 1.0, -3.0);
+  particleLanternSys.initialize(150.0, 0.0, 100.0, 0.0, 150.0, 0.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
 
   const camera = new Camera();
   camera.updateOrbit(0.0, -60.0);

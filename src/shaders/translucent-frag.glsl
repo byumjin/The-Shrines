@@ -186,31 +186,39 @@ void main() {
 
 		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 
+		
 		if(bWater)
 		{
 			//fresnel
 			float NoV = clamp( dot(viewVec.xyz, worldNormal), 0.0, 1.0);
 			NoV = 1.0 - NoV;
-			float wNoV = pow(NoV, 20.0);
+			float wNoV = pow(NoV, 10.0);
 			pbrColor.xyz *= wNoV;
 
-			float fNoV = pow(NoV, 50.0);
-			pbrColor.xyz += fNoV *  u_lightColor.xyz;
+
+			float LoV = clamp( dot(-viewVec.xyz, u_lightDirection.xyz), 0.0, 1.0);
+			float fNoV =  pow( NoV, 20.0) * pow( LoV, 10.0);
+
+			vec3 tintColor = vec3(1.0, 0.6, 0.4);
+
+			pbrColor.xyz += fNoV *  tintColor * 20.0;
 		}
+		
 
         float Opacity = 0.1;		
 
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
 
 		vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
+		fogColor *= 0.7;
 		fogColor = pow(fogColor, vec3(2.2));
 		
 		
 
 		if(bWater)
 		{		
-			float linearDepth = LinearDepth(Depth, 1000.0);	
-			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, pow(linearDepth, 1.5) );
+			float linearDepth = LinearDepth(Depth, 200.0);	
+			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, linearDepth );
 		}
 		else
 		{
