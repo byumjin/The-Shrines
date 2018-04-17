@@ -39,7 +39,7 @@ void main()
 
     //calculate velocityPrime
     vec3 desiredVelocity;
-    float u_MaxSpeed = 20.0;
+    float u_MaxSpeed = 10.0;
     
    
     targetPos.y = 200.0;
