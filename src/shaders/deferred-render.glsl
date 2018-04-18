@@ -207,9 +207,7 @@ float getShadow(vec4 lightSpacePos){
 		1.0/2048.0*4.0, 
 		vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
 		lightSpacePos.z);
-	// float shadow = VSM(u_ShadowMap, 
-	// 	vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
-	// 	lightSpacePos.z - bias);
+	
 	return shadow;
 }
 
@@ -254,6 +252,7 @@ void main() {
 	{		
 			vec4 lightSpacePos = u_LightViewProj * worldPos;
 			lightSpacePos /= lightSpacePos.w;
+
 			float shadow = getShadow(lightSpacePos);
 
 			vec4 diffuseColor = vec4(albedo.xyz, 1.0);
@@ -275,9 +274,19 @@ void main() {
 
 			float ambientTerm = 0.1;
 
-			vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
+			vec4 pbrColor;
+			 
 
-			pbrColor.xyz *= shadow * u_lightColor.xyz * u_lightColor.w;
+			if(shadow < 0.5)
+			{
+				pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
+				pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * shadow;
+			}
+			else
+			{
+				pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
+				pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a * shadow;
+			}
 
 			out_Col = vec4(pbrColor.xyz, depth);
 

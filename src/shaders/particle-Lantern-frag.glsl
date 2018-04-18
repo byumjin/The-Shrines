@@ -38,10 +38,8 @@ void main()
     if(sceneDepth > particleDepth)
     {
         out_Col.xyz = texture(u_frame1, fs_UV).xyz;
-        
-        //float alpha = texture(u_frame1, fs_UV).a;        
-        //out_Col.xyz *= (1.0 +  (alpha - 0.5) * 2.0);
-        
+
+        out_Col.xyz += pow(out_Col.xyz, vec3(3.0)) * 3.0;
 
         if(fs_Pos.y < 5.0)
         {

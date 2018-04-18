@@ -17,10 +17,10 @@ import {LSystem} from './LSystem';
 // Define an object with application parameters and button callbacks
 const controls = {
    
-  SSR_MaxStep : 128,
+  SSR_MaxStep : 196,
   SSR_Opaque_Intensity : 0.2,
   SSR_Trans_Intensity : 0.2,
-  SSR_Threshold : 3.1,
+  SSR_Threshold : 2.0,
 
   Bloom_Iteration : 16,
   Bloom_Dispersal : 0.5,
@@ -411,7 +411,7 @@ function main() {
   const gui = new DAT.GUI();
 
   var SSR = gui.addFolder('SSR');  
-  SSR.add(controls, 'SSR_MaxStep', 16.0, 256.0).step(1);
+  SSR.add(controls, 'SSR_MaxStep', 16.0, 512.0).step(1);
   SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 1.0).step(0.01);
   SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.01);
   SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
@@ -555,7 +555,7 @@ function main() {
 
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0);
+  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
   let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
   vec3.normalize(lightD, vec3.fromValues(-0.53, 0.2, 1.0));
@@ -598,7 +598,8 @@ function main() {
       [LS, LS1, mesh1, mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
       [LS, LS1, mesh1, mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
-    renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightColor, lightDirection);
+
+    renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 

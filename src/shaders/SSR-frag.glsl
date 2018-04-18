@@ -109,6 +109,8 @@ void main() {
 	float timeInterval = 0.7;
 	float threshold = 2.0;
 	float stepSize =  (1.0 + roughness) * (bWater ? 10.0 : u_SSRInfo.w);
+	float maxStep = bWater ? 64.0 : u_SSRInfo.x;
+
 	float prevDepth;
 	float prevDepthFromDepthBuffer;
 	float currentDepth;
@@ -120,7 +122,7 @@ void main() {
 
 	bool bHit = false;
 	float fadeFactor = 0.0;
-	float maxStep = u_SSRInfo.x;
+	
 
 	//rayMarching
 	for(float i = 0.0; i < maxStep; i++ )

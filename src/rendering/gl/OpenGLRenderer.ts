@@ -536,7 +536,7 @@ HblurPass : PostProcess = new PostProcess(
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
-  renderToTranslucent(camera: Camera, tProg: ShaderProgram, drawables: Array<Drawable>, skyCubeMap: WebGLTexture, lightColor : vec4, lightDir : vec4) {
+  renderToTranslucent(camera: Camera, tProg: ShaderProgram, drawables: Array<Drawable>, skyCubeMap: WebGLTexture, lightViewProjMat : mat4, lightColor : vec4, lightDir : vec4) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.tBuffer);
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -563,6 +563,9 @@ HblurPass : PostProcess = new PostProcess(
     tProg.setProjMatrix(proj);
     tProg.setInvViewProjMatrix(camera.invViewProjectionMatrix);
     tProg.setCameraWPos(camera.position);
+
+    tProg.setShadowMap(this.post32Targets[PipelineEnum.ShadowPass]);
+    tProg.setLightViewProjMatrix(lightViewProjMat);
 
     tProg.setTime(this.currentTime);
 
