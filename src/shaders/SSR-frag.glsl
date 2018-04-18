@@ -29,11 +29,32 @@ float LinearDepth(float d)
 	return (2.0 * n) / (f + n - d * (f - n));
 }
 
+float LinearDepthFar(float d, float f)
+{	
+	float n = 0.1;
+	return clamp( (2.0 * n) / (f + n - d * (f - n)), 0.0, 1.0);
+}
+
 float fade(vec2 UV)
 {
 	vec2 NDC = UV * 2.0 - vec2(1.0);
 
 	return clamp( 1.0 - max( pow( NDC.y * NDC.y, 4.0) , pow( NDC.x * NDC.x, 4.0)) , 0.0, 1.0); 
+}
+
+float getNormalizedDepth(float d)
+{
+
+	if(d >= 19.0)
+	{
+		d -= 20.0;
+	}
+	else if(d >= 9.0)
+	{
+		d -= 10.0;
+	}
+
+	return LinearDepthFar(d, 1000.0);
 }
 
 void main() {
@@ -85,6 +106,7 @@ void main() {
 	vec3 prevPos = currentPos;
 	vec4 reflectionColor = vec4(0.0, 0.0, 0.0, 0.0);
 
+	float timeInterval = 0.7;
 	float threshold = 2.0;
 	float stepSize =  (1.0 + roughness) * (bWater ? 10.0 : u_SSRInfo.w);
 	float prevDepth;
@@ -199,12 +221,18 @@ void main() {
 				}
 				*/
 
-				reflectionColor = mix(texture(u_frame0, lerpedScreenSpaceCoords), texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y)), 0.8 ); //temporal Blend
-				//reflectionColor = texture(u_frame0, lerpedScreenSpaceCoords);
-				//reflectionColor = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
-
 				fadeFactor = fade(lerpedScreenSpaceCoords);
 				fadeFactor = min(pow(1.0 -  (i + 1.0)/maxStep, 0.05), fadeFactor);
+
+				vec4 previousFrame = texture(u_frame0, lerpedScreenSpaceCoords);
+				vec4 currentFrame = texture(u_frame1, vec2( lerpedScreenSpaceCoords.x, 1.0 - lerpedScreenSpaceCoords.y));
+
+								
+				float diffDepth = abs(getNormalizedDepth(currentFrame.a) - getNormalizedDepth(previousFrame.a));
+
+
+				reflectionColor =  mix(previousFrame, currentFrame, timeInterval );
+				
 				bHit = true;
 
 				break;
@@ -258,8 +286,13 @@ void main() {
 		}
 		else
 		{
+			vec4 previousFrame = texture(u_frame0, farPos_SS.xy);
+			vec4 currentFrame = texture(u_frame1, vec2( farPos_SS.x, 1.0 - farPos_SS.y));
+			
+			vec4 mixedColor =  mix(previousFrame, currentFrame, timeInterval );
+
 			fadeFactor = fade(farPos_SS.xy);
-			SkyColor = mix(SkyColor, mix( texture(u_frame0, farPos_SS.xy), texture(u_frame1, vec2( farPos_SS.x, 1.0 - farPos_SS.y)), 0.8 ), fadeFactor);	
+			SkyColor = mix(SkyColor, mixedColor, fadeFactor);	
 		}
 				
 	}

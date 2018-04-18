@@ -32,66 +32,31 @@ mat4 rotationMatrix(vec3 axis, float angle)
 
 void main()
 {   
-    vec4 targetPos = i_attract;
-
-    vec4 prevPosition = i_position;
-    vec4 prevVelocity = i_velocity;
-
-    //calculate velocityPrime
-    vec3 desiredVelocity;
-    float u_MaxSpeed = 200.0;
-    
-   
-    targetPos.z = 51000.0;
-    desiredVelocity = targetPos.xyz - prevPosition.xyz;
-    desiredVelocity = normalize(desiredVelocity) * u_MaxSpeed;
-
-
-    vec3 acceleration = (desiredVelocity - prevVelocity.xyz);
-    
-    vec3 velocityPrime = acceleration;
-    vec3 positionPrime = prevVelocity.xyz;
-
-
-    //runge_kutta_2nd
-
-    //calculate Vel
-    vec3 PredictVel = prevVelocity.xyz + velocityPrime * u_deltaTime;
-    vec3 PredictVelPrime = (PredictVel - prevVelocity.xyz) / u_deltaTime;
-
-    o_velocity = vec4(prevVelocity.xyz + (u_deltaTime * 0.5) * (velocityPrime + PredictVelPrime), i_velocity.a);
-
-
-    //calculate Pos
-    vec3 PredictPos = prevPosition.xyz + positionPrime * u_deltaTime;
-    vec3 PredictPosPrime = (PredictPos - prevPosition.xyz) / u_deltaTime;
-
-    o_position = vec4(prevPosition.xyz + (u_deltaTime * 0.5) * (positionPrime + PredictPosPrime), i_position.a);
+    o_position = i_position;
+    o_velocity = i_velocity;
+    o_attract = i_attract;
 
     o_color = i_color;
     o_color.a = float(gl_VertexID) + 0.1;
 
+    float speed = 1000.0;
+    o_position.z += u_deltaTime * speed;
+        
+    float MaxDist = 50000.0;
 
-
+    if(o_position.z > MaxDist * 0.8)
+    {
+        o_color.xyz = vec3( 1.0 - (o_position.z - MaxDist * 0.8) /(MaxDist * 0.2));
+    }
+    else if(o_position.z < -MaxDist * 0.8)
+    {
+        o_color.xyz = vec3( 1.0 + (o_position.z + MaxDist * 0.8) /(MaxDist * 0.2));
+    }
    
-        
-        
-        if(o_position.z > 50000.0)
-        {
-            o_position.x = i_position.x;
-            o_position.y = i_position.y;
-            o_position.z -= 100000.0;
-
-            //o_attract = i_attract;
-
-           
-            vec3 originalPos = vec3(i_position.a, i_velocity.a, i_attract.a);
-
-           
-
-            o_attract = vec4(originalPos.xyz, i_attract.a);
-        }
-        else
-            o_attract = i_attract;
+    if(o_position.z > 50000.0)
+    {
+        o_position.z -= MaxDist * 2.0;
+        o_color.xyz = vec3(0.0);
+    }
    
 }

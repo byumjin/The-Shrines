@@ -20,7 +20,7 @@ const controls = {
   SSR_MaxStep : 128,
   SSR_Opaque_Intensity : 0.2,
   SSR_Trans_Intensity : 0.2,
-  SSR_Threshold : 3.0,
+  SSR_Threshold : 3.1,
 
   Bloom_Iteration : 16,
   Bloom_Dispersal : 0.5,
@@ -28,14 +28,22 @@ const controls = {
 
   FireFly : false,
   Rain : false,
+  Rain_delaytoDieTimer : 3.0,
+  Rain_Timer: 3.0,
+
   Snow : false,
-  Lantern : true,
+  Lantern : false,
+  Lantern_delaytoDieTimer : 10.0,
+  Lantern_Timer: 10.0,
+
   Clouds : true,
 
-  Temperature : 10000,
+  Temperature : 6500,
   
   Vignette_Effect: true,
 };
+
+
 
 let square: Square;
 let particleQuad: Quad;
@@ -89,7 +97,7 @@ let skyCubeMap: Texture;
 let cloudsTexture: Texture;
 let cloudsNormalTexture: Texture;
 
-let numParticle: number = 32768; //Bilboard
+let numParticle: number = 16384; //Bilboard
 let numCloud: number = 256;
 
 let numLatern: number = 1024;
@@ -414,7 +422,7 @@ function main() {
   BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
 
   var PARTICLE = gui.addFolder('Particle');  
-  PARTICLE.add(controls, 'FireFly');
+  //PARTICLE.add(controls, 'FireFly');
   PARTICLE.add(controls, 'Rain');
   PARTICLE.add(controls, 'Snow');
   PARTICLE.add(controls, 'Lantern');
@@ -440,14 +448,13 @@ function main() {
   loadScene();
 
   const particleSys = new Particle(numParticle);
-  particleSys.initialize(150.0, 0.0, 100.0, 0.0, 150.0, 0.0, 0.5, 0.5, 0.7, 0.3, 1.0, -3.0);
-
+  particleSys.initialize(150.0, 0.0, 400.0, 100.0, 150.0, 0.0, 0.5, 0.5, 0.7, 0.3, 1.0, -3.0);
   
   const particleCloud = new Particle(numCloud);
-  particleCloud.initialize(50000.0, 0.0, 3000.0, 3000.0, 50000.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0 );
+  particleCloud.initialize(50000.0, 0.0, 3000.0, 5000.0, 50000.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0 );
 
   const particleLanternSys = new Particle(numLatern);
-  particleLanternSys.initialize(150.0, 0.0, 100.0, 0.0, 150.0, 0.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
+  particleLanternSys.initialize(150.0, 0.0, 100.0, -105.0, 150.0, 0.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
 
   const camera = new Camera();
   camera.updateOrbit(0.0, -60.0);
@@ -604,17 +611,53 @@ function main() {
                        controls.SSR_MaxStep, controls.SSR_Opaque_Intensity, controls.SSR_Trans_Intensity, controls.SSR_Threshold);
     renderer.renderSSRMip();
 
-    renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader,
-      controls.Lantern);
-
     renderer.renderClouds(camera, cloudQuad, particleCloud, lightColor, lightDirection, cloudsTexture.texture, cloudsNormalTexture.texture, mesh_lake.normalMap.texture, feedBackCloudShader, particleCloudRenderShader,
-    controls.Clouds);
+      controls.Clouds);
 
-      
-      
-    renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader,
-      controls.FireFly, controls.Rain);    
+    if(!controls.Lantern)
+    {
+      controls.Lantern_Timer += timer.deltaTime;
 
+      if(controls.Lantern_Timer < controls.Lantern_delaytoDieTimer)
+      {
+        renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader,
+          controls.Lantern, true);
+      }
+      else
+      {
+        renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader,
+          controls.Lantern, false);
+      }
+    }
+    else
+    {
+      controls.Lantern_Timer = 0.0;
+
+      renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader,
+        controls.Lantern, true);
+    }
+
+
+    if(!controls.Rain)
+    {
+      controls.Rain_Timer += timer.deltaTime;
+
+      if(controls.Rain_Timer < controls.Rain_delaytoDieTimer)
+      {
+        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, controls.Rain, true); 
+      }
+      else
+      {
+        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, controls.Rain, false); 
+      }
+    }
+    else
+    {
+      controls.Rain_Timer = 0.0;
+      
+      renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, controls.Rain, true);   
+    }
+    
     renderer.renderforSavingCurrentFrame(camera);
 
     renderer.renderforHighLightCurrentFrame(camera);

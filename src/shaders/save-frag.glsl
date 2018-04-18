@@ -7,7 +7,7 @@ out vec4 out_Col;
 uniform sampler2D u_frame0; //Scene
 uniform sampler2D u_frame1; //SSR_Mask
 uniform sampler2D u_frame2; //SSR
-uniform sampler2D u_frame3; //Particle
+uniform sampler2D u_frame3; //ParticleRain
 uniform sampler2D u_frame4; //ParticleMesh
 uniform sampler2D u_DepthMap; //Cloud
 
@@ -43,10 +43,10 @@ void main() {
 	else
 		finalColor = SSRMipColor.xyz + sceneImagecolor.xyz;
 		
-	vec4 particleColor = texture(u_frame3, reverseUV);
+	vec4 RainColor = texture(u_frame3, reverseUV);
 
 	
-	finalColor.xyz += particleColor.xyz;
+	finalColor.xyz += RainColor.xyz;
 
 	vec4 cloudColor = texture(u_DepthMap, reverseUV);
 
@@ -54,5 +54,5 @@ void main() {
 	finalColor.xyz += cloudColor.xyz;
 
 
-	out_Col = vec4( finalColor, 1.0);
+	out_Col = vec4( finalColor, sceneImagecolor.a);
 }

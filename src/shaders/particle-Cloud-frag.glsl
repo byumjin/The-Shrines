@@ -74,9 +74,7 @@ void main()
 
        vec3 darkColor = vec3(0.0);
 
-       float linearizedDepth = LinearDepth(particleDepth, 1000.0);
-       out_Col.xyz *= (1.0 - pow(linearizedDepth, 4.0));
-       out_Col.xyz *= 2.0;
+       out_Col.xyz *= fs_Col.xyz * 0.5;
        out_Col.a = 1.0;
 
        vec3 tintColor = vec3(1.0, 0.6, 0.4);

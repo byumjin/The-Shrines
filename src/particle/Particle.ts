@@ -136,14 +136,14 @@ class Particle
       this.position[p * 4 + 1] = (Math.random()) *  height + yOffset;
       this.position[p * 4 + 2] = posXZ[1] *  depth + zOffset;
       
-      
+       // Life
       this.velocity[p * 4] = 0.0;
       this.velocity[p * 4 + 1] = 0.0;
       this.velocity[p * 4 + 2] = 0.0;
 
       this.color[p * 4] = Math.random() * Rrange + Rbias;
       this.color[p * 4 + 1] = Math.random() * Grange + Gbias;
-      this.color[p * 4 + 2] = Math.random() * Brange + Bbias; // Life
+      this.color[p * 4 + 2] = Math.random() * Brange + Bbias;
 
       this.color[p * 4 + 3] = 0.0; //Index
 
