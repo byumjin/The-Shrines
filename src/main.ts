@@ -38,7 +38,7 @@ const controls = {
 
   Clouds : true,
 
-  Temperature : 6500,
+  Temperature : 10000,
   
   Vignette_Effect: true,
 };
@@ -581,7 +581,7 @@ function main() {
     return lightViewProjMat;
   }
 
-  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 600, 300, -300, 300);
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 600, 300, -300, 350);
 
   function tick() {
 

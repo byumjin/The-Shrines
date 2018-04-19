@@ -277,19 +277,11 @@ void main() {
 
 			float ambientTerm = 0.1;
 
-			vec4 pbrColor;
+			
+			vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
+			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a * smoothstep( -0.25, 0.5, shadow);
 			 
-
-			if(shadow < 0.5)
-			{
-				pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
-				pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * smoothstep( -0.5, 1.0, shadow * 2.0);
-			}
-			else
-			{
-				pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
-				pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
-			}
+		
 
 			out_Col = vec4(pbrColor.xyz, depth);
 

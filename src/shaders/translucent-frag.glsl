@@ -41,7 +41,7 @@ float texture2DCompare(sampler2D depths, vec2 uv, vec2 offset, float compare){
     float bias = 0.0025;
     //vec2 gradient = vec2(texture(depths, uv).g, texture(depths, uv).b);
     compare = compare - bias;
-    if(depth <= compare)
+    if(depth < compare)
     	return 0.1;
     else
     	return 1.0;
@@ -122,7 +122,7 @@ float rand(vec4 co){
 
 
 
-#define PCF_NUM_SAMPLES 4
+#define PCF_NUM_SAMPLES 36
 
 float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
     float result = 0.0;
@@ -137,7 +137,15 @@ float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
 }
 
 float getShadow(vec4 lightSpacePos){
-	float shadow = texture2DCompare(u_ShadowMap, vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5), vec2(0.0), lightSpacePos.z);
+
+	
+	float shadow = PCF(u_ShadowMap, 
+		1.0/SHADOWMAP_SIZE*4.0, 
+		vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
+		lightSpacePos.z);
+	
+	
+	//float shadow = texture2DCompare(u_ShadowMap, vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5), vec2(0.0), lightSpacePos.z);
 
 	// float shadow = VSM(u_ShadowMap, 
 	// 	vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
@@ -304,12 +312,14 @@ void main() {
 
 		float ambientTerm = 0.1;
 
-		vec4 pbrColor;
+		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
+		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a * pow( smoothstep( 0.0, 0.5, shadow), 3.5);
 
+		/*	
 		if(shadow < 0.5)
 		{
 			pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
-			pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a *smoothstep( -0.5, 1.0, shadow * 2.0);;
+			pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a *smoothstep( -2.0, 1.0, shadow * 2.0);
 		}
 		else
 		{
@@ -317,6 +327,7 @@ void main() {
 			pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
 			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 		}
+		*/
 
 
 		
@@ -331,7 +342,7 @@ void main() {
 
 
 			float LoV = clamp( dot(-viewVec.xyz, u_lightDirection.xyz), 0.0, 1.0);
-			float fNoV =  pow( NoV, 20.0) * pow( LoV, 10.0);
+			float fNoV =  pow( NoV, 30.0) * pow( LoV, 10.0);
 
 			vec3 tintColor = vec3(1.0, 0.6, 0.4);
 

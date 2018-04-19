@@ -555,8 +555,8 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
     gl.viewport(0, 0, gShadowMapSize, gShadowMapSize);
-  
-    gl.cullFace(gl.FRONT);
+    gl.enable(gl.CULL_FACE);
+    gl.cullFace(gl.BACK);
 
     shadowProg.setViewProjMatrix(lightViewProjMat);
     leafProg.setViewProjMatrix(lightViewProjMat);
@@ -590,7 +590,7 @@ HmipblurPass : PostProcess = new PostProcess(
         barkProg.draw(drawables[i]);
       }
     }
-    gl.cullFace(gl.BACK);
+    gl.disable(gl.CULL_FACE);
 
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
