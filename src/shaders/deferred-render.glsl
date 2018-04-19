@@ -241,6 +241,7 @@ void main() {
 
 	vec3 halfVec = viewVec + lightDir;
 
+
 	if(depth >= 1.0) //SkyBox
 	{			
 		 //inverse gamma correct

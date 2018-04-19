@@ -626,7 +626,7 @@ HmipblurPass : PostProcess = new PostProcess(
 
     tProg.setShadowMap(this.post32Targets[PipelineEnum.ShadowPass]);
     tProg.setLightViewProjMatrix(lightViewProjMat);
-
+    
     tProg.setTime(this.currentTime);
 
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);

@@ -182,18 +182,6 @@ void main()
     }
     
     col *= mix(vec3(1.0), vec3(0.9), focus);
-
-    t = (T+3.)*.5;										// make time sync with first lightnoing
-    float colFade = sin(t*.2)*.5+.5+story;
-    col *= mix(vec3(1.), vec3(.8, .9, 1.3), colFade);	// subtle color shift
-    float fade = S(0., 10., T);							// fade in at the start
-    //float lightning = sin(t*sin(t*10.));				// lighting flicker
-    //lightning *= pow(max(0., sin(t+sin(t))), 10.);		// lightning flash
-    //col *= 1.+lightning*fade*mix(1., .1, story*story);	// composite lightning
-    //col *= 1.-dot(UV-=.5, UV);							// vignette
-    											
-    col *= fade;										// composite start and end fade
     
-    //col = vec3(heart);
     out_Col = vec4(col, 1.);
 }

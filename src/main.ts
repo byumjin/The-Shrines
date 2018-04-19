@@ -597,7 +597,7 @@ function main() {
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
       [LS, LS1, mesh1, mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-      [LS, LS1, mesh1, mesh_B_Outter,  mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+      [LS, LS1, mesh1, mesh_B_Outter,  mesh_lake, mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
 
     renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
