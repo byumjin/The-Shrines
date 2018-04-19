@@ -18,8 +18,8 @@ import {LSystem} from './LSystem';
 const controls = {
    
   SSR_MaxStep : 196,
-  SSR_Opaque_Intensity : 0.2,
-  SSR_Trans_Intensity : 0.2,
+  SSR_Opaque_Intensity : 1.0,
+  SSR_Trans_Intensity : 0.4,
   SSR_Threshold : 2.0,
 
   Bloom_Iteration : 16,
@@ -412,8 +412,8 @@ function main() {
 
   var SSR = gui.addFolder('SSR');  
   SSR.add(controls, 'SSR_MaxStep', 16.0, 512.0).step(1);
-  SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 1.0).step(0.01);
-  SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.01);
+  SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 4.0).step(0.1);
+  SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.1);
   SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
 
   var BLOOM = gui.addFolder('BLOOM');  
@@ -556,7 +556,7 @@ function main() {
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
   let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
-  let lightPosition : vec4 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+  let lightPosition : vec4 = vec4.fromValues(0.0, 50.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
   vec3.normalize(lightD, vec3.fromValues(-0.53, 0.2, 1.0));
 
@@ -581,7 +581,7 @@ function main() {
     return lightViewProjMat;
   }
 
-  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 400, 400, -300, 450);
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 600, 300, -300, 300);
 
   function tick() {
 
@@ -611,6 +611,14 @@ function main() {
     renderer.renderSSR(camera, skyCubeMap.cubemap_texture,
                        controls.SSR_MaxStep, controls.SSR_Opaque_Intensity, controls.SSR_Trans_Intensity, controls.SSR_Threshold);
     renderer.renderSSRMip();
+
+    
+    for(var m = 0; m < 5; m++)
+    {
+      renderer.renderforHorizontalMipBlur(camera, m);
+      renderer.renderforVerticaMipBlur(camera, m);
+    } 
+    
 
     renderer.renderClouds(camera, cloudQuad, particleCloud, lightColor, lightDirection, cloudsTexture.texture, cloudsNormalTexture.texture, mesh_lake.normalMap.texture, feedBackCloudShader, particleCloudRenderShader,
       controls.Clouds);

@@ -3,6 +3,7 @@ precision highp float;
 
 #define EPS 0.0001
 #define PI 3.1415962
+#define SHADOWMAP_SIZE 1024.0
 
 in vec4 fs_Pos;
 in vec4 fs_Nor;
@@ -121,7 +122,7 @@ float rand(vec4 co){
 
 
 
-#define PCF_NUM_SAMPLES 36
+#define PCF_NUM_SAMPLES 4
 
 float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
     float result = 0.0;
@@ -145,10 +146,10 @@ float getShadow(vec4 lightSpacePos){
 	// }
 	
 	// float penumbraRatio = penumbraSize(lightSpacePos.z-bias, blockers.x);
-	// float filterRadius = penumbraRatio * 1.0/2048.0*4.0;
+	// float filterRadius = penumbraRatio * 1.0/SHADOWMAP_SIZE*4.0;
 
 	float shadow = PCF(u_ShadowMap, 
-		1.0/2048.0*4.0, 
+		1.0/SHADOWMAP_SIZE*4.0, 
 		vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
 		lightSpacePos.z);
 	// float shadow = VSM(u_ShadowMap, 
@@ -321,12 +322,12 @@ void main() {
 		if(shadow < 0.5)
 		{
 			pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
-			pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * shadow;
+			pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a *smoothstep( -0.5, 1.0, shadow * 2.0);;
 		}
 		else
 		{
 			pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
-			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a * shadow;
+			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 		}
 
 
@@ -364,13 +365,15 @@ void main() {
 		{		
 			float linearDepth = LinearDepth(Depth, 200.0);	
 			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, linearDepth );
+			fragColor[1] = vec4(normal.xyz, 0.0);
 		}
 		else
 		{
 			float linearDepth = LinearDepth(Depth, 200.0);
 			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, pow(linearDepth, 2.0) );
+			fragColor[1] = vec4(normal.xyz, Roughness);
 		}
         
-		fragColor[1] = vec4(normal.xyz, Roughness);
+		
 	}
 }

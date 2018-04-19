@@ -5,8 +5,8 @@ in vec2 fs_UV;
 out vec4 out_Col;
 
 uniform sampler2D u_frame0;
-uniform float u_Time;
 uniform vec2 u_screenSize;
+uniform vec2 u_BlurScale;
 
 float offset[5];
 float weight[5];
@@ -25,8 +25,8 @@ void main()
 	out_Col = texture( u_frame0, fs_UV ) * weight[0];
     for (int i=1; i<3; i++)
 	{
-        out_Col += texture( u_frame0, ( vec2(fs_UV)+vec2(0.0, offset[i] / u_screenSize.y) )) * weight[i];
-        out_Col += texture( u_frame0, ( vec2(fs_UV)-vec2(0.0, offset[i] / u_screenSize.y) )) * weight[i];
+        out_Col += texture( u_frame0, ( vec2(fs_UV)+vec2(0.0, offset[i] * u_BlurScale.y / u_screenSize.y) )) * weight[i];
+        out_Col += texture( u_frame0, ( vec2(fs_UV)-vec2(0.0, offset[i] * u_BlurScale.y / u_screenSize.y) )) * weight[i];
     }	
 
 	out_Col = clamp(out_Col, 0.0, 1.0);

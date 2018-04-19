@@ -14,10 +14,28 @@ const GbufferEnum = {"Albedo":0, "Specular":1, "Normal":2};
 
 const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "ShadowPass": 4,
                       "ExtractHighLight" : 5, "HorizonBlur" : 6, "VerticalBlur" : 7, "Particle" : 8, "ParticleMesh" : 9, "Clouds" : 10,
+                      "SSR_HBLURRED_MIP_0" : 11, 
+                      "SSR_VBLURRED_MIP_0" : 12, 
+                      
+                      "SSR_HBLURRED_MIP_1" : 13,
+                      "SSR_VBLURRED_MIP_1" : 14,                      
+                      
+                      "SSR_HBLURRED_MIP_2" : 15,
+                      "SSR_VBLURRED_MIP_2" : 16,                      
+                      
+                      "SSR_HBLURRED_MIP_3" : 17,
+                      "SSR_VBLURRED_MIP_3" : 18,                      
+                      
+                      "SSR_HBLURRED_MIP_4" : 19,
+                      "SSR_VBLURRED_MIP_4" : 20,
+
+                      "SSR_HBLURRED_MIP_5" : 21,
+                      "SSR_VBLURRED_MIP_5" : 22,
+
                      "ToneMapping": 0};
 
 
-var gShadowMapSize = 2048;
+var gShadowMapSize = 1024;
 
 
 class OpenGLRenderer {
@@ -96,6 +114,14 @@ HblurPass : PostProcess = new PostProcess(
   new Shader(gl.FRAGMENT_SHADER, require('../../shaders/Blur_Horizontal-frag.glsl'))
 );
 
+VmipblurPass : PostProcess = new PostProcess(
+  new Shader(gl.FRAGMENT_SHADER, require('../../shaders/Blur_Mipmap_Vertical-frag.glsl'))
+);
+
+HmipblurPass : PostProcess = new PostProcess(
+  new Shader(gl.FRAGMENT_SHADER, require('../../shaders/Blur_Mipmap_Horizontal-frag.glsl'))
+);
+
   // shader that maps 32-bit color to 8-bit color
   tonemapPass : PostProcess = new PostProcess(
     new Shader(gl.FRAGMENT_SHADER, require('../../shaders/tonemap-frag.glsl'))
@@ -142,8 +168,12 @@ HblurPass : PostProcess = new PostProcess(
     this.post8Targets = [undefined, undefined];
     this.post8Passes = [];
 
-    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+                          undefined,  undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined,
+                          undefined, undefined, undefined];
+    this.post32Targets = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+                         undefined,  undefined, undefined, undefined, undefined, undefined, undefined,undefined, undefined, undefined,
+                         undefined, undefined, undefined];
     this.post32Passes = [];
 
     if (!gl.getExtension("OES_texture_float_linear")) {
@@ -328,7 +358,7 @@ HblurPass : PostProcess = new PostProcess(
       if(i == PipelineEnum.SSR)
       {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling, gl.drawingBufferHeight * this.SSRDownSampling, 0, gl.RGBA, gl.FLOAT, null);       
       }
       else if(i == PipelineEnum.SSR_MIP)
@@ -351,7 +381,37 @@ HblurPass : PostProcess = new PostProcess(
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling, 0, gl.RGBA, gl.FLOAT, null); 
-      }     
+      }   
+      else if(i == PipelineEnum.SSR_HBLURRED_MIP_0 || i == PipelineEnum.SSR_VBLURRED_MIP_0){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling, gl.drawingBufferHeight * this.SSRDownSampling, 0, gl.RGBA, gl.FLOAT, null); 
+      } 
+      else if(i == PipelineEnum.SSR_HBLURRED_MIP_1 || i == PipelineEnum.SSR_VBLURRED_MIP_1){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling / 2, gl.drawingBufferHeight * this.SSRDownSampling / 2, 0, gl.RGBA, gl.FLOAT, null); 
+      } 
+      else if(i == PipelineEnum.SSR_HBLURRED_MIP_2 || i == PipelineEnum.SSR_VBLURRED_MIP_2){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling / 4, gl.drawingBufferHeight * this.SSRDownSampling / 4, 0, gl.RGBA, gl.FLOAT, null); 
+      } 
+      else if(i == PipelineEnum.SSR_HBLURRED_MIP_3 || i == PipelineEnum.SSR_VBLURRED_MIP_3){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling / 8, gl.drawingBufferHeight * this.SSRDownSampling / 8, 0, gl.RGBA, gl.FLOAT, null); 
+      } 
+      else if(i == PipelineEnum.SSR_HBLURRED_MIP_4 || i == PipelineEnum.SSR_VBLURRED_MIP_4){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling / 16, gl.drawingBufferHeight * this.SSRDownSampling / 16, 0, gl.RGBA, gl.FLOAT, null); 
+      }    
+      else if(i == PipelineEnum.SSR_HBLURRED_MIP_5 || i == PipelineEnum.SSR_VBLURRED_MIP_5){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, gl.drawingBufferWidth * this.SSRDownSampling / 32, gl.drawingBufferHeight * this.SSRDownSampling / 32, 0, gl.RGBA, gl.FLOAT, null); 
+      }  
       else
       {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -932,10 +992,16 @@ HblurPass : PostProcess = new PostProcess(
 
     this.savePass.setFrame00( this.tDTargets[0]);
     this.savePass.setFrame01(this.post32Targets[PipelineEnum.SSR]);
-    this.savePass.setFrame02(this.post32Targets[PipelineEnum.SSR_MIP]);
+    //this.savePass.setFrame02(this.post32Targets[PipelineEnum.SSR_MIP]);
     this.savePass.setFrame03(this.post32Targets[PipelineEnum.Particle]);
     this.savePass.setFrame04(this.post32Targets[PipelineEnum.ParticleMesh]);
     this.savePass.setDepthMap(this.post32Targets[PipelineEnum.Clouds]);
+
+    this.savePass.setFrame05(this.post32Targets[PipelineEnum.SSR_VBLURRED_MIP_0]);
+    this.savePass.setFrame06(this.post32Targets[PipelineEnum.SSR_VBLURRED_MIP_1]);
+    this.savePass.setFrame07(this.post32Targets[PipelineEnum.SSR_VBLURRED_MIP_2]);
+    this.savePass.setFrame08(this.post32Targets[PipelineEnum.SSR_VBLURRED_MIP_3]);
+    this.savePass.setFrame09(this.post32Targets[PipelineEnum.SSR_VBLURRED_MIP_4]);
    
     this.savePass.draw();
     // bind default frame buffer
@@ -966,7 +1032,8 @@ HblurPass : PostProcess = new PostProcess(
     
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    this.HblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) )
+    this.HblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) );
+    this.HblurPass.setBlurScale(vec2.fromValues( 4.0, 1.0) );
 
     if(index == 0)
       this.HblurPass.setFrame00(this.post32Targets[PipelineEnum.ExtractHighLight]);
@@ -986,10 +1053,51 @@ HblurPass : PostProcess = new PostProcess(
     
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    this.VblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) )
+    this.VblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) );
+    this.VblurPass.setBlurScale(vec2.fromValues( 1.0, 1.0) );
     this.VblurPass.setFrame00(this.post32Targets[PipelineEnum.HorizonBlur]);
    
     this.VblurPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
+  }  
+
+  renderforHorizontalMipBlur(camera: Camera, LOD : number) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SSR_HBLURRED_MIP_0 + 2*LOD]);
+
+    var denom = Math.pow(2.0, LOD + 1.0);
+    gl.viewport(0, 0, gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom);
+    gl.disable(gl.DEPTH_TEST);
+    
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    this.HmipblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom) );
+    this.HmipblurPass.setBlurScale(vec2.fromValues( 1.0, 1.0) );
+    this.HmipblurPass.setFrame00(this.post32Targets[PipelineEnum.SSR_MIP]);
+    this.HmipblurPass.setmipLod(LOD);
+
+    this.HmipblurPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
+  }
+
+  renderforVerticaMipBlur(camera: Camera, LOD : number) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SSR_VBLURRED_MIP_0 + 2*LOD]);
+    var denom = Math.pow(2.0, LOD + 1.0);
+
+    gl.viewport(0, 0, gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom);
+    gl.disable(gl.DEPTH_TEST);
+    
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    this.VmipblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom) );
+    this.VmipblurPass.setBlurScale(vec2.fromValues( 1.0, 1.0) );
+    this.VmipblurPass.setFrame00(this.post32Targets[PipelineEnum.SSR_HBLURRED_MIP_0 + 2*LOD]);
+    this.VmipblurPass.setmipLod(LOD);
+
+    this.VmipblurPass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
     gl.bindTexture(gl.TEXTURE_2D, null); 
@@ -1050,7 +1158,7 @@ HblurPass : PostProcess = new PostProcess(
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
-    //this.presentPass.setFrame00(  this.post32Targets[PipelineEnum.Clouds]);
+    //this.presentPass.setFrame00(  this.post32Targets[PipelineEnum.ShadowPass]);
     //this.presentPass.setFrame01( this.post32Targets[PipelineEnum.SceneImage] );
     this.presentPass.draw();
 

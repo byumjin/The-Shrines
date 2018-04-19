@@ -4,6 +4,8 @@ precision highp float;
 #define EPS 0.0001
 #define PI 3.1415962
 
+#define SHADOWMAP_SIZE 1024.0
+
 in vec2 fs_UV;
 out vec4 out_Col;
 
@@ -201,10 +203,10 @@ float getShadow(vec4 lightSpacePos){
 	// }
 	
 	// float penumbraRatio = penumbraSize(lightSpacePos.z-bias, blockers.x);
-	// float filterRadius = penumbraRatio * 1.0/2048.0*4.0;
+	// float filterRadius = penumbraRatio * 1.0/SHADOWMAP_SIZE*4.0;
 
 	float shadow = PCF(u_ShadowMap, 
-		1.0/2048.0*4.0, 
+		1.0/SHADOWMAP_SIZE*4.0, 
 		vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
 		lightSpacePos.z);
 	
@@ -280,12 +282,12 @@ void main() {
 			if(shadow < 0.5)
 			{
 				pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
-				pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * shadow;
+				pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * smoothstep( -0.5, 1.0, shadow * 2.0);
 			}
 			else
 			{
 				pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
-				pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a * shadow;
+				pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 			}
 
 			out_Col = vec4(pbrColor.xyz, depth);

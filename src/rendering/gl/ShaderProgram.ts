@@ -56,6 +56,13 @@ class ShaderProgram {
   unifFrame2: WebGLUniformLocation;
   unifFrame3: WebGLUniformLocation;
   unifFrame4: WebGLUniformLocation;
+
+  unifFrame5: WebGLUniformLocation;
+  unifFrame6: WebGLUniformLocation;
+  unifFrame7: WebGLUniformLocation;
+  unifFrame8: WebGLUniformLocation;
+  unifFrame9: WebGLUniformLocation;
+
   
   unifLightColor: WebGLUniformLocation;
   unifLightDirection: WebGLUniformLocation;
@@ -67,9 +74,12 @@ class ShaderProgram {
   unifCenter: WebGLUniformLocation;
 
   unifScreenSize: WebGLUniformLocation;
+  unifBlurScale: WebGLUniformLocation;
   unifChromaticInfo: WebGLUniformLocation;
 
   unifParticleInfo: WebGLUniformLocation;
+
+  unifLod: WebGLUniformLocation;
 
   unifTexUnits: Map<string, WebGLUniformLocation>;
   
@@ -124,6 +134,15 @@ class ShaderProgram {
     this.unifFrame2 = gl.getUniformLocation(this.prog, "u_frame2");
     this.unifFrame3 = gl.getUniformLocation(this.prog, "u_frame3");
     this.unifFrame4 = gl.getUniformLocation(this.prog, "u_frame4");
+
+    this.unifFrame5 = gl.getUniformLocation(this.prog, "u_frame5");
+    this.unifFrame6 = gl.getUniformLocation(this.prog, "u_frame6");
+    this.unifFrame7 = gl.getUniformLocation(this.prog, "u_frame7");
+    this.unifFrame8 = gl.getUniformLocation(this.prog, "u_frame8");
+    this.unifFrame9 = gl.getUniformLocation(this.prog, "u_frame9");
+
+
+  
     
     this.unifLightColor = gl.getUniformLocation(this.prog, "u_lightColor");
     this.unifLightDirection = gl.getUniformLocation(this.prog, "u_lightDirection");
@@ -136,9 +155,11 @@ class ShaderProgram {
     this.unifCenter = gl.getUniformLocation(this.prog, "u_Center");
 
     this.unifScreenSize = gl.getUniformLocation(this.prog, "u_screenSize");
+    this.unifBlurScale = gl.getUniformLocation(this.prog, "u_BlurScale");
     this.unifChromaticInfo = gl.getUniformLocation(this.prog, "u_chromaticInfo");
 
     this.unifParticleInfo = gl.getUniformLocation(this.prog, "u_particleInfo");
+    this.unifLod = gl.getUniformLocation(this.prog, "u_Lod");
 
     this.unifTexUnits = new Map<string, WebGLUniformLocation>();
   }
@@ -308,12 +329,77 @@ class ShaderProgram {
     }
   }
 
+  setFrame05(texture: WebGLTexture)
+  {
+    this.use();
+    if (this.unifFrame5 != -1) {
+  
+      gl.activeTexture(gl.TEXTURE14);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(this.unifFrame5, 14);   
+    }
+  }
+
+  setFrame06(texture: WebGLTexture)
+  {
+    this.use();
+    if (this.unifFrame6 != -1) {
+  
+      gl.activeTexture(gl.TEXTURE15);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(this.unifFrame6, 15);   
+    }
+  }
+
+  setFrame07(texture: WebGLTexture)
+  {
+    this.use();
+    if (this.unifFrame7 != -1) {
+  
+      gl.activeTexture(gl.TEXTURE16);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(this.unifFrame7, 16);   
+    }
+  }
+
+  setFrame08(texture: WebGLTexture)
+  {
+    this.use();
+    if (this.unifFrame8 != -1) {
+  
+      gl.activeTexture(gl.TEXTURE17);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(this.unifFrame8, 17);   
+    }
+  }
+
+  setFrame09(texture: WebGLTexture)
+  {
+    this.use();
+    if (this.unifFrame9 != -1) {
+  
+      gl.activeTexture(gl.TEXTURE18);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(this.unifFrame9, 18);   
+    }
+  }
+
   setScreenSize(screenSize: vec2){
     this.use();
     if (this.unifScreenSize !== -1) {
       gl.uniform2fv(this.unifScreenSize, screenSize);
     }
   }
+
+  setBlurScale(BlurScale: vec2){
+    this.use();
+    if (this.unifBlurScale !== -1) {
+      gl.uniform2fv(this.unifBlurScale, BlurScale);
+    }
+  }
+
+
+  
 
   setChromaticInfo(info: vec4){
     this.use();
@@ -326,6 +412,13 @@ class ShaderProgram {
     this.use();
     if (this.unifParticleInfo !== -1) {
       gl.uniform4fv(this.unifParticleInfo, info);
+    }
+  }
+
+  setmipLod(lod: number){
+    this.use();
+    if (this.unifLod !== -1) {
+      gl.uniform1f(this.unifLod, lod);
     }
   }
 
