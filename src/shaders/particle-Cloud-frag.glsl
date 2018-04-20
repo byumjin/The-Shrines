@@ -12,11 +12,15 @@ uniform mat4 u_InvViewProj;
 uniform vec4 u_lightDirection;
 uniform float u_Time;
 
+uniform vec3 u_CameraWPos;
+
 in vec4 fs_Col;
 in vec4 fs_Pos;
 in vec2 fs_UV;
 in vec2 fs_UV_SS;
 in vec3 fs_billboardNormal;
+
+
 
 out vec4 out_Col;
 
@@ -52,33 +56,38 @@ void main()
 
     if(sceneDepth > particleDepth)
     {
+        vec3 viewVec = normalize(u_CameraWPos - fs_Pos.xyz);
+
         int sprite = int( floor(fs_Col.a) ) % 8;
-
-       
-
-        vec4 NoiseMap = texture(u_frame3, vec2(fs_UV.x + u_Time * 0.0983, fs_UV.y - u_Time * 0.0365)  );
+        vec4 NoiseMap = texture(u_frame3, vec2(fs_UV.x + u_Time * 0.0983, fs_UV.y - u_Time * 0.0365));
 
         vec2 Noise = NoiseMap.xy * 2.0 - vec2(1.0);
         Noise *= 0.02;
 
         vec2 TwickedUV = fs_UV + Noise;
 
-        out_Col.xyz = texture(u_frame1, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;
+       out_Col.xyz = texture(u_frame1, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;
+       vec3 normal = texture(u_frame2, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;
 
-
-        vec3 normal = texture(u_frame2, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;
+   
+       
 
        normal = applyNormalMap(fs_billboardNormal, normalize(normal * 2.0 - 1.0) );
 
-       float NoL = clamp( dot(normal, u_lightDirection.xyz), 0.2, 1.0);
+       // out_Col.xyz = normal;
+       // return;
 
-       vec3 darkColor = vec3(0.0);
+       float NoV = clamp( dot(normal, viewVec), 0.0, 1.0);
 
-       out_Col.xyz *= fs_Col.xyz * 0.5;
+       float NoL = clamp(abs(dot(normal, u_lightDirection.xyz)), 0.2, 1.0);
+
+       vec3 sliverLight = vec3(10.0);
+
+       out_Col.xyz *= fs_Col.xyz * mix(sliverLight, vec3(1.0, 0.6, 0.4) , pow(NoV, 1.5)) * NoL;
+
        out_Col.a = 1.0;
 
-       vec3 tintColor = vec3(1.0, 0.6, 0.4);
-       out_Col.xyz *= tintColor;
+       
        out_Col = clamp(out_Col, 0.0, 1.0);
        
     }

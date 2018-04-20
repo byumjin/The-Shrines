@@ -38,7 +38,7 @@ const controls = {
 
   Clouds : true,
 
-  Temperature : 10000,
+  Temperature : 6500,
   
   Vignette_Effect: true,
 };

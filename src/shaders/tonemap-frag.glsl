@@ -153,7 +153,7 @@ void main() {
     
     vec3 direction = normalize(vec3(ghostVec, 0.0));
 
-    vec3 bloomColor = textureDistorted(u_frame1, reverseUV, direction.xy, distortion).xyz;
+    vec3 bloomColor = textureDistorted(u_frame1, reverseUV, direction.xy, distortion).xyz * 2.0;
 
 	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + bloomColor) * ColorTemperatureToRGB(u_Temperature);
 
