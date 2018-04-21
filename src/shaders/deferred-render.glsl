@@ -224,7 +224,7 @@ void main() {
 	// read from GBuffers
 	vec4 albedo = texture(u_Gbuffer_Albedo, fs_UV);
 	vec4 specular = texture(u_Gbuffer_Specular, fs_UV);
-	vec4 normal = texture(u_Gbuffer_Normal, fs_UV);
+	vec4 normal = texture(u_Gbuffer_Normal, fs_UV);	
 
 	float Roughness = specular.w;
 	Roughness = clamp(Roughness, 0.05, 0.95);
@@ -275,9 +275,6 @@ void main() {
 
 
 			float ambientTerm = 0.1;
-
-			//out_Col = vec4( vec3(diffuseTerm) , depth);
-			//return;
 
 			vec4 pbrColor =  vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) * pow( smoothstep( 0.1, 0.5, shadow), 1.0), diffuseColor.a);
 			pbrColor.xyz += diffuseColor.rgb * ambientTerm;

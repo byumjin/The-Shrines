@@ -54,7 +54,7 @@ void main() {
 			if(bWater0)
 			{
 				float depthDistance = clamp( LinearDepth(opaqueColor.a), 0.0, 1.0);
-				depthDistance *= 5.0;
+				depthDistance *= 3.0;
 				depthDistance = clamp(depthDistance, 0.0, 1.0);
 				fragColor[0].xyz =  mix( opaqueColor.xyz , transColor.xyz, depthDistance);
 

@@ -671,6 +671,7 @@ HmipblurPass : PostProcess = new PostProcess(
     this.deferredShader.setNormalMap(this.gbTargets[GbufferEnum.Normal]);
     
     this.deferredShader.setDepthMap(this.depthTexture);
+    this.deferredShader.setTime(this.currentTime);
 
     this.deferredShader.setShadowMap(this.post32Targets[PipelineEnum.ShadowPass]);
     this.deferredShader.setLightViewProjMatrix(lightViewProjMat);
