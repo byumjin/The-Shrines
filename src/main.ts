@@ -325,7 +325,7 @@ function loadScene() {
     new Texture('./src/resources/objs/shrines/textures/Uber_Normal.png', false));
   m_shrines_main.create();
   m_shrines_main.scale( vec3.fromValues(scale, scale, scale));
-  //m_shrines_main.translate(vec3.fromValues(0.0, -1.0, 0.0));
+  m_shrines_main.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
   m_shrines_poles = new Mesh(shrines_poles, vec3.fromValues(0, 0, 0),
   new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
@@ -333,7 +333,7 @@ function loadScene() {
     new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
     m_shrines_poles.create();
     m_shrines_poles.scale( vec3.fromValues(scale, scale, scale));
-    //m_shrines_poles.translate(vec3.fromValues(0.0, -1.0, 0.0));
+    m_shrines_poles.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
   m_shrines_balconis = new Mesh(shrines_balconis, vec3.fromValues(0, 0, 0),
   new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
@@ -341,7 +341,7 @@ function loadScene() {
     new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
     m_shrines_balconis.create();
     m_shrines_balconis.scale( vec3.fromValues(scale, scale, scale));
-    //m_shrines_balconis.translate(vec3.fromValues(0.0, -1.0, 0.0));
+    m_shrines_balconis.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
   m_shrines_colums = new Mesh(shrines_colums, vec3.fromValues(0, 0, 0),
   new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
@@ -349,7 +349,7 @@ function loadScene() {
     new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
     m_shrines_colums.create();
     m_shrines_colums.scale( vec3.fromValues(scale, scale, scale));
-    //m_shrines_colums.translate(vec3.fromValues(0.0, -1.0, 0.0));
+    m_shrines_colums.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
   m_shrines_gold = new Mesh(shrines_gold, vec3.fromValues(0, 0, 0),
   new Texture('./src/resources/objs/shrines/textures/Gold_Albedo.png', false),
@@ -357,6 +357,7 @@ function loadScene() {
     new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
     m_shrines_gold.create();
     m_shrines_gold.scale( vec3.fromValues(scale, scale, scale));
+    m_shrines_gold.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
   ///////////////
 
