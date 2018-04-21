@@ -137,23 +137,16 @@ float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
 }
 
 float getShadow(vec4 lightSpacePos){
-<<<<<<< HEAD
-	//float shadow = texture2DCompare(u_ShadowMap, vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5), vec2(0.0), lightSpacePos.z);
-=======
 
 	
->>>>>>> 3f7b6a6573695dbf93466365a833fd90f153b13e
 	float shadow = PCF(u_ShadowMap, 
 		1.0/SHADOWMAP_SIZE*4.0, 
 		vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
 		lightSpacePos.z);
 	
-<<<<<<< HEAD
-=======
 	
 	//float shadow = texture2DCompare(u_ShadowMap, vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5), vec2(0.0), lightSpacePos.z);
 
->>>>>>> 3f7b6a6573695dbf93466365a833fd90f153b13e
 	// float shadow = VSM(u_ShadowMap, 
 	// 	vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
 	// 	lightSpacePos.z - bias);
