@@ -26,7 +26,7 @@ uniform float u_Time;
 
 vec3 applyNormalMap(vec3 geomnor, vec3 normap) {
     
-    vec3 up = normalize(vec3(0.001, 1, 0.001));
+    vec3 up = normalize(vec3(0.01, 1, 0.01));
     vec3 surftan = normalize(cross(geomnor, up));
     vec3 surfbinor = cross(geomnor, surftan);
     return normalize(normap.y * surftan + normap.x * surfbinor + normap.z * geomnor);
@@ -59,8 +59,28 @@ void main() {
 
     //fragColor[1].w = (sin(u_Time) + 1.0) * 0.5;
 
-    vec4 normalInfo = texture(NormalMap, fs_UV /*+ vec2(u_Time, 0.0)*/);
+    vec4 normalInfo;
+    //rainy
+    bool bWater = texture(NormalMap, fs_UV).a < 0.5;
+	if(bWater)
+	{
+		normalInfo = texture(NormalMap, fs_UV - vec2(0.0, u_Time * 0.05));
+
+        
+	}
+    else
+    {
+        normalInfo = texture(NormalMap, fs_UV);
+    }
+
+     
     normalInfo.xyz = (normalInfo.xyz*2.0 - vec3(1.0)); 
+
+    if(bWater)
+    {
+        normalInfo.z += 10.0;
+        normalInfo.xyz = normalize(normalInfo.xyz);
+    }
 
     vec3 worldNormal = applyNormalMap(vertexNormal.xyz, normalInfo.xyz);
 

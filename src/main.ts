@@ -71,6 +71,19 @@ let mesh_B_Inner: Mesh;
 let obj_B_Glass: string;
 let mesh_B_Glass: Mesh;
 
+//
+let shrines_main: string;
+let shrines_poles: string;
+let shrines_balconis: string;
+let shrines_colums: string;
+let shrines_gold: string;
+
+let m_shrines_main: Mesh;
+let m_shrines_poles: Mesh;
+let m_shrines_balconis: Mesh;
+let m_shrines_colums: Mesh;
+let m_shrines_gold: Mesh;
+
 let obj_Leaf: string;
 let obj_Bark: string;
 let obj_Leaf2: string;
@@ -125,6 +138,12 @@ function loadOBJText() {
   obj_lake = readTextFile('./src/resources/objs/lake/models/lake.obj');
   obj_holodeck = readTextFile('./src/resources/objs/holodeck/models/holodeck.obj');
 
+  shrines_main = readTextFile('./src/resources/objs/shrines/models/w_main.obj');
+  shrines_poles = readTextFile('./src/resources/objs/shrines/models/w_poles.obj');
+  shrines_balconis = readTextFile('./src/resources/objs/shrines/models/w_balconis.obj');
+  shrines_colums = readTextFile('./src/resources/objs/shrines/models/w_colums.obj');
+  shrines_gold = readTextFile('./src/resources/objs/shrines/models/w_golden.obj');
+
   obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter_v2.obj');
   obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner_v2.obj');
   obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass_v2.obj');
@@ -147,53 +166,53 @@ function loadRoadMap(){
   let Array_Road = new Array<Mesh>();
   let objText = readTextFile('./src/resources/objs/road/models/road00.obj');
   let mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Road.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/road01.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Road.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/road02.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Road.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/road03.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Road.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/road04.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Road.push(mesh);
    Array_Road.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/road05.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Road.push(mesh);
    Array_Road.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/road06.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Road.push(mesh);
 
@@ -202,44 +221,44 @@ function loadRoadMap(){
   let Array_Conn = new Array<Mesh>();
   objText = readTextFile('./src/resources/objs/road/models/conn00.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn01.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn02.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn03.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn04.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn05.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   road_Mesh_Map.set("conn", Array_Conn);
@@ -285,34 +304,71 @@ function loadScene() {
     new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
   mesh1.create();
 
+  var scale = 3.0;
+
   mesh_lake = new Mesh(obj_lake, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/lake/textures/albedo.png', false),
     new Texture('./src/resources/objs/lake/textures/specular2.png', false),
      new Texture('./src/resources/objs/lake/textures/normal.png', false));
+     mesh_lake.scale( vec3.fromValues(scale, scale, scale));
   mesh_lake.create();
 
-  mesh_lake.translate( vec3.fromValues(0.0, -2.0, 0.0));
+  //mesh_lake.translate( vec3.fromValues(0.0, 0.0, 0.0));
 
-  mesh_holodeck = new Mesh(obj_holodeck, vec3.fromValues(0, 0, 0),
-   new Texture('./src/resources/objs/holodeck/textures/wall.png', false),
-    new Texture('./src/resources/objs/holodeck/textures/wall_Specular.png', false),
-     new Texture('./src/resources/objs/holodeck/textures/wall_Normal.png', false));
-  mesh_holodeck.create();
+  ////////////////
 
-  mesh_holodeck2 = new Mesh(obj_holodeck, vec3.fromValues(0, 0, 0),
-   new Texture('./src/resources/objs/holodeck/textures/wall02.png', false),
-    new Texture('./src/resources/objs/holodeck/textures/wall_Specular.png', false),
-     new Texture('./src/resources/objs/holodeck/textures/wall_Normal.png', false));
-  mesh_holodeck2.create();
-  mesh_holodeck2.translate( vec3.fromValues(-100.0, 0.0, 0.0));
+ 
+ 
+  m_shrines_main = new Mesh(shrines_main, vec3.fromValues(0, 0, 0),
+  new Texture('./src/resources/objs/shrines/textures/Uber_Albedo.png', false),
+   new Texture('./src/resources/objs/shrines/textures/Uber_Specular.png', false),
+    new Texture('./src/resources/objs/shrines/textures/Uber_Normal.png', false));
+  m_shrines_main.create();
+  m_shrines_main.scale( vec3.fromValues(scale, scale, scale));
+  m_shrines_main.translate(vec3.fromValues(0.0, -1.0, 0.0));
+
+  m_shrines_poles = new Mesh(shrines_poles, vec3.fromValues(0, 0, 0),
+  new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
+   new Texture('./src/resources/objs/shrines/textures/marbles_specular.png', false),
+    new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
+    m_shrines_poles.create();
+    m_shrines_poles.scale( vec3.fromValues(scale, scale, scale));
+    m_shrines_poles.translate(vec3.fromValues(0.0, -1.0, 0.0));
+
+  m_shrines_balconis = new Mesh(shrines_balconis, vec3.fromValues(0, 0, 0),
+  new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
+   new Texture('./src/resources/objs/shrines/textures/marbles_specular.png', false),
+    new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
+    m_shrines_balconis.create();
+    m_shrines_balconis.scale( vec3.fromValues(scale, scale, scale));
+    m_shrines_balconis.translate(vec3.fromValues(0.0, -1.0, 0.0));
+
+  m_shrines_colums = new Mesh(shrines_colums, vec3.fromValues(0, 0, 0),
+  new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
+   new Texture('./src/resources/objs/shrines/textures/marbles_specular.png', false),
+    new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
+    m_shrines_colums.create();
+    m_shrines_colums.scale( vec3.fromValues(scale, scale, scale));
+    m_shrines_colums.translate(vec3.fromValues(0.0, -1.0, 0.0));
+
+  m_shrines_gold = new Mesh(shrines_gold, vec3.fromValues(0, 0, 0),
+  new Texture('./src/resources/objs/shrines/textures/Gold_Albedo.png', false),
+   new Texture('./src/resources/objs/shrines/textures/Gold_Specular.png', false),
+    new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
+    m_shrines_gold.create();
+    m_shrines_gold.scale( vec3.fromValues(scale, scale, scale));
+    m_shrines_gold.translate(vec3.fromValues(0.0, -1.0, 0.0));
+
+  ///////////////
 
   mesh_B_Outter = new Mesh(obj_B_Outter, vec3.fromValues(0, 0, 0),
-  new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-    new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+  new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+    new Texture('./src/resources/objs/B_Side/textures/Normal_Normal.png', false));
     mesh_B_Outter.create();
 
     mesh_B_Outter.scale(vec3.fromValues(3, 3, 3));
+    mesh_B_Outter.translate(vec3.fromValues(0.0, 0.5, 0.0));
 
   mesh_B_Inner = new Mesh(obj_B_Inner, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/B_Side/textures/Inner_Albedo.png', false),
@@ -321,6 +377,7 @@ function loadScene() {
    mesh_B_Inner.create();
 
    mesh_B_Inner.scale(vec3.fromValues(3, 3, 3));
+   mesh_B_Inner.translate(vec3.fromValues(0.0, 0.5, 0.0));
 
   mesh_B_Glass = new Mesh(obj_B_Glass, vec3.fromValues(0, 0, 0),
     new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
@@ -329,6 +386,7 @@ function loadScene() {
     mesh_B_Glass.create();
 
     mesh_B_Glass.scale(vec3.fromValues(3, 3, 3));
+    mesh_B_Glass.translate(vec3.fromValues(0.0, 0.5, 0.0));
 
 // Create By PLY format
    mesh_Leaf = new Mesh(obj_Leaf, vec3.fromValues(-50, 2, 25),
@@ -368,9 +426,9 @@ function loadScene() {
    loadRoadMap();
 
    LS = new LSystem(vec3.fromValues(62,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-    new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
    let program = "X\nX->F*[+F][-F]F*[+F]F\nF->FFF\n";
    LS.loadProgramFromString(program);
    LS.setDefaultStep(13.5);
@@ -381,9 +439,9 @@ function loadScene() {
    console.log(LS);
 
    LS1 = new LSystem(vec3.fromValues(-0.53*64,0,-0.8*64),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
    program = "X\nX->F+*[[FFX]-FFX]-FF*[-FFX]+FFX\nF->FF\n";
    LS1.loadProgramFromString(program);
    LS1.setDefaultStep(13.5);
@@ -555,7 +613,7 @@ function main() {
 
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
+  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0); // this is for shadow complement
   let lightPosition : vec4 = vec4.fromValues(0.0, 50.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
   vec3.normalize(lightD, vec3.fromValues(-0.53, 0.2, 1.0));
@@ -581,7 +639,7 @@ function main() {
     return lightViewProjMat;
   }
 
-  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 600, 300, -300, 300);
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 600, 300, -300, 350);
 
   function tick() {
 
@@ -595,11 +653,11 @@ function main() {
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS, LS1, mesh1, mesh_B_Outter, mesh_B_Inner, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+      [LS, LS1, mesh1, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold ]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-      [LS, LS1, mesh1, mesh_B_Outter,  mesh_lake, mesh_B_Inner, mesh_B_Glass, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2]);
+      [LS, LS1, mesh1, mesh_lake, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold ]);
 
-    renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
+    renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_B_Glass , mesh_lake], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 

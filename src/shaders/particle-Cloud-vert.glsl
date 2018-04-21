@@ -79,7 +79,7 @@ void main()
     fs_Pos.a = normalizedPos.z;
 
 
-    fs_Pos.xyz += offset;
+    fs_Pos.xyz = billboardPos;
 
-    fs_billboardNormal =  normalize(vec3(u_CameraWPos - billboardPos));//   CameraAxes[2];
+    fs_billboardNormal =  normalize(vec3(u_CameraWPos - offset));
 }

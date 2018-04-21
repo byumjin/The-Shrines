@@ -137,12 +137,23 @@ float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
 }
 
 float getShadow(vec4 lightSpacePos){
+<<<<<<< HEAD
 	//float shadow = texture2DCompare(u_ShadowMap, vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5), vec2(0.0), lightSpacePos.z);
+=======
+
+	
+>>>>>>> 3f7b6a6573695dbf93466365a833fd90f153b13e
 	float shadow = PCF(u_ShadowMap, 
 		1.0/SHADOWMAP_SIZE*4.0, 
 		vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
 		lightSpacePos.z);
 	
+<<<<<<< HEAD
+=======
+	
+	//float shadow = texture2DCompare(u_ShadowMap, vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5), vec2(0.0), lightSpacePos.z);
+
+>>>>>>> 3f7b6a6573695dbf93466365a833fd90f153b13e
 	// float shadow = VSM(u_ShadowMap, 
 	// 	vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),
 	// 	lightSpacePos.z - bias);
@@ -301,29 +312,16 @@ void main() {
 		
 		float energyConservation = 1.0 - Roughness * Roughness;
 
-		float waterRoughness = 0.2;
+		float waterRoughness = 0.4;
 
-		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? waterRoughness :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? waterRoughness :Roughness))) * (bWater ? 1.0 - waterRoughness*waterRoughness : energyConservation);
+		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? waterRoughness :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? waterRoughness :Roughness))) * (bWater ? 1.0 : energyConservation);
 
 
 		float ambientTerm = 0.1;
 
-		vec4 pbrColor;
-
-		if(shadow < 0.5)
-		{
-			pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
-			pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a *smoothstep( -0.5, 1.0, shadow * 2.0);;
-		}
-		else
-		{
-			shadow = 1.0;
-			pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
-			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
-		}
-
-
-		
+		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) * pow( smoothstep( 0.1, 0.5, shadow), 1.0), diffuseColor.a);
+		pbrColor.xyz += diffuseColor.rgb * ambientTerm;
+		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 		
 		if(bWater)
 		{
@@ -335,11 +333,13 @@ void main() {
 
 
 			float LoV = clamp( dot(-viewVec.xyz, u_lightDirection.xyz), 0.0, 1.0);
-			float fNoV =  pow( NoV, 20.0) * pow( LoV, 10.0);
+			//float fNoV =  pow( NoV, 20.0) * pow( LoV, 30.0);
+			float fNoV = pow( LoV, 40.0);
 
 			vec3 tintColor = vec3(1.0, 0.6, 0.4);
+			//vec3 tintColor = vec3(1.0);
 
-			pbrColor.xyz += fNoV *  tintColor * 20.0;
+			pbrColor.xyz += fNoV *  tintColor * 30.0;
 		}
 		
 
@@ -348,7 +348,7 @@ void main() {
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
 
 		vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
-		fogColor *= 0.7;
+		fogColor *= 0.6;
 		fogColor = pow(fogColor, vec3(2.2));
 		
 		

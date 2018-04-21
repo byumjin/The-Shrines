@@ -213,7 +213,7 @@ void main() {
 	// read from GBuffers
 	vec4 albedo = texture(u_Gbuffer_Albedo, fs_UV);
 	vec4 specular = texture(u_Gbuffer_Specular, fs_UV);
-	vec4 normal = texture(u_Gbuffer_Normal, fs_UV);
+	vec4 normal = texture(u_Gbuffer_Normal, fs_UV);	
 
 	float Roughness = specular.w;
 	Roughness = clamp(Roughness, 0.05, 0.95);
@@ -262,30 +262,21 @@ void main() {
 
 			specularTerm = GGX_Spec(normal.xyz, halfVec, Roughness, diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, Roughness)) *energyConservation;
 
-			//specularTerm = clamp(specularTerm, 0.0, 2.0);
 
 			float ambientTerm = 0.1;
 
-			vec4 pbrColor;
+			vec4 pbrColor =  vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) * pow( smoothstep( 0.1, 0.5, shadow), 1.0), diffuseColor.a);
+			pbrColor.xyz += diffuseColor.rgb * ambientTerm;
+			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 			 
-
-			if(shadow < 0.5)
-			{
-				pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
-				pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * smoothstep( -0.5, 1.0, shadow * 2.0);
-			}
-			else
-			{
-				pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
-				pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
-			}
+		
 
 			out_Col = vec4(pbrColor.xyz, depth);
 
 			//Emissive
 			if(normal.a > 0.8)
 			{
-				out_Col.xyz += albedo.xyz;
+				out_Col.xyz += albedo.xyz * 3.0;
 			}
 
 			vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
