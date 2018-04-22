@@ -30,7 +30,7 @@ void main()
 	vec2 uv = fs_UV.xy;
 
     vec4 d = texture(u_frame1, uv);
-	vec2 rnd = vec2(rand(uv+d.r*.05), rand(uv+d.b*.05));
+	vec2 rnd = vec2(rand(uv+d.r*.05)-0.5, rand(uv+d.b*.05)-0.5);
     
     //vignette
     const vec2 lensRadius 	= vec2(0.95*1.5, 0.05);
