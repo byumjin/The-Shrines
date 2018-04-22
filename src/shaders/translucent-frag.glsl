@@ -312,8 +312,9 @@ void main() {
 
 		float ambientTerm = 0.1;
 
-		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) * pow( smoothstep( 0.1, 0.5, shadow), 1.0), diffuseColor.a);
-		pbrColor.xyz += diffuseColor.rgb * ambientTerm;
+		vec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) *  smoothstep( 0.1, 0.5, shadow), diffuseColor.a);
+		//pbrColor.xyz += diffuseColor.rgb * ambientTerm;
+		pbrColor.xyz += diffuseColor.rgb * ambientTerm * (smoothstep( 0.0, 0.5, diffuseTerm) + 0.5);
 		pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
 		
 		if(bWater)
