@@ -279,8 +279,18 @@ void main() {
 			vec4 pbrColor =  vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) * pow( smoothstep( 0.1, 0.5, shadow), 1.0), diffuseColor.a);
 			pbrColor.xyz += diffuseColor.rgb * ambientTerm;
 			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
-			 
-		
+			// vec4 pbrColor;
+			
+			// if(shadow < 0.5)
+			// {
+			// 	pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
+			// 	pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * shadow;
+			// }
+			// else
+			// {
+			// 	pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
+			// 	pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a * shadow;
+			// }
 
 			out_Col = vec4(pbrColor.xyz, depth);
 

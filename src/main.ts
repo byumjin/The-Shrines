@@ -32,6 +32,8 @@ const controls = {
   Rain_Timer: 3.0,
 
   Snow : false,
+  Snow_delaytoDieTimer : 3.0,
+  Snow_Timer: 3.0,
   Lantern : false,
   Lantern_delaytoDieTimer : 10.0,
   Lantern_Timer: 10.0,
@@ -166,7 +168,7 @@ function loadRoadMap(){
   let Array_Road = new Array<Mesh>();
   let objText = readTextFile('./src/resources/objs/road/models/road00.obj');
   let mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
@@ -221,42 +223,42 @@ function loadRoadMap(){
   let Array_Conn = new Array<Mesh>();
   objText = readTextFile('./src/resources/objs/road/models/conn00.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn01.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn02.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn03.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn04.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
   Array_Conn.push(mesh);
   objText = readTextFile('./src/resources/objs/road/models/conn05.obj');
   mesh = new Mesh(objText, vec3.fromValues(0,0,0),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
   mesh.create();
@@ -425,7 +427,7 @@ function loadScene() {
 
    loadRoadMap();
 
-   LS = new LSystem(vec3.fromValues(62,0,0),
+   LS = new LSystem(vec3.fromValues(62,1.5,0),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
     new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
@@ -438,7 +440,7 @@ function loadScene() {
    LS.create();
    console.log(LS);
 
-   LS1 = new LSystem(vec3.fromValues(-0.53*64,0,-0.8*64),
+   LS1 = new LSystem(vec3.fromValues(-0.53*64,1.5,-0.8*64),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
@@ -711,19 +713,38 @@ function main() {
 
       if(controls.Rain_Timer < controls.Rain_delaytoDieTimer)
       {
-        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, controls.Rain, true); 
+        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, true); 
       }
       else
       {
-        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, controls.Rain, false); 
+        if(!controls.Snow)
+        {
+          controls.Snow_Timer += timer.deltaTime;
+
+          if(controls.Snow_Timer < controls.Snow_delaytoDieTimer)
+          {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, true); 
+          }
+          else
+          {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false); 
+          }
+        }
+        else
+        {
+          controls.Snow_Timer = 0.0;
+          
+          renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true);   
+        }
       }
     }
     else
     {
       controls.Rain_Timer = 0.0;
       
-      renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, controls.Rain, true);   
+      renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true);   
     }
+
     
     renderer.renderforSavingCurrentFrame(camera);
 
@@ -739,7 +760,7 @@ function main() {
     
     if(controls.Vignette_Effect && controls.Rain)
       renderer.renderRainy();   
-    else if(controls.Vignette_Effect && controls.Rain, controls.Snow)
+    else if(controls.Vignette_Effect && controls.Snow)
       renderer.renderFrost();
     else
       renderer.renderPresent(camera);

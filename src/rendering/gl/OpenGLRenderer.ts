@@ -35,7 +35,7 @@ const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "Sha
                      "ToneMapping": 0};
 
 
-var gShadowMapSize = 1024;
+var gShadowMapSize = 2048;
 
 
 class OpenGLRenderer {
@@ -768,7 +768,7 @@ HmipblurPass : PostProcess = new PostProcess(
   }
 
   renderParticle(camera: Camera, quad: Quad, particleSystem: Particle, feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram,
-    FireFly: boolean, Weather_Rain: boolean, bSwitch: boolean)
+    FireFly: boolean, Weather: number, bSwitch: boolean)
   {    
     if(bSwitch)
     {
@@ -777,7 +777,7 @@ HmipblurPass : PostProcess = new PostProcess(
     feedbackShader.setdeltaTime(this.deltaTime);
     feedbackShader.setTime(this.currentTime);    
     feedbackShader.setCameraWPos(camera.position);
-    feedbackShader.setParticleInfo(vec4.fromValues(Weather_Rain ? 1.0 : 0.0, FireFly ? 1.0 : 0.0, 0.0, 0.0));
+    feedbackShader.setParticleInfo(vec4.fromValues(Weather, FireFly ? 1.0 : 0.0, 0.0, 0.0));
 
     var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;   
 
@@ -827,6 +827,8 @@ HmipblurPass : PostProcess = new PostProcess(
       particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
       particleRenderShader.setFrame00(this.tDTargets[0]);
       particleRenderShader.drawInstance(quad, particleSystem.count);
+      particleRenderShader.setParticleInfo(vec4.fromValues(Weather, FireFly ? 1.0 : 0.0, 0.0, 0.0));
+
     }
 
     // bind default frame buffer
