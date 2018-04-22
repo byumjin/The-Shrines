@@ -19,7 +19,7 @@ out vec2 fs_UV;
 out vec2 fs_UV_SS;
 
 
-const int rainIndex = 8192;
+const int rainIndex = 0;
 const int rainStainIndex = 0;
 
 void main()

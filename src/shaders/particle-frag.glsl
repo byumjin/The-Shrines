@@ -12,7 +12,7 @@ in vec2 fs_UV_SS;
 
 out vec4 out_Col;
 
-const int rainIndex = 8192;
+const int rainIndex = 0;
 const int rainStainIndex = 0;
 
 float LinearDepth(float d, float f)
