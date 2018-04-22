@@ -19,7 +19,7 @@ const controls = {
    
   SSR_MaxStep : 196,
   SSR_Opaque_Intensity : 1.0,
-  SSR_Trans_Intensity : 0.4,
+  SSR_Trans_Intensity : 0.18,
   SSR_Threshold : 2.0,
 
   Bloom_Iteration : 16,
@@ -86,6 +86,10 @@ let m_shrines_balconis: Mesh;
 let m_shrines_colums: Mesh;
 let m_shrines_gold: Mesh;
 
+//
+let shrines_statue: string;
+let m_shrines_statue: Mesh;
+
 let obj_Leaf: string;
 let obj_Bark: string;
 let obj_Leaf2: string;
@@ -112,7 +116,7 @@ let skyCubeMap: Texture;
 let cloudsTexture: Texture;
 let cloudsNormalTexture: Texture;
 
-let numParticle: number = 16384; //Bilboard
+let numParticle: number = 4096; //Bilboard
 let numCloud: number = 256;
 
 let numLatern: number = 1024;
@@ -145,6 +149,8 @@ function loadOBJText() {
   shrines_balconis = readTextFile('./src/resources/objs/shrines/models/w_balconis.obj');
   shrines_colums = readTextFile('./src/resources/objs/shrines/models/w_colums.obj');
   shrines_gold = readTextFile('./src/resources/objs/shrines/models/w_golden.obj');
+
+  shrines_statue = readTextFile('./src/resources/objs/shrines/statues/statues.obj');
 
   obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter_v2.obj');
   obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner_v2.obj');
@@ -271,13 +277,13 @@ function loadScene() {
   square && square.destroy();
   mesh0 && mesh0.destroy();
 
-  skyCubeMap = new Texture('./src/resources/objs/skybox/nightSky_', true);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 0);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 1);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 2);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 3);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 4);
-  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/nightSky_', 5);
+  skyCubeMap = new Texture('./src/resources/objs/skybox/dawnSky_', true);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/dawnSky_', 0);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/dawnSky_', 1);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/dawnSky_', 2);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/dawnSky_', 3);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/dawnSky_', 4);
+  skyCubeMap.loadCubeImg('./src/resources/objs/skybox/dawnSky_', 5);
 
   cloudsTexture = new Texture('./src/resources/clouds/clouds.png', false);
   cloudsNormalTexture = new Texture('./src/resources/clouds/clouds_Normal.png', false);
@@ -356,12 +362,21 @@ function loadScene() {
   m_shrines_gold = new Mesh(shrines_gold, vec3.fromValues(0, 0, 0),
   new Texture('./src/resources/objs/shrines/textures/Gold_Albedo.png', false),
    new Texture('./src/resources/objs/shrines/textures/Gold_Specular.png', false),
-    new Texture('./src/resources/objs/shrines/textures/marbles_normal.png', false));
+    new Texture('./src/resources/objs/shrines/textures/Gold_Normal.png', false));
     m_shrines_gold.create();
     m_shrines_gold.scale( vec3.fromValues(scale, scale, scale));
     m_shrines_gold.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
   ///////////////
+  m_shrines_statue = new Mesh(shrines_statue, vec3.fromValues(0, 0, 0),
+  new Texture('./src/resources/objs/shrines/statues/albedo.png', false),
+   new Texture('./src/resources/objs/shrines/statues/specular.png', false),
+    new Texture('./src/resources/objs/shrines/statues/normal.png', false));
+    m_shrines_statue.create();
+    m_shrines_statue.scale( vec3.fromValues(scale, scale, scale));
+    m_shrines_statue.translate(vec3.fromValues(0.0, -1.0, 0.0));
+
+
 
   mesh_B_Outter = new Mesh(obj_B_Outter, vec3.fromValues(0, 0, 0),
   new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
@@ -473,7 +488,7 @@ function main() {
   var SSR = gui.addFolder('SSR');  
   SSR.add(controls, 'SSR_MaxStep', 16.0, 512.0).step(1);
   SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 4.0).step(0.1);
-  SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.1);
+  SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.01);
   SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
 
   var BLOOM = gui.addFolder('BLOOM');  
@@ -615,10 +630,10 @@ function main() {
 
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0); // this is for shadow complement
+  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
   let lightPosition : vec4 = vec4.fromValues(0.0, 50.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
-  vec3.normalize(lightD, vec3.fromValues(-0.53, 0.2, 1.0));
+  vec3.normalize(lightD, vec3.fromValues(-1.0, 0.4, 1.0));
 
   let lightDirection : vec4 = vec4.fromValues(lightD[0], lightD[1], lightD[2], 0.0);
 
@@ -655,9 +670,9 @@ function main() {
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS, LS1, mesh1, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold ]);
+      [LS, LS1, mesh1, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-      [LS, LS1, mesh1, mesh_lake, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold ]);
+      [LS, LS1, mesh1, mesh_lake, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
 
     renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_B_Glass , mesh_lake], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 

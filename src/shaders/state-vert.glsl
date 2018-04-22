@@ -34,7 +34,7 @@ out vec4 o_velocity;
 out vec4 o_color;
 out vec4 o_attract;
 
-const int rainIndex = 8192;
+const int rainIndex = 0;
 const int rainStainIndex = 0;
 
 
@@ -164,7 +164,7 @@ void main()
                 o_color.z -= (0.2 + xi.x *0.1);
             }
 
-            o_position.y = 0.2;
+            o_position.y = 1.5;
         }
     }
     
