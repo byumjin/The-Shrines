@@ -355,7 +355,7 @@ void main() {
 		{		
 			float linearDepth = LinearDepth(Depth, 200.0);	
 			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, linearDepth );
-			fragColor[1] = vec4(normal.xyz, 0.0);
+			fragColor[1] = vec4(normal.xyz, 0.05);
 		}
 		else
 		{
