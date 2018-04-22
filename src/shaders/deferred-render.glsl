@@ -242,13 +242,16 @@ void main() {
 	vec3 halfVec = viewVec + lightDir;
 
 
+	vec4 skycol = texture(u_SkyCubeMap, normalize( -viewVec  + vec3(0.0, u_CameraWPos.y, 0.0)*0.001 ) );
+    skycol = pow(skycol, vec4(2.2));
+	skycol *= 0.3;
+
 	if(depth >= 1.0) //SkyBox
 	{			
 		 //inverse gamma correct
 		//vec3 reflVec = -viewVec;//reflect(-viewVec, normal.xyz);
-		vec4 col = texture(u_SkyCubeMap, normalize( -viewVec  + vec3(0.0, u_CameraWPos.y, 0.0)*0.001 ) );
-    	col = pow(col, vec4(2.2));
-		out_Col = col;
+		
+		out_Col = skycol;
 		out_Col.w = 1.0;
 	}
 	else
@@ -290,9 +293,13 @@ void main() {
 				out_Col.xyz += albedo.xyz * 3.0;
 			}
 
+			/*
 			vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
 			fogColor *= 0.7;
 			fogColor = pow(fogColor, vec3(2.2));
+			*/
+
+			vec3 fogColor = skycol.xyz;
 
 			float linearDepth = LinearDepth(depth, 200.0);
 

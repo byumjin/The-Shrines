@@ -273,16 +273,18 @@ void main() {
 	vec3 viewVec = normalize(u_CameraWPos - worldPos.xyz);
 	vec3 halfVec = viewVec + u_lightDirection.xyz;
 
-	
+	vec3 reflVec = reflect(-viewVec, normal.xyz);
+	vec4 skycol = texture(u_SkyCubeMap, reflVec);
+    skycol = pow(skycol, vec4(2.2));
+	skycol *= 0.3;
 	
 	vec4 lightSpacePos = vec4(0.0);
 	if(depth >= 1.0) //SkyBox
 	{			
-		vec3 reflVec = reflect(-viewVec, normal.xyz);
-        vec4 col = texture(u_SkyCubeMap, reflVec);
-    	col = pow(col, vec4(2.2));
+		
+        
 
-		fragColor[0] = col;
+		fragColor[0] = skycol;
         fragColor[0].w =  bWater ? 21.0 : 11.0;
         fragColor[1] = vec4(normal.xyz, Roughness);
 	}
@@ -341,10 +343,12 @@ void main() {
 
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
 
+		/*
 		vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
 		fogColor *= 0.6;
 		fogColor = pow(fogColor, vec3(2.2));
-		
+		*/
+		vec3 fogColor = skycol.xyz;
 		
 
 		if(bWater)
