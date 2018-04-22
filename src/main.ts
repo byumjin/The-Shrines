@@ -116,7 +116,7 @@ let skyCubeMap: Texture;
 let cloudsTexture: Texture;
 let cloudsNormalTexture: Texture;
 
-let numParticle: number = 4096; //Bilboard
+let numParticle: number = 8192; //Bilboard
 let numCloud: number = 256;
 
 let numLatern: number = 1024;

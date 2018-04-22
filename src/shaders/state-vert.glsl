@@ -136,7 +136,7 @@ void main()
             {
                 o_position.x = u_CameraWPos.x + o_position.w;
                 o_position.z = u_CameraWPos.z + o_attract.w;
-                o_position.y = 150.0*rand(vec2(gl_VertexID,gl_VertexID)) + o_velocity.w;
+                o_position.y = 150.0*rand(vec2(gl_VertexID,gl_VertexID)) - 50.0 + o_velocity.w;
             }
         }
     }

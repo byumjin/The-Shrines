@@ -47,7 +47,7 @@ void main()
             if(u_particleInfo.x == 1.0)
                 dist = pow(smoothstep(0.0, 1.0, 1.0 - pow(fs_Pos.x * 10.0, 2.0)), 10.0) * clamp(1.0 - pow(fs_Pos.y, 4.0 ), 0.0, 1.0);
             else if(u_particleInfo.x == 2.0)
-                dist = pow(1.0 - (length(fs_Pos.xyz) * 4.0), 1.5);
+                dist = 1.0 - (length(fs_Pos.xyz) * 4.0);
             float closeFade = clamp(LinearDepth(particleDepth, 1000.0) * 100.0, 0.0, 1.0);
 
             out_Col = vec4(0.2, 0.2, 0.2, 0.0) * dist * closeFade;

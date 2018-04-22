@@ -33,7 +33,7 @@ void main()
 	vec2 rnd = vec2(rand(uv+d.r*.05), rand(uv+d.b*.05));
     
     //vignette
-    const vec2 lensRadius 	= vec2(0.85*1.5, 0.05);
+    const vec2 lensRadius 	= vec2(0.95*1.5, 0.05);
     float dist = distance(uv.xy, vec2(0.5,0.5));
     float vigfin = pow(1.-smoothstep(lensRadius.x, lensRadius.y, dist),2.);
    
