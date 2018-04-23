@@ -311,6 +311,10 @@ void main() {
 
 		specularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? waterRoughness :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? waterRoughness :Roughness))) * (bWater ? 1.0 : energyConservation);
 
+		if(bWater)
+		{
+			specularTerm *= 6.0;
+		}
 
 		float ambientTerm = 0.1;
 
@@ -332,22 +336,13 @@ void main() {
 			//float fNoV =  pow( NoV, 20.0) * pow( LoV, 30.0);
 			float fNoV = pow( LoV, 40.0);
 
-			vec3 tintColor = vec3(1.0, 0.6, 0.4);
-			//vec3 tintColor = vec3(1.0);
-
-			pbrColor.xyz += fNoV *  tintColor * 30.0;
+			pbrColor.xyz += fNoV * 30.0;
 		}
 		
 
         float Opacity = 0.1;		
 
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
-
-		/*
-		vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
-		fogColor *= 0.6;
-		fogColor = pow(fogColor, vec3(2.2));
-		*/
 		vec3 fogColor = skycol.xyz;
 		
 
