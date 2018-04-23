@@ -121,9 +121,10 @@ let numCloud: number = 256;
 
 let numLatern: number = 1024;
 
-let LS: LSystem;
+let LS0: LSystem;
 let LS1: LSystem;
 let LS2: LSystem;
+let LS3: LSystem;
 
 
 var timer = {
@@ -311,6 +312,7 @@ function loadScene() {
    new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
     new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
   mesh1.create();
+  mesh1.translate( vec3.fromValues(0.0, 12.5, 0.0) );
 
   var scale = 3.0;
 
@@ -406,28 +408,28 @@ function loadScene() {
     mesh_B_Glass.translate(vec3.fromValues(0.0, 0.5, 0.0));
 
 // Create By PLY format
-   mesh_Leaf = new Mesh(obj_Leaf, vec3.fromValues(-50, 2, 25),
+   mesh_Leaf = new Mesh(obj_Leaf, vec3.fromValues(-50, 2, -50),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree22.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree0.png', false));
    mesh_Leaf.createByPly(1, ply_Leaf);
    mesh_Leaf.scale(vec3.fromValues(3, 3, 3));
    
-   mesh_Bark = new Mesh(obj_Bark, vec3.fromValues(-50, 2, 25),
+   mesh_Bark = new Mesh(obj_Bark, vec3.fromValues(-50, 2, -50),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree0.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree0.png', false));
    mesh_Bark.createByPly(2, ply_Bark);
    mesh_Bark.scale(vec3.fromValues(3, 3, 3));
 
-   mesh_Leaf2 = new Mesh(obj_Leaf2, vec3.fromValues(10,0,0),
+   mesh_Leaf2 = new Mesh(obj_Leaf2, vec3.fromValues(0,9.5,252),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/leaf_Tex_Tree2.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Leaf_png/Normal_Tex_Tree2.png', false));
    mesh_Leaf2.createByPly(1, ply_Leaf2);
    mesh_Leaf2.scale(vec3.fromValues(3, 3, 3));
 
-   mesh_Bark2 = new Mesh(obj_Bark2, vec3.fromValues(10,0,0),
+   mesh_Bark2 = new Mesh(obj_Bark2, vec3.fromValues(0,9.5,252),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Tex_Tree2.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/specular.png', false),
     new Texture('./src/resources/objs/tree/textures/Bark_png/BroadleafBark_Normal_Tex_Tree2.png', false));
@@ -442,20 +444,20 @@ function loadScene() {
 
    loadRoadMap();
 
-   LS = new LSystem(vec3.fromValues(62,1.5,0),
+   LS0 = new LSystem(vec3.fromValues(55,1.5,0),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
     new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
-   let program = "X\nX->F*[+F][-F]F*[+F]F\nF->FFF\n";
-   LS.loadProgramFromString(program);
-   LS.setDefaultStep(13.5);
-   LS.setDefaultAngle(90);
-   LS.setInitialDirection(90);
-   LS.process(1);
-   LS.create();
-   console.log(LS);
+   let program = "X\nX->FF*[+F][-F]F*[-F][+F]\nF->FFF\n";
+   LS0.loadProgramFromString(program);
+   LS0.setDefaultStep(13.5);
+   LS0.setDefaultAngle(90);
+   LS0.setInitialDirection(90);
+   LS0.process(1);
+   LS0.create();
+   console.log(LS0);
 
-   LS1 = new LSystem(vec3.fromValues(-0.53*64,1.5,-0.8*64),
+   LS1 = new LSystem(vec3.fromValues(0,1.5,-55),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
    new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
@@ -463,14 +465,68 @@ function loadScene() {
    LS1.loadProgramFromString(program);
    LS1.setDefaultStep(13.5);
    LS1.setDefaultAngle(90);
-   LS1.setInitialDirection(-150)
+   LS1.setInitialDirection(180)
    LS1.process(1);
    LS1.create();
    console.log(LS1);
 
+   LS2 = new LSystem(vec3.fromValues(-55,1.5,0),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
+   program = "X\nX->FF*[+F][-F]F*[-F][+F]\nF->FFF\n";
+   LS2.loadProgramFromString(program);
+   LS2.setDefaultStep(13.5);
+   LS2.setDefaultAngle(90);
+   LS2.setInitialDirection(-90)
+   LS2.process(1);
+   LS2.create();
+   console.log(LS2);
 
+   LS3 = new LSystem(vec3.fromValues(0,1.5,55),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
+   program = "X\nX->F+*[[FFX]-FFX]-FF*[-FFX]+FFX\nF->FF\n";
+   LS3.loadProgramFromString(program);
+   LS3.setDefaultStep(13.5);
+   LS3.setDefaultAngle(90);
+   LS3.setInitialDirection(0)
+   LS3.process(1);
+   LS3.create();
+   console.log(LS3);
 }
 
+function CheckTriggers(camPos: vec3, distance: number, height: number, range: number){
+  if(camPos[0]<range && camPos[0] > -range 
+    && camPos[1]<height+range && camPos[1]>height-range
+    && camPos[2]<range && camPos[2]>-range)
+    //Middle Shrine
+    controls.Lantern = true;
+  else if(camPos[0]<range && camPos[0] > -range 
+    && camPos[1]<height+range && camPos[1]>height-range
+    && camPos[2]<distance+range && camPos[2]>distance-range)
+    controls.Rain = false;
+  else if(camPos[0]<range && camPos[0] > -range 
+    && camPos[1]<height+range && camPos[1]>height-range
+    && camPos[2]<-distance+range && camPos[2]>-distance-range)
+    controls.Rain = false;
+  else if(camPos[0]<distance+range && camPos[0] > distance-range 
+    && camPos[1]<height+range && camPos[1]>height-range
+    && camPos[2]<range && camPos[2]>-range)
+    //Ice Shrine
+    controls.Snow = true;
+  else if(camPos[0]<-distance+range && camPos[0] > -distance-range 
+    && camPos[1]<height+range && camPos[1]>height-range
+    && camPos[2]<range && camPos[2]>-range)
+    //Water Shrine
+    controls.Rain = true;
+  else{
+    controls.Rain = false;
+    controls.Snow = false;
+    controls.Lantern = false;
+  }
+}
 
 function main() {
   // Initial display for framerate
@@ -665,16 +721,16 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     timer.updateTime();
     renderer.updateTime(timer.deltaTime, timer.currentTime);
-
+    CheckTriggers(camera.position, 250, 75, 75);
     renderer.clear();
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS, LS1, mesh1, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
+      [LS0, LS1, LS2, LS3, mesh1, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-      [LS, LS1, mesh1, mesh_lake, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
+      [LS0, LS1, LS2, LS3, mesh1, mesh_lake, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
 
-    renderer.renderToTranslucent(camera, translucentDeferred, [ mesh_B_Glass , mesh_lake], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
+    renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
