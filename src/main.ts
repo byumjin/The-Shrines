@@ -726,11 +726,11 @@ function main() {
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS0, LS1, LS2, LS3, mesh1, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
+      [LS0, LS1, LS2, LS3, mesh1, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-      [LS0, LS1, LS2, LS3, mesh1, mesh_lake, mesh_Leaf, mesh_Bark, mesh_Leaf2, mesh_Bark2, mesh_B_Outter, mesh_B_Inner, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
+      [LS0, LS1, LS2, LS3, mesh1, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
 
-    renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
+    renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
