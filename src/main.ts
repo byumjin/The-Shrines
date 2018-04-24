@@ -19,7 +19,7 @@ const controls = {
    
   SSR_MaxStep : 64,
   SSR_Opaque_Intensity : 1.0,
-  SSR_Trans_Intensity : 0.4,
+  SSR_Trans_Intensity : 0.8,
   SSR_Threshold : 2.0,
 
   Bloom_Iteration : 16,
@@ -40,7 +40,7 @@ const controls = {
 
   Clouds : true,
 
-  Temperature : 10000,
+  Temperature : 7000,
   
   Vignette_Effect: true,
 };
@@ -577,18 +577,22 @@ function main() {
   BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
   BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
 
+  
   var PARTICLE = gui.addFolder('Particle');  
   //PARTICLE.add(controls, 'FireFly');
   PARTICLE.add(controls, 'Rain');
   PARTICLE.add(controls, 'Snow');
   PARTICLE.add(controls, 'Lantern');
   PARTICLE.add(controls, 'Clouds');
+  
 
   var ENVIRONMENT = gui.addFolder('Environment');
   ENVIRONMENT.add(controls, 'Temperature', 3600, 10000).step(1);
 
+  /*
   var VIGNETTE = gui.addFolder('Vignette');
   VIGNETTE.add(controls, 'Vignette_Effect');
+  */
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -713,7 +717,7 @@ function main() {
 
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.0); // this is for shadow complement
+  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.2); // this is for shadow complement
   let lightPosition : vec4 = vec4.fromValues(0.0, 50.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
   vec3.normalize(lightD, vec3.fromValues(-1.0, 0.4, 1.0));

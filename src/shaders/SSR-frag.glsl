@@ -308,8 +308,16 @@ void main() {
 	}
 	else
 	{
-		//if(!trans)
-			reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);			
+		reflectionColor = mix(SkyColor, reflectionColor, fadeFactor);			
+	}
+
+	if(bWater)
+	{
+		//fresnel
+		float NoV = clamp( dot(-viewVec.xyz, WorldNormal), 0.0, 1.0);
+		NoV = 1.0 - NoV;
+		float wNoV = pow(NoV, 1.0);
+		reflectionColor.xyz *= wNoV;
 	}
 
 

@@ -122,7 +122,7 @@ float rand(vec4 co){
 
 
 
-#define PCF_NUM_SAMPLES 36
+#define PCF_NUM_SAMPLES 8
 
 float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
     float result = 0.0;
@@ -276,14 +276,17 @@ void main() {
 	vec3 reflVec = reflect(-viewVec, normal.xyz);
 	vec4 skycol = texture(u_SkyCubeMap, reflVec);
     skycol = pow(skycol, vec4(2.2));
-	skycol *= 0.3;
+
+	vec3 fogColor = skycol.xyz * 0.2;
+
+	if(bWater)
+		skycol *= 0.0;
+	else
+		skycol *= 0.3;
 	
 	vec4 lightSpacePos = vec4(0.0);
 	if(depth >= 1.0) //SkyBox
-	{			
-		
-        
-
+	{		
 		fragColor[0] = skycol;
         fragColor[0].w =  bWater ? 21.0 : 11.0;
         fragColor[1] = vec4(normal.xyz, Roughness);
@@ -333,7 +336,6 @@ void main() {
 
 
 			float LoV = clamp( dot(-viewVec.xyz, u_lightDirection.xyz), 0.0, 1.0);
-			//float fNoV =  pow( NoV, 20.0) * pow( LoV, 30.0);
 			float fNoV = pow( LoV, 40.0);
 
 			pbrColor.xyz += fNoV * 30.0;
@@ -343,13 +345,13 @@ void main() {
         float Opacity = 0.1;		
 
 		fragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));
-		vec3 fogColor = skycol.xyz;
+		
 		
 
 		if(bWater)
 		{		
-			float linearDepth = LinearDepth(Depth, 200.0);	
-			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, linearDepth );
+			float linearDepth = LinearDepth(Depth, 1000.0);	
+			fragColor[0].xyz = mix(fragColor[0].xyz, fogColor, linearDepth * linearDepth );
 			fragColor[1] = vec4(normal.xyz, 0.05);
 		}
 		else
