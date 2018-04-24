@@ -12,7 +12,7 @@ void main()
 	
 	vec4 sceneColor = texture(u_frame0, fs_UV);
 
-	out_Col = max(vec4(0.0), pow( smoothstep(vec4(0.0), vec4(4.0), sceneColor), vec4(4.0)));
+	out_Col = max(vec4(0.0), pow( smoothstep(vec4(0.0), vec4(4.0), sceneColor), vec4(2.0)));
 	
 	out_Col.w = 1.0;
 }

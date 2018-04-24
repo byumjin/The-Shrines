@@ -300,7 +300,7 @@ void main() {
 			//Emissive
 			if(normal.a > 0.8)
 			{
-				out_Col.xyz += albedo.xyz * 3.0;
+				out_Col.xyz += albedo.xyz * 3.0 * (diffuseTerm * 0.5 + 0.5);
 			}
 
 			/*

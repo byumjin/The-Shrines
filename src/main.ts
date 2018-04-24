@@ -17,7 +17,7 @@ import {LSystem} from './LSystem';
 // Define an object with application parameters and button callbacks
 const controls = {
    
-  SSR_MaxStep : 196,
+  SSR_MaxStep : 64,
   SSR_Opaque_Intensity : 1.0,
   SSR_Trans_Intensity : 0.4,
   SSR_Threshold : 2.0,
@@ -748,7 +748,7 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     timer.updateTime();
     renderer.updateTime(timer.deltaTime, timer.currentTime);
-    CheckTriggers(camera.position, 250, 75, 75);
+    //CheckTriggers(camera.position, 250, 75, 75);
     renderer.clear();
     renderer.clearGB();
 
@@ -924,18 +924,22 @@ function main() {
       if (String.fromCharCode(ev.keyCode) == 'W')
       {
         camera.bForward = true;
+        CheckTriggers(camera.position, 250, 75, 75);
       }
       if (String.fromCharCode(ev.keyCode) == 'A')
       {
         camera.bLeft = true;
+        CheckTriggers(camera.position, 250, 75, 75);
       }
       if (String.fromCharCode(ev.keyCode) == 'S')
       {
         camera.bBackward = true;
+        CheckTriggers(camera.position, 250, 75, 75);
       }
       if (String.fromCharCode(ev.keyCode) == 'D')
       {
         camera.bRight = true;
+        CheckTriggers(camera.position, 250, 75, 75);
       }
     }
 
