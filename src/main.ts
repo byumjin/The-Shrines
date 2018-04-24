@@ -40,7 +40,7 @@ const controls = {
 
   Clouds : true,
 
-  Temperature : 6500,
+  Temperature : 10000,
   
   Vignette_Effect: true,
 };
@@ -141,6 +141,10 @@ var timer = {
 
 function play_single_sound() {
   var JukeBox = new AudioContext();
+
+  var gainNode = JukeBox.createGain(); // Create a gainNode reference.
+  gainNode.connect(JukeBox.destination); // Add context to gainNode
+
   fetch('./src/music/Monroe.mp3')
     .then(r=>r.arrayBuffer())
     .then(b=>JukeBox.decodeAudioData(b))
@@ -148,7 +152,9 @@ function play_single_sound() {
         const audio_buf = JukeBox.createBufferSource();
         audio_buf.buffer = data;
         audio_buf.loop = true;
-        audio_buf.connect(JukeBox.destination);
+        
+        audio_buf.connect(gainNode);
+        gainNode.gain.value = 0.3; // Volume
         audio_buf.start(0);
         });
 
@@ -579,7 +585,7 @@ function main() {
   PARTICLE.add(controls, 'Clouds');
 
   var ENVIRONMENT = gui.addFolder('Environment');
-  ENVIRONMENT.add(controls, 'Temperature', 0, 10000).step(1);
+  ENVIRONMENT.add(controls, 'Temperature', 3600, 10000).step(1);
 
   var VIGNETTE = gui.addFolder('Vignette');
   VIGNETTE.add(controls, 'Vignette_Effect');
