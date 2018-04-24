@@ -19,7 +19,7 @@ const controls = {
    
   SSR_MaxStep : 196,
   SSR_Opaque_Intensity : 1.0,
-  SSR_Trans_Intensity : 0.18,
+  SSR_Trans_Intensity : 0.4,
   SSR_Threshold : 2.0,
 
   Bloom_Iteration : 16,
@@ -153,9 +153,9 @@ function loadOBJText() {
 
   shrines_statue = readTextFile('./src/resources/objs/shrines/statues/statues.obj');
 
-  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter_v2.obj');
-  obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner_v2.obj');
-  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass_v2.obj');
+  obj_B_Outter = readTextFile('./src/resources/objs/B_Side/models/b_Outter_v3.obj');
+  obj_B_Inner = readTextFile('./src/resources/objs/B_Side/models/b_Inner_v3.obj');
+  obj_B_Glass = readTextFile('./src/resources/objs/B_Side/models/b_Glass_v3.obj');
 
   ply_Leaf = readTextFile('./src/resources/objs/tree/models/leaf01.ply');
   ply_Bark = readTextFile('./src/resources/objs/tree/models/bark01.ply');
@@ -381,13 +381,13 @@ function loadScene() {
 
 
   mesh_B_Outter = new Mesh(obj_B_Outter, vec3.fromValues(0, 0, 0),
-  new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
-   new Texture('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false),
-    new Texture('./src/resources/objs/B_Side/textures/Normal_Normal.png', false));
+  new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+   new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+    new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
     mesh_B_Outter.create();
 
-    mesh_B_Outter.scale(vec3.fromValues(3, 3, 3));
-    mesh_B_Outter.translate(vec3.fromValues(0.0, 0.5, 0.0));
+    mesh_B_Outter.scale(vec3.fromValues(scale, scale, scale));
+    mesh_B_Outter.translate(vec3.fromValues(0.0,-1.0, 0.0));
 
   mesh_B_Inner = new Mesh(obj_B_Inner, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/B_Side/textures/Inner_Albedo.png', false),
@@ -395,8 +395,8 @@ function loadScene() {
    new Texture('./src/resources/objs/B_Side/textures/Inner_Normal.png', false));
    mesh_B_Inner.create();
 
-   mesh_B_Inner.scale(vec3.fromValues(3, 3, 3));
-   mesh_B_Inner.translate(vec3.fromValues(0.0, 0.5, 0.0));
+   mesh_B_Inner.scale(vec3.fromValues(scale, scale, scale));
+   mesh_B_Inner.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
   mesh_B_Glass = new Mesh(obj_B_Glass, vec3.fromValues(0, 0, 0),
     new Texture('./src/resources/objs/B_Side/textures/Glass_Albedo.png', false),
@@ -404,8 +404,8 @@ function loadScene() {
     new Texture('./src/resources/objs/B_Side/textures/Normal.png', false));
     mesh_B_Glass.create();
 
-    mesh_B_Glass.scale(vec3.fromValues(3, 3, 3));
-    mesh_B_Glass.translate(vec3.fromValues(0.0, 0.5, 0.0));
+    mesh_B_Glass.scale(vec3.fromValues(scale, scale, scale));
+    mesh_B_Glass.translate(vec3.fromValues(0.0, -1.0, 0.0));
 
 // Create By PLY format
    mesh_Leaf = new Mesh(obj_Leaf, vec3.fromValues(-50, 2, -50),
@@ -588,9 +588,11 @@ function main() {
   particleLanternSys.initialize(150.0, 0.0, 100.0, -105.0, 150.0, 0.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
 
   const camera = new Camera();
-  camera.updateOrbit(0.0, -60.0);
-  camera.updatePosition( -10, 6);
-  camera.updateOrbit(0.0, 60.0);
+
+  camera.updateOrbit(0.0, 3.0);
+  camera.updatePosition( -70, -290);  
+  camera.updateOrbit(0.0, -3.0);
+  camera.updateOrbit(120.0,  0.0);
   
 
   const renderer = new OpenGLRenderer(canvas);
@@ -726,11 +728,11 @@ function main() {
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS0, LS1, LS2, LS3, mesh1, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
+      [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-      [LS0, LS1, LS2, LS3, mesh1, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, m_shrines_statue ]);
+      [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
 
-    renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
+    renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
