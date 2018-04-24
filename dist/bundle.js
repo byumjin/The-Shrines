@@ -1165,7 +1165,20 @@ function loadScene() {
     LS3.create();
     console.log(LS3);
 }
-function CheckTriggers(camPos, distance, height, range) {
+function CheckTriggers(cam, camPos, distance, height, range, deltaTime) {
+    //move first
+    if (cam.bForward) {
+        cam.updatePosition(0.0, -deltaTime * 100.0);
+    }
+    if (cam.bBackward) {
+        cam.updatePosition(0.0, deltaTime * 100.0);
+    }
+    if (cam.bLeft) {
+        cam.updatePosition(-deltaTime * 100.0, 0.0);
+    }
+    if (cam.bRight) {
+        cam.updatePosition(deltaTime * 100.0, 0.0);
+    }
     if (camPos[0] < range && camPos[0] > -range
         && camPos[1] < height + range && camPos[1] > height - range
         && camPos[2] < range && camPos[2] > -range)
@@ -1334,12 +1347,12 @@ function main() {
     }
     let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 750, 350, -350, 380);
     function tick() {
-        camera.update(timer.deltaTime);
+        CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
+        camera.update();
         stats.begin();
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         timer.updateTime();
         renderer.updateTime(timer.deltaTime, timer.currentTime);
-        //CheckTriggers(camera.position, 250, 75, 75);
         renderer.clear();
         renderer.clearGB();
         renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner]);
@@ -1451,19 +1464,19 @@ function main() {
         if (ev.keyCode !== undefined) {
             if (String.fromCharCode(ev.keyCode) == 'W') {
                 camera.bForward = true;
-                CheckTriggers(camera.position, 250, 75, 75);
+                //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
             }
             if (String.fromCharCode(ev.keyCode) == 'A') {
                 camera.bLeft = true;
-                CheckTriggers(camera.position, 250, 75, 75);
+                //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
             }
             if (String.fromCharCode(ev.keyCode) == 'S') {
                 camera.bBackward = true;
-                CheckTriggers(camera.position, 250, 75, 75);
+                //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
             }
             if (String.fromCharCode(ev.keyCode) == 'D') {
                 camera.bRight = true;
-                CheckTriggers(camera.position, 250, 75, 75);
+                //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
             }
         }
     }, false);
@@ -13833,23 +13846,25 @@ class Camera {
         this.position[0] += deltaPos[0];
         this.position[1] += deltaPos[1];
         this.position[2] += deltaPos[2];
+        //limit camera area
+        if (this.position[1] < 10.0) {
+            this.position[1] = 10.0;
+        }
+        else if (this.position[1] > 30.0) {
+            this.position[1] = 30.0;
+        }
+        var length = Math.sqrt(this.position[0] * this.position[0] + this.position[2] * this.position[2]);
+        if (length > 400.0) {
+            this.position[0] /= length;
+            this.position[0] *= 400.0;
+            this.position[2] /= length;
+            this.position[2] *= 400.0;
+        }
         this.transMat[12] = this.position[0];
         this.transMat[13] = this.position[1];
         this.transMat[14] = this.position[2];
     }
-    update(deltaTime) {
-        if (this.bForward) {
-            this.updatePosition(0.0, -deltaTime * 100.0);
-        }
-        if (this.bBackward) {
-            this.updatePosition(0.0, deltaTime * 100.0);
-        }
-        if (this.bLeft) {
-            this.updatePosition(-deltaTime * 100.0, 0.0);
-        }
-        if (this.bRight) {
-            this.updatePosition(deltaTime * 100.0, 0.0);
-        }
+    update() {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["a" /* mat4 */].mul(this.viewMatrix, this.transMat, this.rotMat);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["a" /* mat4 */].invert(this.viewMatrix, this.viewMatrix);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["a" /* mat4 */].mul(this.viewProjectionMatrix, this.projectionMatrix, this.viewMatrix);
