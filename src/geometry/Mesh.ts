@@ -122,7 +122,7 @@ class Mesh extends Drawable {
     var loadedMesh = new Loader.Mesh(this.objString);
 
     var PLYLoader = new PlyLoader();
-    PLYLoader.loadColorsOnly(plyText);
+    PLYLoader.load(plyText);
 
     //posTemp = loadedMesh.vertices;
     let idx = 0;

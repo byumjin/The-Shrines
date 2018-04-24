@@ -739,7 +739,7 @@ function main() {
     return lightViewProjMat;
   }
 
-  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 600, 300, -300, 350);
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 600, 300, -350, 350);
 
   function tick() {
 
@@ -756,6 +756,10 @@ function main() {
       [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
       [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
+    // renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
+    //   [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter]);
+    // renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
+    //   [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2, mesh_lake, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter]);
 
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 

@@ -3,7 +3,7 @@ precision highp float;
 
 #define EPS 0.0001
 #define PI 3.1415962
-#define SHADOWMAP_SIZE 1024.0
+#define SHADOWMAP_SIZE 2048.0
 
 in vec4 fs_Pos;
 in vec4 fs_Nor;
@@ -41,7 +41,7 @@ float texture2DCompare(sampler2D depths, vec2 uv, vec2 offset, float compare){
     float bias = 0.0025;
     //vec2 gradient = vec2(texture(depths, uv).g, texture(depths, uv).b);
     compare = compare - bias;
-    if(depth < compare)
+    if(depth <= compare)
     	return 0.1;
     else
     	return 1.0;

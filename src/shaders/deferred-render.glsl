@@ -4,7 +4,7 @@ precision highp float;
 #define EPS 0.0001
 #define PI 3.1415962
 
-#define SHADOWMAP_SIZE 1024.0
+#define SHADOWMAP_SIZE 2048.0
 
 in vec2 fs_UV;
 out vec4 out_Col;
