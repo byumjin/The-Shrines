@@ -743,7 +743,7 @@ function main() {
 
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 1.2); // this is for shadow complement
+  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
   let lightPosition : vec4 = vec4.fromValues(0.0, 50.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
   vec3.normalize(lightD, vec3.fromValues(-1.0, 0.4, 1.0));

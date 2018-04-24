@@ -1325,7 +1325,7 @@ function main() {
         new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(60)),
     ]);
     //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-    let lightColor = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(1.0, 1.0, 1.0, 1.2); // this is for shadow complement
+    let lightColor = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
     let lightPosition = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(0.0, 50.0, 0.0, 1.0);
     let lightD = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
     __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].normalize(lightD, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(-1.0, 0.4, 1.0));
