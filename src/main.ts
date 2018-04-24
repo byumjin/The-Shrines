@@ -139,6 +139,22 @@ var timer = {
   },
 }
 
+function play_single_sound() {
+  var JukeBox = new AudioContext();
+  fetch('./src/music/Monroe.mp3')
+    .then(r=>r.arrayBuffer())
+    .then(b=>JukeBox.decodeAudioData(b))
+    .then(data=>{
+        const audio_buf = JukeBox.createBufferSource();
+        audio_buf.buffer = data;
+        audio_buf.loop = true;
+        audio_buf.connect(JukeBox.destination);
+        audio_buf.start(0);
+        });
+
+        console.log(`Music On!`);
+}
+
 
 function loadOBJText() {
   obj0 = readTextFile('./src/resources/objs/mario/models/wahoo.obj');
@@ -529,6 +545,9 @@ function CheckTriggers(camPos: vec3, distance: number, height: number, range: nu
 }
 
 function main() {
+
+  play_single_sound();
+
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);
