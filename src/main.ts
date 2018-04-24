@@ -519,7 +519,27 @@ function loadScene() {
    console.log(LS3);
 }
 
-function CheckTriggers(camPos: vec3, distance: number, height: number, range: number){
+function CheckTriggers(cam : Camera, camPos: vec3, distance: number, height: number, range: number, deltaTime : number){
+
+  //move first
+
+  if(cam.bForward)
+    {
+      cam.updatePosition(0.0, -deltaTime * 100.0);
+    }
+    if(cam.bBackward)
+    {
+      cam.updatePosition(0.0, deltaTime * 100.0);
+    }
+    if(cam.bLeft)
+    {
+      cam.updatePosition(-deltaTime * 100.0, 0.0);
+    }
+    if(cam.bRight)
+    {
+      cam.updatePosition(deltaTime * 100.0, 0.0);
+    }
+
   if(camPos[0]<range && camPos[0] > -range 
     && camPos[1]<height+range && camPos[1]>height-range
     && camPos[2]<range && camPos[2]>-range)
@@ -543,11 +563,14 @@ function CheckTriggers(camPos: vec3, distance: number, height: number, range: nu
     && camPos[2]<range && camPos[2]>-range)
     //Water Shrine
     controls.Rain = true;
-  else{
+  else
+  {
     controls.Rain = false;
     controls.Snow = false;
     controls.Lantern = false;
   }
+
+  
 }
 
 function main() {
@@ -619,6 +642,9 @@ function main() {
   const camera = new Camera();
 
   camera.updateOrbit(0.0, 3.0);
+
+
+
   camera.updatePosition( -70, -290);  
   camera.updateOrbit(0.0, -3.0);
   camera.updateOrbit(120.0,  0.0);
@@ -748,12 +774,14 @@ function main() {
 
   function tick() {
 
-    camera.update(timer.deltaTime);
+    CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
+
+    camera.update();
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     timer.updateTime();
     renderer.updateTime(timer.deltaTime, timer.currentTime);
-    //CheckTriggers(camera.position, 250, 75, 75);
+    
     renderer.clear();
     renderer.clearGB();
 
@@ -933,22 +961,22 @@ function main() {
       if (String.fromCharCode(ev.keyCode) == 'W')
       {
         camera.bForward = true;
-        CheckTriggers(camera.position, 250, 75, 75);
+        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
       if (String.fromCharCode(ev.keyCode) == 'A')
       {
         camera.bLeft = true;
-        CheckTriggers(camera.position, 250, 75, 75);
+        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
       if (String.fromCharCode(ev.keyCode) == 'S')
       {
         camera.bBackward = true;
-        CheckTriggers(camera.position, 250, 75, 75);
+        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
       if (String.fromCharCode(ev.keyCode) == 'D')
       {
         camera.bRight = true;
-        CheckTriggers(camera.position, 250, 75, 75);
+        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
     }
 

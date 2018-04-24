@@ -132,29 +132,32 @@ class Camera {
     this.position[1] += deltaPos[1];
     this.position[2] += deltaPos[2];
 
+      //limit camera area
+    if(this.position[1] < 10.0)
+    {
+      this.position[1] = 10.0;
+    }
+    else if(this.position[1] > 30.0)
+    {
+      this.position[1] = 30.0;
+    }
+
+    var length = Math.sqrt(this.position[0] * this.position[0] + this.position[2] * this.position[2]);
+    
+    if(length > 400.0)
+    {
+      this.position[0] /= length;
+      this.position[0] *= 400.0;
+      this.position[2] /= length;
+      this.position[2] *= 400.0;
+    }
+
     this.transMat[12] = this.position[0];
     this.transMat[13] = this.position[1];
     this.transMat[14] = this.position[2];
   }
 
-  update(deltaTime : number) {
-
-    if(this.bForward)
-    {
-      this.updatePosition(0.0, -deltaTime * 100.0);
-    }
-    if(this.bBackward)
-    {
-      this.updatePosition(0.0, deltaTime * 100.0);
-    }
-    if(this.bLeft)
-    {
-      this.updatePosition(-deltaTime * 100.0, 0.0);
-    }
-    if(this.bRight)
-    {
-      this.updatePosition(deltaTime * 100.0, 0.0);
-    }
+  update() {
 
     mat4.mul(this.viewMatrix, this.transMat, this.rotMat);
     mat4.invert(this.viewMatrix, this.viewMatrix);
