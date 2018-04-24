@@ -2,6 +2,7 @@
 
 uniform mat4 u_ViewProj;
 uniform float u_Time;
+uniform vec4 u_particleInfo;
 
 uniform mat4 u_View; // Used for rendering particles as billboards (quads that are always looking at the camera)
 // gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;
@@ -50,7 +51,12 @@ void main()
 
     if(fs_Col.a >= float(rainIndex))
     {
-      billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * vec3(0.0, 1.4, 0.0);
+        if(u_particleInfo.x == 1.0)
+        //Rain 
+            billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * vec3(0.0, 1.4, 0.0);
+        else
+        //Snow
+            billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * vec3(0.0, 1.0, 0.0);
     }
     else if(fs_Col.a >= float(rainStainIndex) )
     {

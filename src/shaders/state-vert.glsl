@@ -130,8 +130,8 @@ void main()
         {
             speed = 5.0;
             o_position.y -= u_deltaTime * speed;
-            o_position.x += u_deltaTime * (speed*0.2*sin(u_Time+rand(vec2(gl_VertexID,gl_VertexID+8000)*M_PI)));
-            o_position.z += u_deltaTime * (speed*0.2*cos(u_Time+rand(vec2(gl_VertexID+8000,gl_VertexID)*M_PI)));
+            o_position.x += u_deltaTime * (speed*0.2*sin(u_Time+rand(vec2(gl_VertexID,gl_VertexID+8000))*M_PI));
+            o_position.z += u_deltaTime * (speed*0.2*cos(u_Time+rand(vec2(gl_VertexID+8000,gl_VertexID))*M_PI));
             if(o_position.y < -10.0)
             {
                 o_position.x = u_CameraWPos.x + o_position.w;
