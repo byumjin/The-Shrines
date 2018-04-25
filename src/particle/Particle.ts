@@ -1,5 +1,5 @@
 import {gl} from '../globals';
-import {vec2} from 'gl-matrix';
+import {vec2, vec3} from 'gl-matrix';
 
 const POSITION_LOCATION = 0;
 const VELOCITY_LOCATION = 1;
@@ -270,6 +270,82 @@ gl.bindBuffer(gl.ARRAY_BUFFER, null);
 gl.bindVertexArray(null);
 }
 }
+  
+  initialize3(width : number, xOffset : number, height : number, yOffset : number, depth : number, zOffset : number,
+              Rrange : number, Rbias : number, Grange : number, Gbias : number, Brange : number, Bbias : number            
+  )
+  {
+    
+    for (let p = 0; p < this.count; ++p)
+    {
+      var posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));
+      this.position[p * 4] = posXZ[0] * width + xOffset;
+      this.position[p * 4 + 1] = (Math.random()) *  height + yOffset;
+      this.position[p * 4 + 2] = posXZ[1] *  depth + zOffset;
+      
+       // Angular Velocity
+      this.velocity[p * 4] = 0.5 + 0.5 * Math.PI * Math.random();
+      this.velocity[p * 4 + 1] = vec2.length(posXZ)*width; // radius range
+      this.velocity[p * 4 + 2] = Math.random()*Math.PI*2.0; // random phase
+
+      //
+      let randomAxis = vec3.create();
+      vec3.normalize(randomAxis, [Math.random(), Math.random(), Math.random()]);
+      this.color[p * 4] = randomAxis[0];
+      this.color[p * 4 + 1] = randomAxis[1];
+      this.color[p * 4 + 2] = randomAxis[2];
+
+      this.color[p * 4 + 3] = 0.0; //Index
+
+      posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));   
+
+      this.attract[p * 4] = posXZ[0] * width + xOffset;
+      this.attract[p * 4 + 1] = (Math.random()) *  height + yOffset;
+      this.attract[p * 4 + 2] = posXZ[1] *  depth + zOffset;
+
+      //save original Gap
+      this.position[p * 4 + 3] = this.attract[p * 4];
+      this.velocity[p * 4 + 3] = this.attract[p * 4 + 1];
+      this.attract[p * 4 + 3] = this.attract[p * 4 + 2];
+    }
+
+    this.VBOs = new Array(this.VAOs.length);
+
+    for (let i = 0; i < this.VAOs.length; ++i)
+    {
+      this.VBOs[i] = new Array(NUM_OUTPUT);
+
+      gl.bindVertexArray(this.VAOs[i]);
+
+      this.VBOs[i][POSITION_LOCATION] = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][POSITION_LOCATION]);
+      gl.bufferData(gl.ARRAY_BUFFER, this.position, gl.DYNAMIC_COPY);
+      gl.vertexAttribPointer(POSITION_LOCATION, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(POSITION_LOCATION);
+
+      this.VBOs[i][VELOCITY_LOCATION] = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][VELOCITY_LOCATION]);
+      gl.bufferData(gl.ARRAY_BUFFER, this.velocity, gl.DYNAMIC_COPY);
+      gl.vertexAttribPointer(VELOCITY_LOCATION, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(VELOCITY_LOCATION);
+
+      this.VBOs[i][COLOR_LOCATION] = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][COLOR_LOCATION]);
+      gl.bufferData(gl.ARRAY_BUFFER, this.color, gl.DYNAMIC_COPY);
+      gl.vertexAttribPointer(COLOR_LOCATION, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(COLOR_LOCATION);
+
+      this.VBOs[i][ATTRACT_LOCATION] = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][ATTRACT_LOCATION]);
+      gl.bufferData(gl.ARRAY_BUFFER, this.attract, gl.DYNAMIC_COPY);
+      gl.vertexAttribPointer(ATTRACT_LOCATION, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(ATTRACT_LOCATION);
+      
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      gl.bindVertexArray(null);
+   }
+  }
 
   setBuffers(a : number, b : number)
   {

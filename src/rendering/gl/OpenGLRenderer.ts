@@ -59,6 +59,7 @@ class OpenGLRenderer {
   shadowDepthTexture: WebGLTexture; // Shadow Depth tex for shadow mapping
 
   frostNoiseTexture: WebGLTexture;
+  fireNoiseTexture: WebGLTexture;
 
   // post-processing buffers pre-tonemapping (32-bit color)
   post32Buffers: WebGLFramebuffer[];
@@ -151,6 +152,10 @@ HmipblurPass : PostProcess = new PostProcess(
     new Shader(gl.FRAGMENT_SHADER, require('../../shaders/rainy-frag.glsl'))
     );
 
+  firePass : PostProcess = new PostProcess(
+    new Shader(gl.FRAGMENT_SHADER, require('../../shaders/fire-frag.glsl'))
+    );
+
   add8BitPass(pass: PostProcess) {
     this.post8Passes.push(pass);
   }
@@ -162,6 +167,10 @@ HmipblurPass : PostProcess = new PostProcess(
 
   setFrostNoiseTexture(tex: WebGLTexture){
     this.frostNoiseTexture = tex;
+  }
+
+  setFireNoiseTexture(tex: WebGLTexture){
+    this.fireNoiseTexture = tex;
   }
 
   constructor(public canvas: HTMLCanvasElement) {
@@ -460,6 +469,7 @@ HmipblurPass : PostProcess = new PostProcess(
   updateTime(deltaTime: number, currentTime: number) {
     this.deferredShader.setTime(currentTime);
     this.rainyPass.setTime(currentTime);
+    this.firePass.setTime(currentTime);
     for (let pass of this.post8Passes) pass.setTime(currentTime);
     for (let pass of this.post32Passes) pass.setTime(currentTime);
     this.currentTime = currentTime;
@@ -968,6 +978,72 @@ HmipblurPass : PostProcess = new PostProcess(
         gl.disable(gl.DEPTH_TEST);   
       }
 
+  renderLeavesParticle(camera: Camera, mesh: Mesh, particleSystem: Particle, feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram,
+    Leaves: boolean, bSwitch: boolean)
+    {
+      if(bSwitch)
+      {
+       //transformation Feedback
+      feedbackShader.use();
+      feedbackShader.setdeltaTime(this.deltaTime);
+      feedbackShader.setTime(this.currentTime);    
+      feedbackShader.setCameraWPos(camera.position);
+      feedbackShader.setParticleInfo(vec4.fromValues(0.0, 0.0, Leaves ? 1.0 : 0.0, 0.0));
+
+      var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;   
+
+      gl.bindVertexArray(particleSystem.getVAO(particleSystem.currentBufferSetIndex));
+      
+      gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
+      particleSystem.bindBufferBase(destinationIdx);    
+
+      // Turn off rasterization - we are not drawing
+      gl.enable(gl.RASTERIZER_DISCARD);
+
+      // Update position and rotation using transform feedback
+      gl.beginTransformFeedback(gl.POINTS);
+      gl.drawArrays(gl.POINTS, 0, particleSystem.count);
+      gl.endTransformFeedback();
+      
+      // Restore state
+      gl.disable(gl.RASTERIZER_DISCARD);
+      gl.useProgram(null);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+      gl.bindVertexArray(null);
+      
+      particleSystem.switchBufferSet();
+      
+      //render       
+      mesh.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
+      }
+
+      
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ParticleMesh]);
+      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      gl.enable(gl.DEPTH_TEST);
+      //gl.enable(gl.BLEND);
+      //gl.blendFunc(gl.ONE, gl.ZERO); 
+      this.setClearColor(0.0, 0.0, 0.0, 0.0);
+      //gl.clear(gl.COLOR_BUFFER_BIT);
+
+      if(bSwitch)
+      {
+        particleRenderShader.setViewMatrix(camera.viewMatrix);
+        particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
+        particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
+        particleRenderShader.setFrame00(this.tDTargets[0]);
+        particleRenderShader.setFrame01(mesh.albedoMap.texture);
+        particleRenderShader.drawInstance(mesh, particleSystem.count);
+      }
+
+      // bind default frame buffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      //gl.blendFunc(gl.ONE, gl.ZERO); 
+      gl.disable(gl.DEPTH_TEST);   
+    }
+
 
   renderClouds(camera: Camera, quad: Quad, particleSystem: Particle, lightColor : vec4, lightDir : vec4, cloudTex : WebGLTexture, normalTex : WebGLTexture, noiseTex : WebGLTexture,
        feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram, clouds : Boolean)
@@ -1228,6 +1304,21 @@ HmipblurPass : PostProcess = new PostProcess(
     this.rainyPass.setFrame00(this.post8Targets[PipelineEnum.FXAA]);
     this.rainyPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
     this.rainyPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+  }
+
+  renderFire(){
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    
+    gl.disable(gl.DEPTH_TEST);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    this.firePass.setFrame00(this.post8Targets[PipelineEnum.FXAA]);
+    this.firePass.setFrame01(this.frostNoiseTexture);
+    this.firePass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
+    this.firePass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
   }

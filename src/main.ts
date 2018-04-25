@@ -34,9 +34,15 @@ const controls = {
   Snow : false,
   Snow_delaytoDieTimer : 3.0,
   Snow_Timer: 3.0,
+
   Lantern : false,
   Lantern_delaytoDieTimer : 10.0,
   Lantern_Timer: 10.0,
+
+  Fire : false,
+  Earth : false,
+  Earth_delaytoDieTimer : 5.0,
+  Earth_Timer: 5.0,
 
   Clouds : true,
 
@@ -101,6 +107,7 @@ let ply_Bark2: string;
 
 let obj_Lantern: string;
 let obj_Boat: string;
+let obj_Leaves: string;
 
 //Road
 export let road_Mesh_Map: Map<string, Array<Mesh>>;
@@ -113,6 +120,7 @@ let mesh_Test: Mesh;
 
 let mesh_Lantern: Mesh;
 let mesh_Boat: Mesh;
+let mesh_Leaves: Mesh;
 
 let skyCubeMap: Texture;
 let cloudsTexture: Texture;
@@ -124,6 +132,7 @@ let numCloud: number = 256;
 let numLatern: number = 1024;
 
 let numBoat: number = 16;
+let numLeaves: number = 192;
 
 let LS0: LSystem;
 let LS1: LSystem;
@@ -195,6 +204,7 @@ function loadOBJText() {
 
   obj_Lantern = readTextFile('./src/resources/objs/lantern/models/lantern.obj');
   obj_Boat = readTextFile('./src/resources/objs/lantern/models/sailboat.obj');
+  obj_Leaves = readTextFile('./src/resources/objs/lantern/models/leaves.obj');
 }
 
 function loadRoadMap(){
@@ -475,6 +485,12 @@ function loadScene() {
      new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
      mesh_Boat.create();
 
+    mesh_Leaves  = new Mesh(obj_Leaves, vec3.fromValues(10,0,0),
+    new Texture('./src/resources/objs/lantern/textures/Leaves_Albedo.jpg', false),
+     new Texture('./src/resources/objs/lantern/textures/Leaves_Albedo.jpg', false),
+     new Texture('./src/resources/objs/lantern/textures/Normal.png', false));
+     mesh_Leaves.create();
+
    loadRoadMap();
 
    LS0 = new LSystem(vec3.fromValues(55,1.5,0),
@@ -557,10 +573,10 @@ function CheckTriggers(cam : Camera, camPos: vec3, distance: number, height: num
     controls.Lantern = true;
   else if(camPos[0]<range && camPos[0] > -range 
     && camPos[2]<distance+range && camPos[2]>distance-range)
-    controls.Rain = false;
+    controls.Earth = true  ;
   else if(camPos[0]<range && camPos[0] > -range 
     && camPos[2]<-distance+range && camPos[2]>-distance-range)
-    controls.Rain = false;
+    controls.Fire = true;
   else if(camPos[0]<distance+range && camPos[0] > distance-range 
     && camPos[2]<range && camPos[2]>-range)
     //Ice Shrine
@@ -574,6 +590,8 @@ function CheckTriggers(cam : Camera, camPos: vec3, distance: number, height: num
     controls.Rain = false;
     controls.Snow = false;
     controls.Lantern = false;
+    controls.Fire = false;
+    controls.Earth = false;
   }
 
   
@@ -653,6 +671,9 @@ function main() {
         0.01, 0.005, //speed
         2.0, 3.0); //size
 
+  const particleLeavesSys = new Particle(numLeaves);
+  particleLeavesSys.initialize3(10.0, 0.0, 100.0, 5, 10.0, 252.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
+
   const camera = new Camera();
 
   camera.updateOrbit(0.0, 3.0);
@@ -669,6 +690,7 @@ function main() {
   gl.enable(gl.DEPTH_TEST);
   gl.frontFace(gl.CCW);
   renderer.setFrostNoiseTexture(new Texture("./src/resources/Noise/lichen_noise.jpg", false).texture);
+  renderer.setFireNoiseTexture(new Texture("./src/resources/Noise/RGBANoise.jpg", false).texture);
 
   const standardDeferred = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/standard-vert.glsl')),
@@ -753,6 +775,17 @@ function main() {
         new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Boat-frag.glsl')),
         ]);
 
+    const feedBackLeavesShader = new ShaderProgram([
+      new Shader(gl.VERTEX_SHADER, require('./shaders/state-Leaves-vert.glsl')),
+      new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
+      ],
+      true,
+      ['o_position', 'o_velocity', 'o_color', 'o_attract']);
+      
+    const particleLeavesRenderShader = new ShaderProgram([
+      new Shader(gl.VERTEX_SHADER, require('./shaders/particle-Leaves-vert.glsl')),
+      new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Leaves-frag.glsl')),
+      ]);
 
       const feedBackCloudShader = new ShaderProgram([
         new Shader(gl.VERTEX_SHADER, require('./shaders/state-Cloud-vert.glsl')),
@@ -872,6 +905,28 @@ function main() {
         controls.Lantern, true);
     }
 
+    if(!controls.Earth)
+    {
+      controls.Earth_Timer += timer.deltaTime;
+
+      if(controls.Earth_Timer < controls.Earth_delaytoDieTimer)
+      {
+        renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader,
+          controls.Earth, true);
+      }
+      else
+      {
+        renderer.renderLanternParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader,
+          controls.Earth, false);
+      }
+    }
+    else
+    {
+      controls.Earth_Timer = 0.0;
+
+      renderer.renderLanternParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader,
+        controls.Earth, true);
+    }
 
     if(!controls.Rain)
     {
@@ -911,7 +966,6 @@ function main() {
       renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true);   
     }
 
-    
     renderer.renderforSavingCurrentFrame(camera);
 
     renderer.renderforHighLightCurrentFrame(camera);
@@ -930,6 +984,8 @@ function main() {
       renderer.renderRainy();   
     else if( controls.Snow)
       renderer.renderFrost();
+    else if (controls.Fire)
+      renderer.renderFire();
     else
       renderer.renderPresent(camera);
     

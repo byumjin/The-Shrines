@@ -21,10 +21,10 @@ out vec4 fs_Nor;
 out vec4 fs_Col;           
 out vec2 fs_UV;
 
-#define SIDE_TO_SIDE_FREQ1 0.675
-#define SIDE_TO_SIDE_FREQ2 0.293
-#define UP_AND_DOWN_FREQ1 0.175
-#define UP_AND_DOWN_FREQ2 0.063
+#define SIDE_TO_SIDE_FREQ1 0.475
+#define SIDE_TO_SIDE_FREQ2 0.193
+#define UP_AND_DOWN_FREQ1 0.095
+#define UP_AND_DOWN_FREQ2 0.043
 
 vec4 SmoothCurve( vec4 x ) {
   return x * x * ( vec4(3.0f,3.0f,3.0f,3.0f) - 2.0 * x ) ;
@@ -137,7 +137,7 @@ void main()
 				// For some reason, Crysis uses solid blue for non-moving, and black for most movement.
 				// So we invert the blue value here.
 		BranchAmp * windStrength, // branch amplitude. Play with this until it looks good.
-		1.0f,					// Speed. Play with this until it looks good.
+		0.5f,					// Speed. Play with this until it looks good.
 		0.13f,					// Detail frequency. Keep this at 1 unless you want to have different per-leaf frequency
 		DetailAmp * windStrength	// Detail amplitude. Play with this until it looks good.
 		);
