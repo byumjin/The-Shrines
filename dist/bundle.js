@@ -871,6 +871,7 @@ const controls = {
     Clouds: true,
     Temperature: 7000,
     Vignette_Effect: true,
+    Volume: 0.1
 };
 let square;
 let particleQuad;
@@ -935,6 +936,7 @@ let LS0;
 let LS1;
 let LS2;
 let LS3;
+let gainNode;
 var timer = {
     deltaTime: 0.0,
     startTime: 0.0,
@@ -948,7 +950,7 @@ var timer = {
 };
 function play_single_sound() {
     var JukeBox = new AudioContext();
-    var gainNode = JukeBox.createGain(); // Create a gainNode reference.
+    gainNode = JukeBox.createGain(); // Create a gainNode reference.
     gainNode.connect(JukeBox.destination); // Add context to gainNode
     fetch('./src/music/Monroe.mp3')
         .then(r => r.arrayBuffer())
@@ -958,10 +960,13 @@ function play_single_sound() {
         audio_buf.buffer = data;
         audio_buf.loop = true;
         audio_buf.connect(gainNode);
-        gainNode.gain.value = 0.1; // Volume
+        gainNode.gain.value = controls.Volume;
         audio_buf.start(0);
     });
     console.log(`Music On!`);
+}
+function changeVolume(volume) {
+    gainNode.gain.value = controls.Volume;
 }
 function loadOBJText() {
     obj0 = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('./src/resources/objs/mario/models/wahoo.obj');
@@ -1222,23 +1227,32 @@ function main() {
     // Add controls to the gui
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_2_dat_gui__["GUI"]();
+    /*
     var SSR = gui.addFolder('SSR');
     SSR.add(controls, 'SSR_MaxStep', 16.0, 512.0).step(1);
     SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 4.0).step(0.1);
     SSR.add(controls, 'SSR_Trans_Intensity', 0.0, 1.0).step(0.01);
     SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
+  
     var BLOOM = gui.addFolder('BLOOM');
     BLOOM.add(controls, 'Bloom_Iteration', 0, 32).step(1);
     BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
     BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
+    */
+    /*
     var PARTICLE = gui.addFolder('Particle');
     //PARTICLE.add(controls, 'FireFly');
     PARTICLE.add(controls, 'Rain');
     PARTICLE.add(controls, 'Snow');
     PARTICLE.add(controls, 'Lantern');
     PARTICLE.add(controls, 'Clouds');
+    */
     var ENVIRONMENT = gui.addFolder('Environment');
     ENVIRONMENT.add(controls, 'Temperature', 3600, 10000).step(1);
+    var MUSIC = gui.addFolder('Music');
+    MUSIC.add(controls, 'Volume', 0.0, 1.0).step(0.01).onChange(function () {
+        changeVolume(controls.Volume);
+    });
     /*
     var VIGNETTE = gui.addFolder('Vignette');
     VIGNETTE.add(controls, 'Vignette_Effect');
@@ -1261,7 +1275,7 @@ function main() {
     const particleLanternSys = new __WEBPACK_IMPORTED_MODULE_10__particle_Particle__["a" /* default */](numLatern);
     particleLanternSys.initialize(150.0, 0.0, 100.0, -105.0, 150.0, 0.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
     const particleBoatSys = new __WEBPACK_IMPORTED_MODULE_10__particle_Particle__["a" /* default */](numBoat);
-    particleBoatSys.initialize2(250.0, 0.0, 0.0, 0.0, 250.0, 0.0, 600.0, 400.0, 2.0, -1.0, //direction
+    particleBoatSys.initialize2(250.0, 0.0, 0.0, 0.0, 250.0, 0.0, 900.0, 500.0, 2.0, -1.0, //direction
     2.0, -1.0, //direction
     0.01, 0.005, //speed
     2.0, 3.0); //size
@@ -13766,7 +13780,7 @@ module.exports = "#version 300 es\nprecision highp float;\n\nin vec2 fs_UV;\nout
 /* 35 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nin vec2 fs_UV;\nout vec4 out_Col;\n\nuniform sampler2D u_frame0; //Scene\nuniform sampler2D u_frame1; //SSR_Mask\n//uniform sampler2D u_frame2; //SSR\nuniform sampler2D u_frame3; //ParticleRain\nuniform sampler2D u_frame4; //ParticleMesh\nuniform sampler2D u_DepthMap; //Cloud\n\nuniform sampler2D u_frame5; //SSR 0\nuniform sampler2D u_frame6; //SSR 1\nuniform sampler2D u_frame7; //SSR 2\nuniform sampler2D u_frame8; //SSR 3\nuniform sampler2D u_frame9; //SSR 4\n\nuniform sampler2D u_Gbuffer_Specular;\nuniform sampler2D u_Gbuffer_Albedo;\n\n\nvec4 getSSRColor(vec2 UV, float lod)\n{\n\tif( lod < 1.0)\n\t{\n\t\treturn mix(texture(u_frame5, UV), texture(u_frame6, UV), lod);\n\t}\n\telse if( lod < 2.0)\n\t{\n\t\treturn mix(texture(u_frame6, UV), texture(u_frame7, UV), fract(lod));\n\t}\n\telse if( lod < 3.0)\n\t{\n\t\treturn mix(texture(u_frame7, UV), texture(u_frame8, UV), fract(lod));\n\t}\n\telse\n\t{\n\t\treturn mix(texture(u_frame8, UV), texture(u_frame9, UV), fract(lod));\n\t}\n}\n\n\nvoid main() {\n\n\tvec2 reverseUV = fs_UV;\n\treverseUV.y = 1.0 - reverseUV.y;\n\n\tfloat roughness = texture(u_Gbuffer_Specular, reverseUV).a;\n\tvec4 sceneImagecolor = texture(u_frame0, fs_UV);\n \tvec4 meshParticle = texture(u_frame4, reverseUV);\n\n\tsceneImagecolor.xyz = mix(sceneImagecolor.xyz, meshParticle.xyz, meshParticle.a);\n\t\n\tfloat opaqueDepth = texture(u_Gbuffer_Albedo, reverseUV).a;\n\n\tfloat SSRMask = texture(u_frame1, fs_UV).a;\n\n\t//bool bWater;\n\tbool bTrans;\n\n\tfloat sceneDepth = texture(u_frame0, reverseUV).a;\n\n\tif(sceneDepth >= 9.0)\n\t{\n\t\tbTrans = true;\n\t}\n\n\tvec4 SSRMipColor = getSSRColor(fs_UV, log2(roughness + 1.0) * 4.0);\n\t//vec4 SSRMipColor = \t\t\t\t   texture(u_frame5, fs_UV);\n\n\n\tvec4 particles = texture(u_frame3, reverseUV) + texture(u_DepthMap, reverseUV);\n\t\n\tvec3 finalColor = vec3(0.0);\n\n\tSSRMask = clamp(SSRMask, 0.0, 1.0);\n\n\tif(SSRMask <= 0.0)\n\t\tfinalColor = sceneImagecolor.xyz + particles.xyz;\n\telse\n\t{\n\t\tif(bTrans)\n\t\t{\n\t\t\tfinalColor = SSRMipColor.xyz + particles.xyz  + sceneImagecolor.xyz;\n\t\t}\n\t\telse\n\t\t\tfinalColor = (SSRMipColor.xyz + particles.xyz) * sceneImagecolor.xyz + sceneImagecolor.xyz;\n\t}\n\t\t\n\t//vec4 RainColor = texture(u_frame3, reverseUV);\t\n\t//finalColor.xyz += RainColor.xyz;\n\t//vec4 cloudColor = texture(u_DepthMap, reverseUV);\n\t//finalColor.xyz += cloudColor.xyz;\n\n\n\tout_Col = vec4( finalColor, sceneImagecolor.a);\n}\n"
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nin vec2 fs_UV;\r\nout vec4 out_Col;\r\n\r\nuniform sampler2D u_frame0; //Scene\r\nuniform sampler2D u_frame1; //SSR_Mask\r\n//uniform sampler2D u_frame2; //SSR\r\nuniform sampler2D u_frame3; //ParticleRain\r\nuniform sampler2D u_frame4; //ParticleMesh\r\nuniform sampler2D u_DepthMap; //Cloud\r\n\r\nuniform sampler2D u_frame5; //SSR 0\r\nuniform sampler2D u_frame6; //SSR 1\r\nuniform sampler2D u_frame7; //SSR 2\r\nuniform sampler2D u_frame8; //SSR 3\r\nuniform sampler2D u_frame9; //SSR 4\r\n\r\nuniform sampler2D u_Gbuffer_Specular;\r\nuniform sampler2D u_Gbuffer_Albedo;\r\n\r\n\r\nvec4 getSSRColor(vec2 UV, float lod)\r\n{\r\n\tif( lod < 1.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame5, UV), texture(u_frame6, UV), lod);\r\n\t}\r\n\telse if( lod < 2.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame6, UV), texture(u_frame7, UV), fract(lod));\r\n\t}\r\n\telse if( lod < 3.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame7, UV), texture(u_frame8, UV), fract(lod));\r\n\t}\r\n\telse\r\n\t{\r\n\t\treturn mix(texture(u_frame8, UV), texture(u_frame9, UV), fract(lod));\r\n\t}\r\n}\r\n\r\n\r\nvoid main() {\r\n\r\n\tvec2 reverseUV = fs_UV;\r\n\treverseUV.y = 1.0 - reverseUV.y;\r\n\r\n\tfloat roughness = texture(u_Gbuffer_Specular, reverseUV).a;\r\n\tvec4 sceneImagecolor = texture(u_frame0, fs_UV);\r\n \tvec4 meshParticle = texture(u_frame4, reverseUV);\r\n\r\n\tsceneImagecolor.xyz = mix(sceneImagecolor.xyz, meshParticle.xyz, meshParticle.a);\r\n\t\r\n\tfloat opaqueDepth = texture(u_Gbuffer_Albedo, reverseUV).a;\r\n\r\n\tfloat SSRMask = texture(u_frame1, fs_UV).a;\r\n\r\n\t//bool bWater;\r\n\tbool bTrans;\r\n\r\n\tfloat sceneDepth = texture(u_frame0, reverseUV).a;\r\n\r\n\tif(sceneDepth >= 9.0)\r\n\t{\r\n\t\tbTrans = true;\r\n\t}\r\n\r\n\tvec4 SSRMipColor = getSSRColor(fs_UV, log2(roughness + 1.0) * 4.0);\r\n\t//vec4 SSRMipColor = \t\t\t\t   texture(u_frame5, fs_UV);\r\n\r\n\r\n\tvec4 particles = texture(u_frame3, reverseUV) + texture(u_DepthMap, reverseUV);\r\n\t\r\n\tvec3 finalColor = vec3(0.0);\r\n\r\n\tSSRMask = clamp(SSRMask, 0.0, 1.0);\r\n\r\n\tif(SSRMask <= 0.0)\r\n\t\tfinalColor = sceneImagecolor.xyz + particles.xyz;\r\n\telse\r\n\t{\r\n\t\tif(bTrans)\r\n\t\t{\r\n\t\t\tfinalColor = SSRMipColor.xyz + particles.xyz  + sceneImagecolor.xyz;\r\n\t\t}\r\n\t\telse\r\n\t\t\tfinalColor = (SSRMipColor.xyz + particles.xyz) * sceneImagecolor.xyz + sceneImagecolor.xyz;\r\n\t}\r\n\t\t\r\n\t//vec4 RainColor = texture(u_frame3, reverseUV);\t\r\n\t//finalColor.xyz += RainColor.xyz;\r\n\t//vec4 cloudColor = texture(u_DepthMap, reverseUV);\r\n\t//finalColor.xyz += cloudColor.xyz;\r\n\r\n\r\n\tout_Col = vec4( finalColor, sceneImagecolor.a);\r\n}\r\n"
 
 /***/ }),
 /* 36 */
@@ -14747,13 +14761,13 @@ module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_del
 /* 60 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat4 u_View; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec4 vs_Nor;\nin vec2 vs_UV;\nin vec4 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\n\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec2 fs_UV;\nout vec2 fs_UV_SS;\n\nmat4 rotationMatrix(vec3 axis, float angle)\n{\n    axis = normalize(axis);\n    float s = sin(angle);\n    float c = cos(angle);\n    float oc = 1.0 - c;\n    \n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\n                0.0,                                0.0,                                0.0,                                1.0);\n}\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    \n    fs_UV = vs_UV;\n\n    vec3 offset = vs_Translate.xyz;\n\n    float dir =  vs_Col.x > 0.0 ? vs_Col.y : vs_Col.y + 3.141592;\n\n    fs_Pos = vs_Pos * rotationMatrix( vec3(0.0, 1.0, 0.0), dir);\n\n    gl_Position = u_ViewProj  *  vec4(offset + fs_Pos.xyz * fs_Col.a, 1.0);\n\n    vec4 normalizedPos = gl_Position / gl_Position.w;\n    \n    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);\n    fs_Pos.a = normalizedPos.z;\n    fs_Pos.xyz += offset;\n}\n"
+module.exports = "#version 300 es\r\n\r\nuniform mat4 u_ViewProj;\r\nuniform float u_Time;\r\n\r\nuniform mat4 u_View; // Used for rendering particles as billboards (quads that are always looking at the camera)\r\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\r\n\r\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\r\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\r\nin vec4 vs_Nor;\r\nin vec2 vs_UV;\r\nin vec4 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\r\n\r\n\r\nout vec4 fs_Col;\r\nout vec4 fs_Pos;\r\nout vec2 fs_UV;\r\nout vec2 fs_UV_SS;\r\n\r\nmat4 rotationMatrix(vec3 axis, float angle)\r\n{\r\n    axis = normalize(axis);\r\n    float s = sin(angle);\r\n    float c = cos(angle);\r\n    float oc = 1.0 - c;\r\n    \r\n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\r\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\r\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\r\n                0.0,                                0.0,                                0.0,                                1.0);\r\n}\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;\r\n    \r\n    fs_UV = vs_UV;\r\n\r\n    vec3 offset = vs_Translate.xyz;\r\n\r\n    float dir =  vs_Col.x < 0.0 ? vs_Col.y + 3.141592 : vs_Col.y;\r\n\r\n    fs_Pos = vs_Pos * rotationMatrix( vec3(0.0, 1.0, 0.0), dir);\r\n\r\n    gl_Position = u_ViewProj  *  vec4(offset + fs_Pos.xyz * fs_Col.a, 1.0);\r\n\r\n    vec4 normalizedPos = gl_Position / gl_Position.w;\r\n    \r\n    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);\r\n    fs_Pos.a = normalizedPos.z;\r\n    fs_Pos.xyz += offset;\r\n}\r\n"
 
 /***/ }),
 /* 61 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform sampler2D u_frame0; //Scene\nuniform sampler2D u_frame1; //Albedo\n\nuniform mat4 u_View; \nuniform mat4 u_InvViewProj; \n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec2 fs_UV;\nin vec2 fs_UV_SS;\n\nout vec4 out_Col;\n\nfloat LinearDepth(float d, float f)\n{\n\t//float f= 1000.0;\n\tfloat n = 0.1;\n\treturn (2.0 * n) / (f + n - d * (f - n));\n}\n\nvoid main()\n{\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\n    float particleDepth = fs_Pos.a;\n\n    if(sceneDepth > 19.0)\n\t{\n\t\tsceneDepth -= 20.0;\n\t}\n\telse if(sceneDepth > 9.0)\n\t{\n\t\tsceneDepth -= 10.0;\n\t}\n\n    if(sceneDepth > particleDepth)\n    {\n        out_Col.xyz = texture(u_frame1, fs_UV).xyz * 0.5;\n\n        out_Col.a = 1.0;\n    }\n    else\n    {   \n        out_Col = vec4(0.0);\n    }\n\n    float linearDepth = LinearDepth(particleDepth, 400.0);\n\tout_Col.a *= 1.0 - pow(linearDepth, 2.0);\n}\n"
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform sampler2D u_frame0; //Scene\r\nuniform sampler2D u_frame1; //Albedo\r\n\r\nuniform mat4 u_View; \r\nuniform mat4 u_InvViewProj; \r\n\r\nin vec4 fs_Col;\r\nin vec4 fs_Pos;\r\nin vec2 fs_UV;\r\nin vec2 fs_UV_SS;\r\n\r\nout vec4 out_Col;\r\n\r\nfloat LinearDepth(float d, float f)\r\n{\r\n\t//float f= 1000.0;\r\n\tfloat n = 0.1;\r\n\treturn (2.0 * n) / (f + n - d * (f - n));\r\n}\r\n\r\nvoid main()\r\n{\r\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\r\n    float particleDepth = fs_Pos.a;\r\n\r\n    if(sceneDepth > 19.0)\r\n\t{\r\n\t\tsceneDepth -= 20.0;\r\n\t}\r\n\telse if(sceneDepth > 9.0)\r\n\t{\r\n\t\tsceneDepth -= 10.0;\r\n\t}\r\n\r\n    if(sceneDepth > particleDepth)\r\n    {\r\n        out_Col.xyz = texture(u_frame1, fs_UV).xyz * 0.5;\r\n        float linearDepth = LinearDepth(particleDepth, 1000.0);\r\n\t    out_Col.a = 1.0 - linearDepth*linearDepth;\r\n\r\n    }\r\n    else\r\n    {   \r\n        out_Col = vec4(0.0);\r\n    }\r\n\r\n    \r\n}\r\n"
 
 /***/ }),
 /* 62 */
