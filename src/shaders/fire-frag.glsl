@@ -182,7 +182,7 @@ void main()
     //
     float flames = pow(ypartClipped,0.3*xfuel)*pow(noise,0.3*xfuel);
     //
-    float f = ypartClippedFalloff*pow(1.0-flames*flames*flames,3.0);
+    float f = ypartClippedFalloff*pow(1.0-flames*flames*flames,2.0 + 1.0 * sin(u_Time));
     float fff = f*f*f;
     vec3 fire = 1.25*vec3(f, fff*1.5, fff*fff*1.0);
     //
