@@ -49,6 +49,8 @@ const controls = {
   Temperature : 7000,
   
   Vignette_Effect: true,
+
+  Volume : 0.1
 };
 
 
@@ -139,6 +141,7 @@ let LS1: LSystem;
 let LS2: LSystem;
 let LS3: LSystem;
 
+let gainNode: GainNode;
 
 var timer = {
   deltaTime: 0.0,
@@ -155,7 +158,7 @@ var timer = {
 function play_single_sound() {
   var JukeBox = new AudioContext();
 
-  var gainNode = JukeBox.createGain(); // Create a gainNode reference.
+  gainNode = JukeBox.createGain(); // Create a gainNode reference.
   gainNode.connect(JukeBox.destination); // Add context to gainNode
 
   fetch('./src/music/Monroe.mp3')
@@ -167,13 +170,17 @@ function play_single_sound() {
         audio_buf.loop = true;
         
         audio_buf.connect(gainNode);
-        gainNode.gain.value = 0.1; // Volume
+        gainNode.gain.value = controls.Volume;
         audio_buf.start(0);
         });
 
         console.log(`Music On!`);
 }
 
+function changeVolume(volume : number)
+{
+  gainNode.gain.value = controls.Volume;
+}
 
 function loadOBJText() {
   obj0 = readTextFile('./src/resources/objs/mario/models/wahoo.obj');
@@ -335,23 +342,18 @@ function loadScene() {
   cloudQuad = new Quad(vec3.fromValues(0, 0, 0));
   cloudQuad.create();
 
+  var scale = 3.0;
 
   mesh0 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/mario/textures/wahoo.png', false),
     new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
      new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
+  
+  mesh0.scale( vec3.fromValues(scale, scale, scale));
   mesh0.create();
 
-  mesh0.translate( vec3.fromValues(-100.0, 30.0, 0.0) );
-
-  mesh1 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
-  new Texture('./src/resources/objs/mario/textures/wahoo.png', false),
-   new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
-    new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
-  mesh1.create();
-  mesh1.translate( vec3.fromValues(0.0, 12.5, 0.0) );
-
-  var scale = 3.0;
+ 
+  
 
   mesh_lake = new Mesh(obj_lake, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/lake/textures/albedo.png', false),
@@ -613,6 +615,7 @@ function main() {
   // Add controls to the gui
   const gui = new DAT.GUI();
 
+  /*
   var SSR = gui.addFolder('SSR');  
   SSR.add(controls, 'SSR_MaxStep', 16.0, 512.0).step(1);
   SSR.add(controls, 'SSR_Opaque_Intensity', 0.0, 4.0).step(0.1);
@@ -623,18 +626,25 @@ function main() {
   BLOOM.add(controls, 'Bloom_Iteration', 0, 32).step(1);
   BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
   BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
-
-  
+  */
+  /*
   var PARTICLE = gui.addFolder('Particle');  
   //PARTICLE.add(controls, 'FireFly');
   PARTICLE.add(controls, 'Rain');
   PARTICLE.add(controls, 'Snow');
   PARTICLE.add(controls, 'Lantern');
   PARTICLE.add(controls, 'Clouds');
-  
+  */
 
   var ENVIRONMENT = gui.addFolder('Environment');
   ENVIRONMENT.add(controls, 'Temperature', 3600, 10000).step(1);
+
+  var MUSIC = gui.addFolder('Music');
+  MUSIC.add(controls, 'Volume', 0.0, 1.0, ).step(0.01).onChange(function()
+  {
+    changeVolume(controls.Volume);
+  });
+  
 
   /*
   var VIGNETTE = gui.addFolder('Vignette');
@@ -665,7 +675,7 @@ function main() {
 
   const particleBoatSys = new Particle(numBoat);
   particleBoatSys.initialize2(250.0, 0.0, 0.0, 0.0, 250.0, 0.0,
-     600.0, 400.0,
+     900.0, 500.0,
      2.0, -1.0, //direction
        2.0, -1.0, //direction
         0.01, 0.005, //speed
@@ -846,7 +856,7 @@ function main() {
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner]);
+      [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh0]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
       [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
     // renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 

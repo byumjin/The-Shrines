@@ -38,14 +38,14 @@ void main()
     if(sceneDepth > particleDepth)
     {
         out_Col.xyz = texture(u_frame1, fs_UV).xyz * 0.5;
+        float linearDepth = LinearDepth(particleDepth, 1000.0);
+	    out_Col.a = 1.0 - linearDepth*linearDepth;
 
-        out_Col.a = 1.0;
     }
     else
     {   
         out_Col = vec4(0.0);
     }
 
-    float linearDepth = LinearDepth(particleDepth, 400.0);
-	out_Col.a *= 1.0 - pow(linearDepth, 2.0);
+    
 }
