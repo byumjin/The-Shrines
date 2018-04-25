@@ -39,7 +39,7 @@ void main()
 
     vec3 offset = vs_Translate.xyz;
 
-    float dir =  vs_Col.x > 0.0 ? vs_Col.y : vs_Col.y + 3.141592;
+    float dir =  vs_Col.x < 0.0 ? vs_Col.y + 3.141592 : vs_Col.y;
 
     fs_Pos = vs_Pos * rotationMatrix( vec3(0.0, 1.0, 0.0), dir);
 
