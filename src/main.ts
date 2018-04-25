@@ -892,10 +892,12 @@ function main() {
     }
 
     renderer.renderTonemapping(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion, controls.Temperature );
+
+    renderer.renderFXAA(camera);
     
-    if(controls.Vignette_Effect && controls.Rain)
+    if(controls.Rain)
       renderer.renderRainy();   
-    else if(controls.Vignette_Effect && controls.Snow)
+    else if( controls.Snow)
       renderer.renderFrost();
     else
       renderer.renderPresent(camera);

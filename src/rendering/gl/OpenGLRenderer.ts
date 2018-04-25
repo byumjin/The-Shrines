@@ -32,7 +32,8 @@ const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "Sha
                       "SSR_HBLURRED_MIP_5" : 21,
                       "SSR_VBLURRED_MIP_5" : 22,
 
-                     "ToneMapping": 0};
+                     "ToneMapping": 0,
+                     "FXAA": 1};
 
 
 var gShadowMapSize = 2048;
@@ -126,6 +127,10 @@ HmipblurPass : PostProcess = new PostProcess(
   tonemapPass : PostProcess = new PostProcess(
     new Shader(gl.FRAGMENT_SHADER, require('../../shaders/tonemap-frag.glsl'))
     );
+
+    FXAAPass : PostProcess = new PostProcess(
+      new Shader(gl.FRAGMENT_SHADER, require('../../shaders/fxaa-frag.glsl'))
+      );
 
   presentPass : PostProcess = new PostProcess(
       new Shader(gl.FRAGMENT_SHADER, require('../../shaders/present-frag.glsl'))
@@ -1123,6 +1128,21 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
     gl.bindTexture(gl.TEXTURE_2D, null); 
   }
+
+  renderFXAA(camera: Camera) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.post8Buffers[PipelineEnum.FXAA]);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.disable(gl.DEPTH_TEST);
+    //gl.enable(gl.BLEND);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    this.FXAAPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling));
+    this.FXAAPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
+    this.FXAAPass.draw();
+    // bind default frame buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
+    gl.bindTexture(gl.TEXTURE_2D, null); 
+  }
   
   renderFrost(){
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1131,7 +1151,7 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.disable(gl.DEPTH_TEST);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
-    this.frostPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
+    this.frostPass.setFrame00(this.post8Targets[PipelineEnum.FXAA]);
     this.frostPass.setFrame01(this.frostNoiseTexture);
     this.frostPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
     this.frostPass.draw();
@@ -1146,7 +1166,7 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.disable(gl.DEPTH_TEST);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
-    this.rainyPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
+    this.rainyPass.setFrame00(this.post8Targets[PipelineEnum.FXAA]);
     this.rainyPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
     this.rainyPass.draw();
     // bind default frame buffer
@@ -1160,7 +1180,7 @@ HmipblurPass : PostProcess = new PostProcess(
     //gl.enable(gl.BLEND);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    this.presentPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
+    this.presentPass.setFrame00(this.post8Targets[PipelineEnum.FXAA]);
     //this.presentPass.setFrame00(  this.post32Targets[PipelineEnum.ShadowPass]);
     //this.presentPass.setFrame01( this.post32Targets[PipelineEnum.SceneImage] );
     this.presentPass.draw();
