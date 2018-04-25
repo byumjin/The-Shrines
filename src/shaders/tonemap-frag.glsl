@@ -146,8 +146,7 @@ void main() {
 
     vec2 reverseUV = vec2(fs_UV.x, 1.0 - fs_UV.y);
 
-     vec3 distortion = vec3(-1.0/u_screenSize.x * u_chromaticInfo.y, 0.0, 1.0/u_screenSize.x * u_chromaticInfo.y);  
-    // ghost vector to image centre:
+    vec3 distortion = vec3(-1.0/u_screenSize.x * u_chromaticInfo.y, 0.0, 1.0/u_screenSize.x * u_chromaticInfo.y);  
 
     vec2 ghostVec = (vec2(0.5, 0.5) - reverseUV) * u_chromaticInfo.x;
     
@@ -157,5 +156,10 @@ void main() {
 
 	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + bloomColor) * ColorTemperatureToRGB(u_Temperature);
 
-	out_Col = vec4( filmicToneMapping(toneMappedColor), 1.0);
+    vec3 toneColor = filmicToneMapping(toneMappedColor);
+
+    //vec3 HSL = RGBtoHSL(toneColor);
+    //vec3 result = HSLtoRGB(vec3(HSL.x, HSL.y, HSL.z + 0.1));
+
+	out_Col = vec4(toneColor, 1.0);
 }

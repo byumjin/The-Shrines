@@ -332,23 +332,18 @@ function loadScene() {
   cloudQuad = new Quad(vec3.fromValues(0, 0, 0));
   cloudQuad.create();
 
+  var scale = 3.0;
 
   mesh0 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/mario/textures/wahoo.png', false),
     new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
      new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
+  
+  mesh0.scale( vec3.fromValues(scale, scale, scale));
   mesh0.create();
 
-  mesh0.translate( vec3.fromValues(-100.0, 30.0, 0.0) );
-
-  mesh1 = new Mesh(obj0, vec3.fromValues(0, 0, 0),
-  new Texture('./src/resources/objs/mario/textures/wahoo.png', false),
-   new Texture('./src/resources/objs/mario/textures/wahoo_Spec.png', false),
-    new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
-  mesh1.create();
-  mesh1.translate( vec3.fromValues(0.0, 12.5, 0.0) );
-
-  var scale = 3.0;
+ 
+  
 
   mesh_lake = new Mesh(obj_lake, vec3.fromValues(0, 0, 0),
    new Texture('./src/resources/objs/lake/textures/albedo.png', false),
@@ -828,7 +823,7 @@ function main() {
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner]);
+      [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh0]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
       [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
     // renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
