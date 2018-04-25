@@ -100,6 +100,7 @@ let ply_Leaf2: string;
 let ply_Bark2: string;
 
 let obj_Lantern: string;
+let obj_Boat: string;
 
 //Road
 export let road_Mesh_Map: Map<string, Array<Mesh>>;
@@ -111,15 +112,18 @@ let mesh_Bark2: Mesh;
 let mesh_Test: Mesh;
 
 let mesh_Lantern: Mesh;
+let mesh_Boat: Mesh;
 
 let skyCubeMap: Texture;
 let cloudsTexture: Texture;
 let cloudsNormalTexture: Texture;
 
-let numParticle: number = 8192; //Bilboard
+let numParticle: number = 4096; //Bilboard
 let numCloud: number = 256;
 
 let numLatern: number = 1024;
+
+let numBoat: number = 16;
 
 let LS0: LSystem;
 let LS1: LSystem;
@@ -154,7 +158,7 @@ function play_single_sound() {
         audio_buf.loop = true;
         
         audio_buf.connect(gainNode);
-        gainNode.gain.value = 0.3; // Volume
+        gainNode.gain.value = 0.1; // Volume
         audio_buf.start(0);
         });
 
@@ -190,6 +194,7 @@ function loadOBJText() {
   obj_Bark2 = readTextFile('./src/resources/objs/tree/models/bark02.obj');
 
   obj_Lantern = readTextFile('./src/resources/objs/lantern/models/lantern.obj');
+  obj_Boat = readTextFile('./src/resources/objs/lantern/models/sailboat.obj');
 }
 
 function loadRoadMap(){
@@ -464,6 +469,12 @@ function loadScene() {
     new Texture('./src/resources/objs/lantern/textures/Normal.png', false));
     mesh_Lantern.create();
 
+    mesh_Boat  = new Mesh(obj_Boat, vec3.fromValues(10,0,0),
+    new Texture('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false),
+     new Texture('./src/resources/objs/B_Side/textures/Outter_Specular.png', false),
+     new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
+     mesh_Boat.create();
+
    loadRoadMap();
 
    LS0 = new LSystem(vec3.fromValues(55,1.5,0),
@@ -522,44 +533,39 @@ function loadScene() {
 function CheckTriggers(cam : Camera, camPos: vec3, distance: number, height: number, range: number, deltaTime : number){
 
   //move first
-
+  var speed = 50.0;
   if(cam.bForward)
     {
-      cam.updatePosition(0.0, -deltaTime * 100.0);
+      cam.updatePosition(0.0, -deltaTime * speed);
     }
     if(cam.bBackward)
     {
-      cam.updatePosition(0.0, deltaTime * 100.0);
+      cam.updatePosition(0.0, deltaTime * speed);
     }
     if(cam.bLeft)
     {
-      cam.updatePosition(-deltaTime * 100.0, 0.0);
+      cam.updatePosition(-deltaTime * speed, 0.0);
     }
     if(cam.bRight)
     {
-      cam.updatePosition(deltaTime * 100.0, 0.0);
+      cam.updatePosition(deltaTime * speed, 0.0);
     }
 
   if(camPos[0]<range && camPos[0] > -range 
-    && camPos[1]<height+range && camPos[1]>height-range
     && camPos[2]<range && camPos[2]>-range)
     //Middle Shrine
     controls.Lantern = true;
   else if(camPos[0]<range && camPos[0] > -range 
-    && camPos[1]<height+range && camPos[1]>height-range
     && camPos[2]<distance+range && camPos[2]>distance-range)
     controls.Rain = false;
   else if(camPos[0]<range && camPos[0] > -range 
-    && camPos[1]<height+range && camPos[1]>height-range
     && camPos[2]<-distance+range && camPos[2]>-distance-range)
     controls.Rain = false;
   else if(camPos[0]<distance+range && camPos[0] > distance-range 
-    && camPos[1]<height+range && camPos[1]>height-range
     && camPos[2]<range && camPos[2]>-range)
     //Ice Shrine
     controls.Snow = true;
   else if(camPos[0]<-distance+range && camPos[0] > -distance-range 
-    && camPos[1]<height+range && camPos[1]>height-range
     && camPos[2]<range && camPos[2]>-range)
     //Water Shrine
     controls.Rain = true;
@@ -638,6 +644,14 @@ function main() {
 
   const particleLanternSys = new Particle(numLatern);
   particleLanternSys.initialize(150.0, 0.0, 100.0, -105.0, 150.0, 0.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
+
+  const particleBoatSys = new Particle(numBoat);
+  particleBoatSys.initialize2(250.0, 0.0, 0.0, 0.0, 250.0, 0.0,
+     600.0, 400.0,
+     2.0, -1.0, //direction
+       2.0, -1.0, //direction
+        0.01, 0.005, //speed
+        2.0, 3.0); //size
 
   const camera = new Camera();
 
@@ -727,6 +741,19 @@ function main() {
       ]);
 
 
+      const feedBackBoatShader = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/state-Boat-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
+        ],
+        true,
+        ['o_position', 'o_velocity', 'o_color', 'o_attract']);
+        
+    const particleBoatRenderShader = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/particle-Boat-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-Boat-frag.glsl')),
+        ]);
+
+
       const feedBackCloudShader = new ShaderProgram([
         new Shader(gl.VERTEX_SHADER, require('./shaders/state-Cloud-vert.glsl')),
         new Shader(gl.FRAGMENT_SHADER, require('./shaders/dummy-frag.glsl')),
@@ -774,7 +801,7 @@ function main() {
 
   function tick() {
 
-    CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
+    CheckTriggers(camera, camera.position, 315, 30, 20, timer.deltaTime);
 
     camera.update();
     stats.begin();
@@ -817,6 +844,10 @@ function main() {
 
     renderer.renderClouds(camera, cloudQuad, particleCloud, lightColor, lightDirection, cloudsTexture.texture, cloudsNormalTexture.texture, mesh_lake.normalMap.texture, feedBackCloudShader, particleCloudRenderShader,
       controls.Clouds);
+
+    renderer.renderBoatParticle(camera, mesh_Boat, particleBoatSys, feedBackBoatShader, particleBoatRenderShader);
+
+      
 
     if(!controls.Lantern)
     {

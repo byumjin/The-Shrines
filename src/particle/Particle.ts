@@ -197,6 +197,80 @@ class Particle
    }
   }
 
+  initialize2(width : number, xOffset : number, height : number, yOffset : number, depth : number, zOffset : number, radius : number, radiusOffset : number,
+    Rrange : number, Rbias : number, Grange : number, Gbias : number, Brange : number, Bbias : number, Arange : number, Abias : number                  
+)
+{
+
+for (let p = 0; p < this.count; ++p)
+{
+var rad = Math.random() * Math.PI * 2.0;
+var rrr = Math.random() *radius + radiusOffset;
+this.position[p * 4] = Math.sin(rad) * rrr;
+this.position[p * 4 + 1] = (Math.random()) *  height + yOffset;
+this.position[p * 4 + 2] = Math.cos(rad) * rrr;
+
+// Life
+this.velocity[p * 4] = Math.random() * Brange + Bbias;
+this.velocity[p * 4 + 1] = 0.0;
+this.velocity[p * 4 + 2] = 0.0;
+
+this.color[p * 4] = Math.random() * Rrange + Rbias;
+this.color[p * 4 + 1] = Math.random() * Grange + Gbias;
+this.color[p * 4 + 2] = Math.random() * Brange + Bbias; //speed
+
+this.color[p * 4 + 3] =  Math.random() * Arange + Abias; //size
+
+var posXZ = this.squareToDiskConcentric(vec2.fromValues( Math.random() , Math.random()));   
+
+this.attract[p * 4] = rrr;
+this.attract[p * 4 + 1] = rrr;
+this.attract[p * 4 + 2] = rrr;
+
+//save original Gap
+this.position[p * 4 + 3] = rad;
+this.velocity[p * 4 + 3] = rrr;
+this.attract[p * 4 + 3] = this.attract[p * 4 + 2];
+}
+
+this.VBOs = new Array(this.VAOs.length);
+
+for (let i = 0; i < this.VAOs.length; ++i)
+{
+this.VBOs[i] = new Array(NUM_OUTPUT);
+
+gl.bindVertexArray(this.VAOs[i]);
+
+this.VBOs[i][POSITION_LOCATION] = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][POSITION_LOCATION]);
+gl.bufferData(gl.ARRAY_BUFFER, this.position, gl.DYNAMIC_COPY);
+gl.vertexAttribPointer(POSITION_LOCATION, 4, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(POSITION_LOCATION);
+
+this.VBOs[i][VELOCITY_LOCATION] = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][VELOCITY_LOCATION]);
+gl.bufferData(gl.ARRAY_BUFFER, this.velocity, gl.DYNAMIC_COPY);
+gl.vertexAttribPointer(VELOCITY_LOCATION, 4, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(VELOCITY_LOCATION);
+
+this.VBOs[i][COLOR_LOCATION] = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][COLOR_LOCATION]);
+gl.bufferData(gl.ARRAY_BUFFER, this.color, gl.DYNAMIC_COPY);
+gl.vertexAttribPointer(COLOR_LOCATION, 4, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(COLOR_LOCATION);
+
+this.VBOs[i][ATTRACT_LOCATION] = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[i][ATTRACT_LOCATION]);
+gl.bufferData(gl.ARRAY_BUFFER, this.attract, gl.DYNAMIC_COPY);
+gl.vertexAttribPointer(ATTRACT_LOCATION, 4, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(ATTRACT_LOCATION);
+
+gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+gl.bindVertexArray(null);
+}
+}
+
   setBuffers(a : number, b : number)
   {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VBOs[a][POSITION_LOCATION]);

@@ -143,13 +143,15 @@ class Camera {
     }
 
     var length = Math.sqrt(this.position[0] * this.position[0] + this.position[2] * this.position[2]);
+
+    var cap = 350.0;
     
-    if(length > 400.0)
+    if(length > cap)
     {
       this.position[0] /= length;
-      this.position[0] *= 400.0;
+      this.position[0] *= cap;
       this.position[2] /= length;
-      this.position[2] *= 400.0;
+      this.position[2] *= cap;
     }
 
     this.transMat[12] = this.position[0];

@@ -33,30 +33,22 @@ mat4 rotationMatrix(vec3 axis, float angle)
 void main()
 {   
     o_position = i_position;
+
+    float rad = i_position.a;
+    float radius = i_velocity.a;
+
+    float time = i_color.x < 0.0 ? u_Time : -u_Time;
+
+    float newRad = rad + time * i_velocity.x;
+    
+    o_position.x = sin(newRad) * radius;
+    o_position.z = cos(newRad) * radius;
+
     o_velocity = i_velocity;
     o_attract = i_attract;
 
     o_color = i_color;
-    o_color.a = float(gl_VertexID) + 0.1;
 
-    float speed = 400.0;
-    o_position.z += u_deltaTime * speed;
-        
-    float MaxDist = 50000.0;
-
-    if(o_position.z > MaxDist * 0.8)
-    {
-        o_color.xyz = vec3( 1.0 - (o_position.z - MaxDist * 0.8) /(MaxDist * 0.2));
-    }
-    else if(o_position.z < -MaxDist * 0.8)
-    {
-        o_color.xyz = vec3( 1.0 + (o_position.z + MaxDist * 0.8) /(MaxDist * 0.2));
-    }
-   
-    if(o_position.z > 50000.0)
-    {
-        o_position.z -= MaxDist * 2.0;
-        o_color.xyz = vec3(0.0);
-    }
-   
+    o_color.y = newRad;
+    
 }

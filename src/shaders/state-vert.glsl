@@ -35,7 +35,6 @@ out vec4 o_color;
 out vec4 o_attract;
 
 const int rainIndex = 0;
-const int rainStainIndex = 0;
 
 
 vec2 squareToDiskConcentric(vec2 xi) 
@@ -104,18 +103,7 @@ void main()
     float speed;
     
 
-    if(gl_VertexID >= rainIndex) //rain
-    {        
-        if(u_particleInfo.x < 1.0) //false
-        {   
-            speed = 300.0;
-            o_position.y -= u_deltaTime * speed;
-            if(o_position.y < -10.0)
-            {
-                o_position.y = -o_velocity.w;
-            }                    
-        }
-        else if(u_particleInfo.x < 2.0)//rain
+    if(u_particleInfo.x < 1.5)//rain
         {
             speed = 300.0;
             o_position.y -= u_deltaTime * speed;
@@ -126,9 +114,9 @@ void main()
                 o_position.y = 150.0 + o_velocity.w;
             }
         }
-        else if(u_particleInfo.x < 3.0)//snow
+        else if(u_particleInfo.x < 2.5)//snow
         {
-            speed = 5.0;
+            speed = 20.0;
             o_position.y -= u_deltaTime * speed;
             o_position.x += u_deltaTime * (speed*0.2*sin(u_Time+rand(vec2(gl_VertexID,gl_VertexID+8000))*M_PI));
             o_position.z += u_deltaTime * (speed*0.2*cos(u_Time+rand(vec2(gl_VertexID+8000,gl_VertexID))*M_PI));
@@ -139,33 +127,6 @@ void main()
                 o_position.y = 150.0*rand(vec2(gl_VertexID,gl_VertexID)) - 50.0 + o_velocity.w;
             }
         }
-    }
-    else if(gl_VertexID >= rainStainIndex)
-    {
-        if(u_particleInfo.x < 1.0) //false
-        {
-            o_position.y = -100.0;
-        }
-        else //true
-        {
-            float time = i_color.z + u_deltaTime;
-
-            if(time < 0.2)
-            {
-                 o_color.z = time;
-                 o_position = i_position;                 
-            }
-            else
-            {                
-                vec2 xi = vec2(noise(i_position.x), noise(i_position.z));
-                //change pos
-                o_position.xz = squareToDiskConcentric( xi) * 200.0  + u_CameraWPos.xz;
-
-                o_color.z -= (0.2 + xi.x *0.1);
-            }
-
-            o_position.y = 1.5;
-        }
-    }
+    
     
 }

@@ -891,7 +891,7 @@ HmipblurPass : PostProcess = new PostProcess(
       //gl.enable(gl.BLEND);
       //gl.blendFunc(gl.ONE, gl.ZERO); 
       this.setClearColor(0.0, 0.0, 0.0, 0.0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
+      //gl.clear(gl.COLOR_BUFFER_BIT);
 
       if(bSwitch)
       {
@@ -908,6 +908,65 @@ HmipblurPass : PostProcess = new PostProcess(
       //gl.blendFunc(gl.ONE, gl.ZERO); 
       gl.disable(gl.DEPTH_TEST);   
     }
+
+
+    renderBoatParticle(camera: Camera, mesh: Mesh, particleSystem: Particle, feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram)
+      {
+         //transformation Feedback
+        feedbackShader.use();
+        feedbackShader.setdeltaTime(this.deltaTime);
+        feedbackShader.setTime(this.currentTime);    
+        feedbackShader.setCameraWPos(camera.position);
+  
+        var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;   
+  
+        gl.bindVertexArray(particleSystem.getVAO(particleSystem.currentBufferSetIndex));
+        
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
+        particleSystem.bindBufferBase(destinationIdx);    
+  
+        // Turn off rasterization - we are not drawing
+        gl.enable(gl.RASTERIZER_DISCARD);
+  
+        // Update position and rotation using transform feedback
+        gl.beginTransformFeedback(gl.POINTS);
+        gl.drawArrays(gl.POINTS, 0, particleSystem.count);
+        gl.endTransformFeedback();
+        
+        // Restore state
+        gl.disable(gl.RASTERIZER_DISCARD);
+        gl.useProgram(null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+        gl.bindVertexArray(null);
+        
+        particleSystem.switchBufferSet();
+        
+        //render       
+        mesh.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
+       
+  
+        
+  
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ParticleMesh]);
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        gl.enable(gl.DEPTH_TEST);
+
+        this.setClearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+          particleRenderShader.setViewMatrix(camera.viewMatrix);
+          particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
+          particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
+          particleRenderShader.setFrame00(this.tDTargets[0]);
+          particleRenderShader.setFrame01(mesh.albedoMap.texture);
+          particleRenderShader.drawInstance(mesh, particleSystem.count);
+
+  
+        // bind default frame buffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.disable(gl.DEPTH_TEST);   
+      }
 
 
   renderClouds(camera: Camera, quad: Quad, particleSystem: Particle, lightColor : vec4, lightDir : vec4, cloudTex : WebGLTexture, normalTex : WebGLTexture, noiseTex : WebGLTexture,

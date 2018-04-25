@@ -21,7 +21,6 @@ out vec2 fs_UV_SS;
 
 
 const int rainIndex = 0;
-const int rainStainIndex = 0;
 
 void main()
 {
@@ -49,19 +48,14 @@ void main()
 
     vec3 billboardPos;
 
-    if(fs_Col.a >= float(rainIndex))
-    {
-        if(u_particleInfo.x == 1.0)
+    
+    if(u_particleInfo.x == 1.0)
         //Rain 
             billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * vec3(0.0, 1.4, 0.0);
         else
         //Snow
-            billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * vec3(0.0, 1.0, 0.0);
-    }
-    else if(fs_Col.a >= float(rainStainIndex) )
-    {
-      billboardPos = offset + vs_Pos.x * 0.2 * vec3(1.0, 0.0, 0.0) + vs_Pos.y * 0.2 * vec3(0.0, 0.0, 1.0);
-    }  
+            billboardPos = offset + vs_Pos.x *  CameraAxes[0] + vs_Pos.y * CameraAxes[1];
+    
 
     gl_Position = u_ViewProj * vec4(billboardPos, 1.0);
 

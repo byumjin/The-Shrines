@@ -55,16 +55,6 @@ void main()
 
             out_Col = vec4(0.2, 0.2, 0.2, 0.0) * dist * closeFade;
         }
-        else if(PerticleIndex >= float(rainStainIndex) )
-        {
-            float dist = 1.0 - (length(fs_Pos.xyz) * 2.0);
-            //float height = clamp( sin(  sqrt(fs_Pos.x*fs_Pos.x + fs_Pos.y*fs_Pos.y) * 100.0  ), 0.0, 1.0) * 0.2;
-
-            if(fs_Col.z >= 0.0)
-                out_Col = vec4(dist) * 6.0 * pow( (0.2 - fs_Col.z) / 0.2 , 4.0);
-            else 
-                out_Col = vec4(0.0);
-        } 
 
         float diff = clamp( LinearDepth(sceneDepth, 1000.0) - LinearDepth(particleDepth, 1000.0), 0.0, 1.0);
              out_Col.xyz *= pow(smoothstep(0.0, 1.0, diff), 0.3);
