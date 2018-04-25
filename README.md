@@ -1,4 +1,4 @@
-# The Shrine
+# The Shrines
 * CGGT, University of Pennsylvania
 * Byumjin Kim, Jiawei Wang
 * Apr. 2018
