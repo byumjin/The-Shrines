@@ -7,4 +7,4 @@
 |---|
 |<img src="./imgs/main.png">|
 
-* [Demo Link](https://byumjin.github.io/The Shrines/)
+* [Demo Link](https://byumjin.github.io/The-Shrines/)
