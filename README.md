@@ -3,8 +3,8 @@
 * Byumjin Kim, Jiawei Wang
 * Apr. 2018
 
-|**ScreenShot**|
+| The Shrines |
 |---|
-|<img src="./results/01.JPG" width="800" height="400">|
+|<img src="./imgs/main.png">|
 
 * [Demo Link](https://byumjin.github.io/Procedural-Final/)
