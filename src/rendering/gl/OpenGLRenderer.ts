@@ -1030,6 +1030,8 @@ HmipblurPass : PostProcess = new PostProcess(
 
       if(bSwitch)
       {
+        particleRenderShader.setdeltaTime(this.deltaTime);
+        particleRenderShader.setTime(this.currentTime);   
         particleRenderShader.setViewMatrix(camera.viewMatrix);
         particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
         particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);

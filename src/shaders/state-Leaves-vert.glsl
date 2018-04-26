@@ -58,7 +58,7 @@ void main()
 
     if(u_particleInfo.z < 1.0) //false
     {
-        if(o_position.y > 50.0)
+        if(o_position.y > 70.0)
         {
             o_position.y = 0.0 + o_velocity.w;
         }
@@ -75,9 +75,9 @@ void main()
     }
     else //true
     {
-        if(o_position.y > 50.0)
+        if(o_position.y > 70.0)
         {
-            o_position.y -= 75.0;
+            o_position.y -= 70.0;
             o_position.y += u_deltaTime * speed;
             float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow(clamp(o_position.y/100.0+0.75, 0.0, 2.0),2.0);
             o_position.xz = rotate2D_Axis_Scale(o_position.xz, u_deltaTime*o_velocity.x, vec2(0.0,252.0), radius);

@@ -134,7 +134,7 @@ let numCloud: number = 256;
 let numLatern: number = 1024;
 
 let numBoat: number = 16;
-let numLeaves: number = 192;
+let numLeaves: number = 208;
 
 let LS0: LSystem;
 let LS1: LSystem;
@@ -682,7 +682,7 @@ function main() {
         2.0, 3.0); //size
 
   const particleLeavesSys = new Particle(numLeaves);
-  particleLeavesSys.initialize3(10.0, 0.0, 80.0, -80, 10.0, 252.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
+  particleLeavesSys.initialize3(10.0, 0.0, 100.0, -100.0, 10.0, 252.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
 
   const camera = new Camera();
 
@@ -926,7 +926,7 @@ function main() {
       }
       else
       {
-        renderer.renderLanternParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader,
+        renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader,
           controls.Earth, false);
       }
     }
@@ -934,7 +934,7 @@ function main() {
     {
       controls.Earth_Timer = 0.0;
 
-      renderer.renderLanternParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader,
+      renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader,
         controls.Earth, true);
     }
 
