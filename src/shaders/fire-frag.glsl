@@ -184,7 +184,7 @@ void main()
     //
     float f = ypartClippedFalloff*pow(1.0-flames*flames*flames,5.0 + 1.0 * sin(u_Time));
     float fff = f*f*f;
-    vec3 fire = 1.35*vec3(f, fff, fff*fff*1.0);
+    vec3 fire = vec3(f * 0.83, f * 0.7, f * 0.6);
     //
     // smoke
     float smokeNoise = 0.5+snoise(0.4*position+timing*vec3(1.0,1.0,0.2))/2.0;
@@ -201,17 +201,18 @@ void main()
     float sparkLife = min(10.0*(1.0-min((sparkGridIndex.y+(190.0*realTime/sparkGridSize))/(24.0-20.0*sparkRandom),1.0)),1.0);
     vec3 sparks = vec3(0.0);
     if (sparkLife>0.0) {
-        float sparkSize = xfuel*xfuel*sparkRandom*0.08;
+        float sparkSize = xfuel*xfuel*sparkRandom*0.12;
         float sparkRadians = 999.0*sparkRandom*2.0*PI + 2.0*time;
         vec2 sparkCircular = vec2(sin(sparkRadians),cos(sparkRadians));
         vec2 sparkOffset = (0.5-sparkSize)*sparkGridSize*sparkCircular;
         vec2 sparkModulus = mod(sparkCoord+sparkOffset,sparkGridSize) - 0.5*vec2(sparkGridSize);
         float sparkLength = length(sparkModulus);
         float sparksGray = max(0.0, 1.0 - sparkLength/(sparkSize*sparkGridSize));
-        sparks = sparkLife*sparksGray*vec3(1.0,0.3,0.0);
+        sparks = sparkLife*sparksGray*vec3(0.83,0.7,0.6);
     }
     //
     vec2 uv = fs_UV.xy;
+    uv.x = uv.x * 0.5 + 0.5;
     vec2 d = vec2(0.0, 0.0);
     const int n = 100;
     for(int i = 0; i < n; i++)
@@ -221,10 +222,10 @@ void main()
         pos.x *= 2.0; // iResolution.x / iResolution.y;
         pos.y += 7.5 * u_Time * 0.02 * r.z;
         //pos.x += sin(t + r.z);
-        d += 0.05 * drop(uv.xy, pos, 0.03);
+        d += 0.25 * drop(uv.xy, pos, 0.03);
     }
 
-    vec3 background = texture(u_frame0, uv.xy + d).rgb;
+    vec3 background = texture(u_frame0, fs_UV.xy + vec2(d.x, d.y)).rgb;
     
     vec3 col = max(fire,sparks)+smoke;
     col = mix(col, background, (1.0-length(col)));
