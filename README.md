@@ -7,4 +7,4 @@
 |---|
 |<img src="./imgs/main.png">|
 
-* [Demo Link](https://byumjin.github.io/Procedural-Final/)
+* [Demo Link](https://byumjin.github.io/The Shrines/)
