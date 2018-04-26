@@ -17,6 +17,7 @@ out vec4 fs_Col;
 out vec4 fs_Pos;
 out vec2 fs_UV;
 out vec2 fs_UV_SS;
+out float fs_Alpha;
 
 void main()
 {
@@ -33,4 +34,11 @@ void main()
     fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);
     fs_Pos.a = normalizedPos.z;
     fs_Pos.xyz += offset;
+
+    if(vs_Translate.y < 20.0)
+    	fs_Alpha = clamp((vs_Translate.y-10.0)/10.0,0.0,1.0);
+    else if(vs_Translate.y > 40.0)
+    	fs_Alpha = clamp((50.0-vs_Translate.y)/10.0,0.0,1.0);
+    else
+    	fs_Alpha = 1.0;
 }
