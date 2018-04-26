@@ -234,6 +234,12 @@ function equals(a, b) {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\nprecision highp float;\n\nin vec4 fs_Pos;\nin vec4 fs_Nor;\nin vec4 fs_Col;\nin vec2 fs_UV;\n\nvoid main() {\n \n   \n}\n"
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -342,12 +348,6 @@ class Drawable {
 ;
 /* harmony default export */ __webpack_exports__["a"] = (Drawable);
 
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-module.exports = "#version 300 es\nprecision highp float;\n\nin vec4 fs_Pos;\nin vec4 fs_Nor;\nin vec4 fs_Col;\nin vec2 fs_UV;\n\nvoid main() {\n \n   \n}\n"
 
 /***/ }),
 /* 5 */
@@ -828,13 +828,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Square__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Mesh__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__rendering_gl_OpenGLRenderer__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Camera__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Camera__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__globals__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__particle_Particle__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__geometry_Quad__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__LSystem__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__particle_Particle__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__geometry_Quad__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__LSystem__ = __webpack_require__(51);
 
 
 
@@ -868,6 +868,10 @@ const controls = {
     Lantern: false,
     Lantern_delaytoDieTimer: 10.0,
     Lantern_Timer: 10.0,
+    Fire: false,
+    Earth: false,
+    Earth_delaytoDieTimer: 14.0,
+    Earth_Timer: 14.0,
     Clouds: true,
     Temperature: 7000,
     Vignette_Effect: true,
@@ -916,6 +920,7 @@ let ply_Leaf2;
 let ply_Bark2;
 let obj_Lantern;
 let obj_Boat;
+let obj_Leaves;
 //Road
 let road_Mesh_Map;
 let mesh_Leaf;
@@ -925,6 +930,7 @@ let mesh_Bark2;
 let mesh_Test;
 let mesh_Lantern;
 let mesh_Boat;
+let mesh_Leaves;
 let skyCubeMap;
 let cloudsTexture;
 let cloudsNormalTexture;
@@ -932,6 +938,7 @@ let numParticle = 4096; //Bilboard
 let numCloud = 256;
 let numLatern = 1024;
 let numBoat = 16;
+let numLeaves = 208;
 let LS0;
 let LS1;
 let LS2;
@@ -991,6 +998,7 @@ function loadOBJText() {
     obj_Bark2 = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('./src/resources/objs/tree/models/bark02.obj');
     obj_Lantern = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('./src/resources/objs/lantern/models/lantern.obj');
     obj_Boat = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('./src/resources/objs/lantern/models/sailboat.obj');
+    obj_Leaves = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('./src/resources/objs/lantern/models/leaves.obj');
 }
 function loadRoadMap() {
     road_Mesh_Map = new Map();
@@ -1135,6 +1143,8 @@ function loadScene() {
     mesh_Lantern.create();
     mesh_Boat = new __WEBPACK_IMPORTED_MODULE_4__geometry_Mesh__["a" /* default */](obj_Boat, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(10, 0, 0), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/B_Side/textures/Outter_Albedo.png', false), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/B_Side/textures/Outter_Specular.png', false), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
     mesh_Boat.create();
+    mesh_Leaves = new __WEBPACK_IMPORTED_MODULE_4__geometry_Mesh__["a" /* default */](obj_Leaves, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(10, 0, 0), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/lantern/textures/Leaves_Albedo.jpg', false), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/lantern/textures/Leaves_Albedo.jpg', false), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/lantern/textures/Normal.png', false));
+    mesh_Leaves.create();
     loadRoadMap();
     LS0 = new __WEBPACK_IMPORTED_MODULE_12__LSystem__["a" /* LSystem */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(55, 1.5, 0), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/B_Side/textures/Wmarble_Albedo.png', false), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/B_Side/textures/Wmarble_Specular.png', false), new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]('./src/resources/objs/B_Side/textures/Wmarble_Normal.png', false));
     let program = "X\nX->FF*[+F][-F]F*[-F][+F]\nF->FFF\n";
@@ -1194,10 +1204,10 @@ function CheckTriggers(cam, camPos, distance, height, range, deltaTime) {
         controls.Lantern = true;
     else if (camPos[0] < range && camPos[0] > -range
         && camPos[2] < distance + range && camPos[2] > distance - range)
-        controls.Rain = false;
+        controls.Earth = true;
     else if (camPos[0] < range && camPos[0] > -range
         && camPos[2] < -distance + range && camPos[2] > -distance - range)
-        controls.Rain = false;
+        controls.Fire = true;
     else if (camPos[0] < distance + range && camPos[0] > distance - range
         && camPos[2] < range && camPos[2] > -range)
         //Ice Shrine
@@ -1210,6 +1220,8 @@ function CheckTriggers(cam, camPos, distance, height, range, deltaTime) {
         controls.Rain = false;
         controls.Snow = false;
         controls.Lantern = false;
+        controls.Fire = false;
+        controls.Earth = false;
     }
 }
 function main() {
@@ -1276,6 +1288,8 @@ function main() {
     2.0, -1.0, //direction
     0.01, 0.005, //speed
     2.0, 3.0); //size
+    const particleLeavesSys = new __WEBPACK_IMPORTED_MODULE_10__particle_Particle__["a" /* default */](numLeaves);
+    particleLeavesSys.initialize3(10.0, 0.0, 100.0, -100.0, 10.0, 252.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
     const camera = new __WEBPACK_IMPORTED_MODULE_6__Camera__["a" /* default */]();
     camera.updateOrbit(0.0, 3.0);
     camera.updatePosition(-70, -290);
@@ -1286,6 +1300,7 @@ function main() {
     gl.enable(gl.DEPTH_TEST);
     gl.frontFace(gl.CCW);
     renderer.setFrostNoiseTexture(new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]("./src/resources/Noise/lichen_noise.jpg", false).texture);
+    renderer.setFireNoiseTexture(new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_Texture__["a" /* default */]("./src/resources/Noise/RGBANoise.jpg", false).texture);
     const standardDeferred = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(6)),
         new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(7)),
@@ -1303,7 +1318,7 @@ function main() {
     barkDeferred.setupTexUnits(["AlbedoMap", "SpecularMap", "NormalMap"]);
     const translucentDeferred = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(6)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(52)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(53)),
     ]);
     translucentDeferred.setupTexUnits(["AlbedoMap", "SpecularMap", "NormalMap"]);
     const standardShadowMapping = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
@@ -1319,36 +1334,44 @@ function main() {
         new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(8)),
     ]);
     const feedBackShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(53)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(4)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(54)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(3)),
     ], true, ['o_position', 'o_velocity', 'o_color', 'o_attract']);
     const particleRenderShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(54)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(55)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(55)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(56)),
     ]);
     const feedBackLanternShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(56)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(4)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(57)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(3)),
     ], true, ['o_position', 'o_velocity', 'o_color', 'o_attract']);
     const particleLanternRenderShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(57)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(58)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(58)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(59)),
     ]);
     const feedBackBoatShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(59)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(4)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(60)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(3)),
     ], true, ['o_position', 'o_velocity', 'o_color', 'o_attract']);
     const particleBoatRenderShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(60)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(61)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(61)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(62)),
+    ]);
+    const feedBackLeavesShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(63)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(3)),
+    ], true, ['o_position', 'o_velocity', 'o_color', 'o_attract']);
+    const particleLeavesRenderShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(64)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(65)),
     ]);
     const feedBackCloudShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(62)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(4)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(66)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(3)),
     ], true, ['o_position', 'o_velocity', 'o_color', 'o_attract']);
     const particleCloudRenderShader = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(63)),
-        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(64)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(67)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(68)),
     ]);
     //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
     let lightColor = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
@@ -1411,6 +1434,19 @@ function main() {
             controls.Lantern_Timer = 0.0;
             renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, controls.Lantern, true);
         }
+        if (!controls.Earth) {
+            controls.Earth_Timer += timer.deltaTime;
+            if (controls.Earth_Timer < controls.Earth_delaytoDieTimer) {
+                renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, true);
+            }
+            else {
+                renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, false);
+            }
+        }
+        else {
+            controls.Earth_Timer = 0.0;
+            renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, true);
+        }
         if (!controls.Rain) {
             controls.Rain_Timer += timer.deltaTime;
             if (controls.Rain_Timer < controls.Rain_delaytoDieTimer) {
@@ -1448,6 +1484,8 @@ function main() {
             renderer.renderRainy();
         else if (controls.Snow)
             renderer.renderFrost();
+        else if (controls.Fire)
+            renderer.renderFire();
         else
             renderer.renderPresent(camera);
         stats.end();
@@ -3853,7 +3891,7 @@ const forEach = (function() {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(1);
 
 
@@ -3905,7 +3943,7 @@ class Square extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /*
 /* 14 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform mat4 u_Model;\nuniform mat4 u_ModelInvTr;  \n\nuniform mat4 u_View;   \nuniform mat4 u_Proj; \nuniform mat4 u_ViewProj;\n\nuniform float u_Time;\nuniform vec4 u_Center;\n\nin vec4 vs_Pos;\nin vec4 vs_Nor;\nin vec4 vs_Col;\nin vec2 vs_UV;\n\nout vec4 fs_Pos;\nout vec4 fs_Nor;            \nout vec4 fs_Col;           \nout vec2 fs_UV;\n\n#define SIDE_TO_SIDE_FREQ1 0.675\n#define SIDE_TO_SIDE_FREQ2 0.293\n#define UP_AND_DOWN_FREQ1 0.175\n#define UP_AND_DOWN_FREQ2 0.063\n\nvec4 SmoothCurve( vec4 x ) {\n  return x * x * ( vec4(3.0f,3.0f,3.0f,3.0f) - 2.0 * x ) ;\n}\nvec4 TriangleWave( vec4 x ) {\n  return abs( fract( x + 0.5 ) * 2.0 - 1.0 );\n}\nvec4 SmoothTriangleWave( vec4 x ) {\n  return SmoothCurve( TriangleWave( x ) );\n}\n\nvoid ApplyMainBending(inout vec3 vPos, vec2 vWind, float fBendScale){\n\t// Calculate the length from the ground, since we'll need it.\n\tfloat fLength = length(vPos);\n\t// Bend factor - Wind variation is done on the CPU.\n\tfloat fBF = vPos.y * fBendScale;\n\t// Smooth bending factor and increase its nearby height limit.\n\tfBF += 1.0;\n\tfBF *= fBF;\n\tfBF = fBF * fBF - fBF;\n\tfBF = fBF * fBF;\n\t// Displace position\n\tvec3 vNewPos = vPos;\n\tvNewPos.xz += vWind.xy * fBF;\n\tvPos.xyz = normalize(vNewPos.xyz)* fLength;\n}\n\nvoid ApplyDetailBending(\n\tinout vec3 vPos,\t\t// The final world position of the vertex being modified\n\tvec2 Wind,\n\tvec3 vNormal,\t\t\t// The world normal for this vertex\n\tvec3 objectPosition,\t        // The world position of the plant instance (same for all vertices)\n\tfloat fDetailPhase,\t\t// Optional phase for side-to-side. This is used to vary the phase for side-to-side motion\n\tfloat fBranchPhase,\t\t// The green vertex channel per Crytek's convention\n\tfloat fTime,\t\t\t// Ever-increasing time value (e.g. seconds ellapsed)\n\tfloat fEdgeAtten,\t\t// \"Leaf stiffness\", red vertex channel per Crytek's convention\n\tfloat fBranchAtten,\t\t// \"Overall stiffness\", *inverse* of blue channel per Crytek's convention\n\tfloat fBranchAmp,\t\t// Controls how much up and down\n\tfloat fSpeed,\t\t\t// Controls how quickly the leaf oscillates\n\tfloat fDetailFreq,\t\t// Same thing as fSpeed (they could really be combined, but I suspect\n\t\t// this could be used to let you additionally control the speed per vertex).\n\tfloat fDetailAmp\t\t// Controls how much back and forth\n\t)\t\t\n{\n\t// Phases (object, vertex, branch)\n\t// fObjPhase: This ensures phase is different for different plant instances, but it should be\n\t// the same value for all vertices of the same plant.\n\tfloat fObjPhase = dot(objectPosition.xyz, vec3(1));  \n\tfBranchPhase += fObjPhase;\n\tfloat fVtxPhase = dot(vPos.xyz, vec3(fDetailPhase + fBranchPhase));  \n\n\tvec2 vWavesIn = vec2(fTime) + vec2(fVtxPhase, fBranchPhase );\n\tvec4 vWaves = (fract( vWavesIn.xxyy *\n\t\t\t\t\t   vec4(SIDE_TO_SIDE_FREQ1, SIDE_TO_SIDE_FREQ2, UP_AND_DOWN_FREQ1, UP_AND_DOWN_FREQ2) ) *\n\t\t\t\t\t   2.0 - 1.0 ) * fSpeed * fDetailFreq;\n\tvWaves = SmoothTriangleWave( vWaves );\n\tvec2 vWavesSum = vWaves.xz + vWaves.yw;  \n\n\t// -fBranchAtten is how restricted this vertex of the leaf/branch is. e.g. close to the stem\n\t//  it should be 0 (maximum stiffness). At the far outer edge it might be 1.\n\t//  In this sample, this is controlled by the blue vertex color.\n\t// -fEdgeAtten controls movement in the plane of the leaf/branch. It is controlled by the\n\t//  red vertex color in this sample. It is supposed to represent \"leaf stiffness\". Generally, it\n\t//  should be 0 in the middle of the leaf (maximum stiffness), and 1 on the outer edges.\n\t// -Note that this is different from the Crytek code, in that we use vPos.xzy instead of vPos.xyz,\n\t//  because I treat y as the up-and-down direction.\n    // vPos.xyz += vWavesSum.x * vec3(fEdgeAtten * fDetailAmp * vNormal.xyz);\n    // vPos.y += vWavesSum.y * fBranchAtten * fBranchAmp;\n    vPos.xyz +=  vWavesSum.xxy * vec3(fEdgeAtten * fDetailAmp *\n                            vNormal.xy, fBranchAtten * fBranchAmp);\n}\n\nvoid main()\n{\n\tvec3 vPos=vec3(u_Model * vs_Pos);\n\tvec3 normalDir=normalize(vec3(u_ModelInvTr * vs_Nor));\n\n\tvec3 objectPosition = vec3(u_Center);\n\tvPos -= objectPosition;\t// Reset the vertex to base-zero\n\t//Wind\n\tvec3 wind_dir = normalize(vec3(0.5, 0, 0));\n    float wind_speed = 1.0;\n    float wave_division_width = 1.0;\n    float wave_info = (cos((dot(objectPosition, wind_dir) - wind_speed * u_Time) / wave_division_width) + 0.7);\n\t\n\tfloat wind_power = 15.0f;\n    //vec3 w = wind_dir * wind_power * wave_info * fd * fr;\n\tvec3 w=wind_dir * wind_power * wave_info;\n\tvec2 Wind=vec2(w.x*0.05,w.z*0.05);\n\n\tfloat BendScale=0.0125;\n\tApplyMainBending(vPos, Wind, BendScale);\n\tvPos += objectPosition;\n\n\n\tfloat BranchAmp=0.2;\n\tfloat DetailAmp=0.1;\n\tvec2 WindDetail = vec2(w.x * 0.5,w.z*0.5);\n\tfloat windStrength = length(WindDetail);\n\tApplyDetailBending(\n\t\tvPos,\n\t\tWindDetail,\n\t\tnormalDir,\n\t\tobjectPosition,\n\t\t0.0,\t\t\t\t\t// Leaf phase - not used in this scenario, but would allow for variation in side-to-side motion\n\t\tvs_Col.g,\t\t// Branch phase - should be the same for all verts in a leaf/branch.\n\t\tu_Time,\n\t\tvs_Col.r,\t\t// edge attenuation, leaf stiffness\n\t\t1.0 - vs_Col.b,  // branch attenuation. High values close to stem, low values furthest from stem.\n\t\t\t\t// For some reason, Crysis uses solid blue for non-moving, and black for most movement.\n\t\t\t\t// So we invert the blue value here.\n\t\tBranchAmp * windStrength, // branch amplitude. Play with this until it looks good.\n\t\t1.0f,\t\t\t\t\t// Speed. Play with this until it looks good.\n\t\t0.13f,\t\t\t\t\t// Detail frequency. Keep this at 1 unless you want to have different per-leaf frequency\n\t\tDetailAmp * windStrength\t// Detail amplitude. Play with this until it looks good.\n\t\t);\n\n\tfs_Col = vs_Col;\n    fs_UV = vs_UV;\n    fs_UV.y = fs_UV.y;\n  \n    fs_Nor = vs_Nor;\n    vec4 new_localPos = inverse(u_Model) * vec4(vPos, 1.0);\n    new_localPos /= new_localPos.w;\n    fs_Pos = new_localPos;    \n\n    gl_Position = u_ViewProj * vec4(vPos, 1.0);\n}\n"
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform mat4 u_Model;\r\nuniform mat4 u_ModelInvTr;  \r\n\r\nuniform mat4 u_View;   \r\nuniform mat4 u_Proj; \r\nuniform mat4 u_ViewProj;\r\n\r\nuniform float u_Time;\r\nuniform vec4 u_Center;\r\n\r\nin vec4 vs_Pos;\r\nin vec4 vs_Nor;\r\nin vec4 vs_Col;\r\nin vec2 vs_UV;\r\n\r\nout vec4 fs_Pos;\r\nout vec4 fs_Nor;            \r\nout vec4 fs_Col;           \r\nout vec2 fs_UV;\r\n\r\n#define SIDE_TO_SIDE_FREQ1 0.475\r\n#define SIDE_TO_SIDE_FREQ2 0.193\r\n#define UP_AND_DOWN_FREQ1 0.095\r\n#define UP_AND_DOWN_FREQ2 0.043\r\n\r\nvec4 SmoothCurve( vec4 x ) {\r\n  return x * x * ( vec4(3.0f,3.0f,3.0f,3.0f) - 2.0 * x ) ;\r\n}\r\nvec4 TriangleWave( vec4 x ) {\r\n  return abs( fract( x + 0.5 ) * 2.0 - 1.0 );\r\n}\r\nvec4 SmoothTriangleWave( vec4 x ) {\r\n  return SmoothCurve( TriangleWave( x ) );\r\n}\r\n\r\nvoid ApplyMainBending(inout vec3 vPos, vec2 vWind, float fBendScale){\r\n\t// Calculate the length from the ground, since we'll need it.\r\n\tfloat fLength = length(vPos);\r\n\t// Bend factor - Wind variation is done on the CPU.\r\n\tfloat fBF = vPos.y * fBendScale;\r\n\t// Smooth bending factor and increase its nearby height limit.\r\n\tfBF += 1.0;\r\n\tfBF *= fBF;\r\n\tfBF = fBF * fBF - fBF;\r\n\tfBF = fBF * fBF;\r\n\t// Displace position\r\n\tvec3 vNewPos = vPos;\r\n\tvNewPos.xz += vWind.xy * fBF;\r\n\tvPos.xyz = normalize(vNewPos.xyz)* fLength;\r\n}\r\n\r\nvoid ApplyDetailBending(\r\n\tinout vec3 vPos,\t\t// The final world position of the vertex being modified\r\n\tvec2 Wind,\r\n\tvec3 vNormal,\t\t\t// The world normal for this vertex\r\n\tvec3 objectPosition,\t        // The world position of the plant instance (same for all vertices)\r\n\tfloat fDetailPhase,\t\t// Optional phase for side-to-side. This is used to vary the phase for side-to-side motion\r\n\tfloat fBranchPhase,\t\t// The green vertex channel per Crytek's convention\r\n\tfloat fTime,\t\t\t// Ever-increasing time value (e.g. seconds ellapsed)\r\n\tfloat fEdgeAtten,\t\t// \"Leaf stiffness\", red vertex channel per Crytek's convention\r\n\tfloat fBranchAtten,\t\t// \"Overall stiffness\", *inverse* of blue channel per Crytek's convention\r\n\tfloat fBranchAmp,\t\t// Controls how much up and down\r\n\tfloat fSpeed,\t\t\t// Controls how quickly the leaf oscillates\r\n\tfloat fDetailFreq,\t\t// Same thing as fSpeed (they could really be combined, but I suspect\r\n\t\t// this could be used to let you additionally control the speed per vertex).\r\n\tfloat fDetailAmp\t\t// Controls how much back and forth\r\n\t)\t\t\r\n{\r\n\t// Phases (object, vertex, branch)\r\n\t// fObjPhase: This ensures phase is different for different plant instances, but it should be\r\n\t// the same value for all vertices of the same plant.\r\n\tfloat fObjPhase = dot(objectPosition.xyz, vec3(1));  \r\n\tfBranchPhase += fObjPhase;\r\n\tfloat fVtxPhase = dot(vPos.xyz, vec3(fDetailPhase + fBranchPhase));  \r\n\r\n\tvec2 vWavesIn = vec2(fTime) + vec2(fVtxPhase, fBranchPhase );\r\n\tvec4 vWaves = (fract( vWavesIn.xxyy *\r\n\t\t\t\t\t   vec4(SIDE_TO_SIDE_FREQ1, SIDE_TO_SIDE_FREQ2, UP_AND_DOWN_FREQ1, UP_AND_DOWN_FREQ2) ) *\r\n\t\t\t\t\t   2.0 - 1.0 ) * fSpeed * fDetailFreq;\r\n\tvWaves = SmoothTriangleWave( vWaves );\r\n\tvec2 vWavesSum = vWaves.xz + vWaves.yw;  \r\n\r\n\t// -fBranchAtten is how restricted this vertex of the leaf/branch is. e.g. close to the stem\r\n\t//  it should be 0 (maximum stiffness). At the far outer edge it might be 1.\r\n\t//  In this sample, this is controlled by the blue vertex color.\r\n\t// -fEdgeAtten controls movement in the plane of the leaf/branch. It is controlled by the\r\n\t//  red vertex color in this sample. It is supposed to represent \"leaf stiffness\". Generally, it\r\n\t//  should be 0 in the middle of the leaf (maximum stiffness), and 1 on the outer edges.\r\n\t// -Note that this is different from the Crytek code, in that we use vPos.xzy instead of vPos.xyz,\r\n\t//  because I treat y as the up-and-down direction.\r\n    // vPos.xyz += vWavesSum.x * vec3(fEdgeAtten * fDetailAmp * vNormal.xyz);\r\n    // vPos.y += vWavesSum.y * fBranchAtten * fBranchAmp;\r\n    vPos.xyz +=  vWavesSum.xxy * vec3(fEdgeAtten * fDetailAmp *\r\n                            vNormal.xy, fBranchAtten * fBranchAmp);\r\n}\r\n\r\nvoid main()\r\n{\r\n\tvec3 vPos=vec3(u_Model * vs_Pos);\r\n\tvec3 normalDir=normalize(vec3(u_ModelInvTr * vs_Nor));\r\n\r\n\tvec3 objectPosition = vec3(u_Center);\r\n\tvPos -= objectPosition;\t// Reset the vertex to base-zero\r\n\t//Wind\r\n\tvec3 wind_dir = normalize(vec3(0.5, 0, 0));\r\n    float wind_speed = 1.0;\r\n    float wave_division_width = 1.0;\r\n    float wave_info = (cos((dot(objectPosition, wind_dir) - wind_speed * u_Time) / wave_division_width) + 0.7);\r\n\t\r\n\tfloat wind_power = 15.0f;\r\n    //vec3 w = wind_dir * wind_power * wave_info * fd * fr;\r\n\tvec3 w=wind_dir * wind_power * wave_info;\r\n\tvec2 Wind=vec2(w.x*0.05,w.z*0.05);\r\n\r\n\tfloat BendScale=0.0125;\r\n\tApplyMainBending(vPos, Wind, BendScale);\r\n\tvPos += objectPosition;\r\n\r\n\r\n\tfloat BranchAmp=0.2;\r\n\tfloat DetailAmp=0.1;\r\n\tvec2 WindDetail = vec2(w.x * 0.5,w.z*0.5);\r\n\tfloat windStrength = length(WindDetail);\r\n\tApplyDetailBending(\r\n\t\tvPos,\r\n\t\tWindDetail,\r\n\t\tnormalDir,\r\n\t\tobjectPosition,\r\n\t\t0.0,\t\t\t\t\t// Leaf phase - not used in this scenario, but would allow for variation in side-to-side motion\r\n\t\tvs_Col.g,\t\t// Branch phase - should be the same for all verts in a leaf/branch.\r\n\t\tu_Time,\r\n\t\tvs_Col.r,\t\t// edge attenuation, leaf stiffness\r\n\t\t1.0 - vs_Col.b,  // branch attenuation. High values close to stem, low values furthest from stem.\r\n\t\t\t\t// For some reason, Crysis uses solid blue for non-moving, and black for most movement.\r\n\t\t\t\t// So we invert the blue value here.\r\n\t\tBranchAmp * windStrength, // branch amplitude. Play with this until it looks good.\r\n\t\t0.5f,\t\t\t\t\t// Speed. Play with this until it looks good.\r\n\t\t0.13f,\t\t\t\t\t// Detail frequency. Keep this at 1 unless you want to have different per-leaf frequency\r\n\t\tDetailAmp * windStrength\t// Detail amplitude. Play with this until it looks good.\r\n\t\t);\r\n\r\n\tfs_Col = vs_Col;\r\n    fs_UV = vs_UV;\r\n    fs_UV.y = fs_UV.y;\r\n  \r\n    fs_Nor = vs_Nor;\r\n    vec4 new_localPos = inverse(u_Model) * vec4(vPos, 1.0);\r\n    new_localPos /= new_localPos.w;\r\n    fs_Pos = new_localPos;    \r\n\r\n    gl_Position = u_ViewProj * vec4(vPos, 1.0);\r\n}\r\n"
 
 /***/ }),
 /* 15 */
@@ -12405,7 +12443,7 @@ dat.utils.common);
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_webgl_obj_loader__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_webgl_obj_loader___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_webgl_obj_loader__);
@@ -12885,6 +12923,7 @@ class OpenGLRenderer {
         // Vignette Effects
         this.frostPass = new __WEBPACK_IMPORTED_MODULE_3__PostProcess__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_2__ShaderProgram__["a" /* Shader */](__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAGMENT_SHADER, __webpack_require__(44)));
         this.rainyPass = new __WEBPACK_IMPORTED_MODULE_3__PostProcess__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_2__ShaderProgram__["a" /* Shader */](__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAGMENT_SHADER, __webpack_require__(45)));
+        this.firePass = new __WEBPACK_IMPORTED_MODULE_3__PostProcess__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_2__ShaderProgram__["a" /* Shader */](__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAGMENT_SHADER, __webpack_require__(46)));
         this.currentTime = 0.0;
         this.gbTargets = [undefined, undefined, undefined];
         this.tTargets = [undefined, undefined];
@@ -12921,6 +12960,9 @@ class OpenGLRenderer {
     }
     setFrostNoiseTexture(tex) {
         this.frostNoiseTexture = tex;
+    }
+    setFireNoiseTexture(tex) {
+        this.fireNoiseTexture = tex;
     }
     setClearColor(r, g, b, a) {
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].clearColor(r, g, b, a);
@@ -13131,6 +13173,7 @@ class OpenGLRenderer {
     updateTime(deltaTime, currentTime) {
         this.deferredShader.setTime(currentTime);
         this.rainyPass.setTime(currentTime);
+        this.firePass.setTime(currentTime);
         for (let pass of this.post8Passes)
             pass.setTime(currentTime);
         for (let pass of this.post32Passes)
@@ -13495,6 +13538,56 @@ class OpenGLRenderer {
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, null);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
     }
+    renderLeavesParticle(camera, mesh, particleSystem, feedbackShader, particleRenderShader, Leaves, bSwitch) {
+        if (bSwitch) {
+            //transformation Feedback
+            feedbackShader.use();
+            feedbackShader.setdeltaTime(this.deltaTime);
+            feedbackShader.setTime(this.currentTime);
+            feedbackShader.setCameraWPos(camera.position);
+            feedbackShader.setParticleInfo(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(0.0, 0.0, Leaves ? 1.0 : 0.0, 0.0));
+            var destinationIdx = (particleSystem.currentBufferSetIndex + 1) == 2 ? 0 : 1;
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindVertexArray(particleSystem.getVAO(particleSystem.currentBufferSetIndex));
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindTransformFeedback(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].TRANSFORM_FEEDBACK, particleSystem.getTransformFeedbacks(destinationIdx));
+            particleSystem.bindBufferBase(destinationIdx);
+            // Turn off rasterization - we are not drawing
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].enable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].RASTERIZER_DISCARD);
+            // Update position and rotation using transform feedback
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].beginTransformFeedback(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].POINTS);
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawArrays(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].POINTS, 0, particleSystem.count);
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].endTransformFeedback();
+            // Restore state
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].RASTERIZER_DISCARD);
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].useProgram(null);
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].ARRAY_BUFFER, null);
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindTransformFeedback(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].TRANSFORM_FEEDBACK, null);
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindVertexArray(null);
+            particleSystem.switchBufferSet();
+            //render       
+            mesh.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
+        }
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, this.post32Buffers[PipelineEnum.ParticleMesh]);
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].viewport(0, 0, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight);
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].enable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
+        //gl.enable(gl.BLEND);
+        //gl.blendFunc(gl.ONE, gl.ZERO); 
+        this.setClearColor(0.0, 0.0, 0.0, 0.0);
+        //gl.clear(gl.COLOR_BUFFER_BIT);
+        if (bSwitch) {
+            particleRenderShader.setdeltaTime(this.deltaTime);
+            particleRenderShader.setTime(this.currentTime);
+            particleRenderShader.setViewMatrix(camera.viewMatrix);
+            particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
+            particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);
+            particleRenderShader.setFrame00(this.tDTargets[0]);
+            particleRenderShader.setFrame01(mesh.albedoMap.texture);
+            particleRenderShader.drawInstance(mesh, particleSystem.count);
+        }
+        // bind default frame buffer
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, null);
+        //gl.blendFunc(gl.ONE, gl.ZERO); 
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
+    }
     renderClouds(camera, quad, particleSystem, lightColor, lightDir, cloudTex, normalTex, noiseTex, feedbackShader, particleRenderShader, clouds) {
         //transformation Feedback
         feedbackShader.use();
@@ -13692,6 +13785,18 @@ class OpenGLRenderer {
         // bind default frame buffer
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, null);
     }
+    renderFire() {
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, null);
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].viewport(0, 0, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight);
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].clear(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].COLOR_BUFFER_BIT);
+        this.firePass.setFrame00(this.post8Targets[PipelineEnum.FXAA]);
+        this.firePass.setFrame01(this.frostNoiseTexture);
+        this.firePass.setScreenSize(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight));
+        this.firePass.draw();
+        // bind default frame buffer
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, null);
+    }
     renderPresent(camera) {
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, null);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].viewport(0, 0, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight);
@@ -13841,6 +13946,12 @@ module.exports = "#version 300 es\nprecision highp float;\n\nin vec2 fs_UV;\nout
 
 /***/ }),
 /* 46 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nin vec2 fs_UV;\r\nout vec4 out_Col;\r\n\r\nuniform sampler2D u_frame0;\r\nuniform sampler2D u_frame1; // noise\r\nuniform vec2 u_screenSize;\r\nuniform float u_Time;\r\n\r\nvec3 mod289(vec3 x) {\r\n    return x - floor(x * (1.0 / 289.0)) * 289.0;\r\n}\r\n\r\nvec4 mod289(vec4 x) {\r\n    return x - floor(x * (1.0 / 289.0)) * 289.0;\r\n}\r\n\r\nvec4 permute(vec4 x) {\r\n         return mod289(((x*34.0)+1.0)*x);\r\n}\r\n\r\nvec4 taylorInvSqrt(vec4 r)\r\n{\r\n    return 1.79284291400159 - 0.85373472095314 * r;\r\n}\r\n\r\nfloat snoise(vec3 v)\r\n    { \r\n    const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\r\n    const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\r\n\r\n// First corner\r\n    vec3 i  = floor(v + dot(v, C.yyy) );\r\n    vec3 x0 =    v - i + dot(i, C.xxx) ;\r\n\r\n// Other corners\r\n    vec3 g = step(x0.yzx, x0.xyz);\r\n    vec3 l = 1.0 - g;\r\n    vec3 i1 = min( g.xyz, l.zxy );\r\n    vec3 i2 = max( g.xyz, l.zxy );\r\n\r\n    //   x0 = x0 - 0.0 + 0.0 * C.xxx;\r\n    //   x1 = x0 - i1   + 1.0 * C.xxx;\r\n    //   x2 = x0 - i2   + 2.0 * C.xxx;\r\n    //   x3 = x0 - 1.0 + 3.0 * C.xxx;\r\n    vec3 x1 = x0 - i1 + C.xxx;\r\n    vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y\r\n    vec3 x3 = x0 - D.yyy;           // -1.0+3.0*C.x = -0.5 = -D.y\r\n\r\n// Permutations\r\n    i = mod289(i); \r\n    vec4 p = permute( permute( permute( \r\n                         i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\r\n                     + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) \r\n                     + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\r\n\r\n// Gradients: 7x7 points over a square, mapped onto an octahedron.\r\n// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)\r\n    float n_ = 0.142857142857; // 1.0/7.0\r\n    vec3    ns = n_ * D.wyz - D.xzx;\r\n\r\n    vec4 j = p - 49.0 * floor(p * ns.z * ns.z); //  mod(p,7*7)\r\n\r\n    vec4 x_ = floor(j * ns.z);\r\n    vec4 y_ = floor(j - 7.0 * x_ );     // mod(j,N)\r\n\r\n    vec4 x = x_ *ns.x + ns.yyyy;\r\n    vec4 y = y_ *ns.x + ns.yyyy;\r\n    vec4 h = 1.0 - abs(x) - abs(y);\r\n\r\n    vec4 b0 = vec4( x.xy, y.xy );\r\n    vec4 b1 = vec4( x.zw, y.zw );\r\n\r\n    //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;\r\n    //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;\r\n    vec4 s0 = floor(b0)*2.0 + 1.0;\r\n    vec4 s1 = floor(b1)*2.0 + 1.0;\r\n    vec4 sh = -step(h, vec4(0.0));\r\n\r\n    vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\r\n    vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\r\n\r\n    vec3 p0 = vec3(a0.xy,h.x);\r\n    vec3 p1 = vec3(a0.zw,h.y);\r\n    vec3 p2 = vec3(a1.xy,h.z);\r\n    vec3 p3 = vec3(a1.zw,h.w);\r\n\r\n//Normalise gradients\r\n    //vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\r\n    vec4 norm = inversesqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\r\n    p0 *= norm.x;\r\n    p1 *= norm.y;\r\n    p2 *= norm.z;\r\n    p3 *= norm.w;\r\n\r\n// Mix final noise value\r\n    vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\r\n    m = m * m;\r\n    return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), \r\n                                                                dot(p2,x2), dot(p3,x3) ) );\r\n    }\r\n\r\n//////////////////////////////////////////////////////////////\r\n\r\n// PRNG\r\n// From https://www.shadertoy.com/view/4djSRW\r\nfloat prng(in vec2 seed) {\r\n    seed = fract (seed * vec2 (5.3983, 5.4427));\r\n    seed += dot (seed.yx, seed.xy + vec2 (21.5351, 14.3137));\r\n    return fract (seed.x * seed.y * 95.4337);\r\n}\r\n\r\n//////////////////////////////////////////////////////////////\r\n\r\nfloat PI = 3.1415926535897932384626433832795;\r\n\r\nfloat noiseStack(vec3 pos,int octaves,float falloff){\r\n    float noise = snoise(vec3(pos));\r\n    float off = 1.0;\r\n    if (octaves>1) {\r\n        pos *= 2.0;\r\n        off *= falloff;\r\n        noise = (1.0-off)*noise + off*snoise(vec3(pos));\r\n    }\r\n    if (octaves>2) {\r\n        pos *= 2.0;\r\n        off *= falloff;\r\n        noise = (1.0-off)*noise + off*snoise(vec3(pos));\r\n    }\r\n    if (octaves>3) {\r\n        pos *= 2.0;\r\n        off *= falloff;\r\n        noise = (1.0-off)*noise + off*snoise(vec3(pos));\r\n    }\r\n    return (1.0+noise)/2.0;\r\n}\r\n\r\nvec2 noiseStackUV(vec3 pos,int octaves,float falloff,float diff){\r\n    float displaceA = noiseStack(pos,octaves,falloff);\r\n    float displaceB = noiseStack(pos+vec3(3984.293,423.21,5235.19),octaves,falloff);\r\n    return vec2(displaceA,displaceB);\r\n}\r\n\r\nvec2 drop(vec2 uv, vec2 pos, float r)\r\n{\r\n    pos.y = fract(pos.y);\r\n    return (uv - pos) * exp(-pow(20.0 * length(uv - pos), 3.0));\r\n}\r\n\r\n\r\nvoid main()\r\n{\r\n    float time = u_Time;\r\n    vec2 resolution = u_screenSize.xy;\r\n        //\r\n    float xpart = fs_UV.x;\r\n    float ypart = fs_UV.y;\r\n    //\r\n    float clip = 410.0;\r\n    float ypartClip = gl_FragCoord.y/clip;\r\n    float ypartClippedFalloff = clamp(2.0-ypartClip,0.0,1.0);\r\n    float ypartClipped = min(ypartClip,1.0);\r\n    float ypartClippedn = 1.0-ypartClipped;\r\n    //\r\n    float xfuel = 1.0-abs(2.0*xpart-1.0);//pow(1.0-abs(2.0*xpart-1.0),0.5);\r\n    //\r\n    float timeSpeed = 0.5;\r\n    float realTime = timeSpeed*time;\r\n    //\r\n    vec2 coordScaled = 0.01*gl_FragCoord.xy - 0.02*vec2(0.0,0.0);\r\n    vec3 position = vec3(coordScaled,0.0) + vec3(1223.0,6434.0,8425.0);\r\n    vec3 flow = vec3(4.1*(0.5-xpart)*pow(ypartClippedn,4.0),-2.0*xfuel*pow(ypartClippedn,64.0),0.0);\r\n    vec3 timing = realTime*vec3(0.0,-1.7,1.1) + flow;\r\n    //\r\n    vec3 displacePos = vec3(1.0,0.5,1.0)*2.4*position+realTime*vec3(0.01,-0.7,1.3);\r\n    vec3 displace3 = vec3(noiseStackUV(displacePos,2,0.4,0.1),0.0);\r\n    //\r\n    vec3 noiseCoord = (vec3(2.0,1.0,1.0)*position+timing+0.4*displace3)/1.0;\r\n    float noise = noiseStack(noiseCoord,3,0.4);\r\n    //\r\n    float flames = pow(ypartClipped,0.3*xfuel)*pow(noise,0.3*xfuel);\r\n    //\r\n    float f = ypartClippedFalloff*pow(1.0-flames*flames*flames,5.0 + 1.0 * sin(u_Time));\r\n    float fff = f*f*f;\r\n    vec3 fire = vec3(f * 0.83, f * 0.7, f * 0.6);\r\n    //\r\n    // smoke\r\n    float smokeNoise = 0.5+snoise(0.4*position+timing*vec3(1.0,1.0,0.2))/2.0;\r\n    vec3 smoke = vec3(0.3*pow(xfuel,3.0)*pow(ypart,2.0)*(smokeNoise+0.4*(1.0-noise)));\r\n    //\r\n    // sparks\r\n    float sparkGridSize = 30.0;\r\n    vec2 sparkCoord = gl_FragCoord.xy - vec2(0.0,190.0*realTime);\r\n    sparkCoord -= 30.0*noiseStackUV(0.01*vec3(sparkCoord,30.0*time),1,0.4,0.1);\r\n    sparkCoord += 100.0*flow.xy;\r\n    if (mod(sparkCoord.y/sparkGridSize,2.0)<1.0) sparkCoord.x += 0.5*sparkGridSize;\r\n    vec2 sparkGridIndex = vec2(floor(sparkCoord/sparkGridSize));\r\n    float sparkRandom = prng(sparkGridIndex);\r\n    float sparkLife = min(10.0*(1.0-min((sparkGridIndex.y+(190.0*realTime/sparkGridSize))/(24.0-20.0*sparkRandom),1.0)),1.0);\r\n    vec3 sparks = vec3(0.0);\r\n    if (sparkLife>0.0) {\r\n        float sparkSize = xfuel*xfuel*sparkRandom*0.12;\r\n        float sparkRadians = 999.0*sparkRandom*2.0*PI + 2.0*time;\r\n        vec2 sparkCircular = vec2(sin(sparkRadians),cos(sparkRadians));\r\n        vec2 sparkOffset = (0.5-sparkSize)*sparkGridSize*sparkCircular;\r\n        vec2 sparkModulus = mod(sparkCoord+sparkOffset,sparkGridSize) - 0.5*vec2(sparkGridSize);\r\n        float sparkLength = length(sparkModulus);\r\n        float sparksGray = max(0.0, 1.0 - sparkLength/(sparkSize*sparkGridSize));\r\n        sparks = sparkLife*sparksGray*vec3(0.83,0.7,0.6);\r\n    }\r\n    //\r\n    vec2 uv = fs_UV.xy;\r\n    uv.x = uv.x * 0.5 + 0.5;\r\n    vec2 d = vec2(0.0, 0.0);\r\n    const int n = 100;\r\n    for(int i = 0; i < n; i++)\r\n    {\r\n        vec4 r = texture(u_frame1, vec2(float(i) / float(n), 0.25));\r\n        vec2 pos = r.xy;\r\n        pos.x *= 2.0; // iResolution.x / iResolution.y;\r\n        pos.y += 7.5 * u_Time * 0.02 * r.z;\r\n        //pos.x += sin(t + r.z);\r\n        d += 0.25 * drop(uv.xy, pos, 0.03);\r\n    }\r\n\r\n    vec3 background = texture(u_frame0, fs_UV.xy + vec2(d.x, d.y)).rgb;\r\n    \r\n    vec3 col = max(fire,sparks)+smoke;\r\n    col = mix(col, background, (1.0-length(col)));\r\n    out_Col = vec4(col, 1.0);\r\n\r\n}"
+
+/***/ }),
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13966,7 +14077,7 @@ class Camera {
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14130,7 +14241,7 @@ class Texture {
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14314,6 +14425,60 @@ class Particle {
             __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindVertexArray(null);
         }
     }
+    initialize3(width, xOffset, height, yOffset, depth, zOffset, Rrange, Rbias, Grange, Gbias, Brange, Bbias) {
+        for (let p = 0; p < this.count; ++p) {
+            var posXZ = this.squareToDiskConcentric(__WEBPACK_IMPORTED_MODULE_1_gl_matrix__["c" /* vec2 */].fromValues(Math.random(), Math.random()));
+            this.position[p * 4] = posXZ[0] * width + xOffset;
+            this.position[p * 4 + 1] = (Math.random()) * height + yOffset;
+            this.position[p * 4 + 2] = posXZ[1] * depth + zOffset;
+            // Angular Velocity
+            this.velocity[p * 4] = 0.5 + 0.5 * Math.PI * Math.random();
+            this.velocity[p * 4 + 1] = __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["c" /* vec2 */].length(posXZ) * width; // radius range
+            this.velocity[p * 4 + 2] = Math.random() * Math.PI * 2.0; // random phase
+            //
+            let randomAxis = __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].create();
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].normalize(randomAxis, [Math.random(), Math.random(), Math.random()]);
+            this.color[p * 4] = randomAxis[0];
+            this.color[p * 4 + 1] = randomAxis[1];
+            this.color[p * 4 + 2] = randomAxis[2];
+            this.color[p * 4 + 3] = 0.0; //Index
+            posXZ = this.squareToDiskConcentric(__WEBPACK_IMPORTED_MODULE_1_gl_matrix__["c" /* vec2 */].fromValues(Math.random(), Math.random()));
+            this.attract[p * 4] = posXZ[0] * width + xOffset;
+            this.attract[p * 4 + 1] = (Math.random()) * height + yOffset;
+            this.attract[p * 4 + 2] = posXZ[1] * depth + zOffset;
+            //save original Gap
+            this.position[p * 4 + 3] = this.attract[p * 4];
+            this.velocity[p * 4 + 3] = this.attract[p * 4 + 1];
+            this.attract[p * 4 + 3] = this.attract[p * 4 + 2];
+        }
+        this.VBOs = new Array(this.VAOs.length);
+        for (let i = 0; i < this.VAOs.length; ++i) {
+            this.VBOs[i] = new Array(NUM_OUTPUT);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindVertexArray(this.VAOs[i]);
+            this.VBOs[i][POSITION_LOCATION] = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.VBOs[i][POSITION_LOCATION]);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.position, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].DYNAMIC_COPY);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].vertexAttribPointer(POSITION_LOCATION, 4, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].FLOAT, false, 0, 0);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].enableVertexAttribArray(POSITION_LOCATION);
+            this.VBOs[i][VELOCITY_LOCATION] = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.VBOs[i][VELOCITY_LOCATION]);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.velocity, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].DYNAMIC_COPY);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].vertexAttribPointer(VELOCITY_LOCATION, 4, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].FLOAT, false, 0, 0);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].enableVertexAttribArray(VELOCITY_LOCATION);
+            this.VBOs[i][COLOR_LOCATION] = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.VBOs[i][COLOR_LOCATION]);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.color, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].DYNAMIC_COPY);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].vertexAttribPointer(COLOR_LOCATION, 4, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].FLOAT, false, 0, 0);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].enableVertexAttribArray(COLOR_LOCATION);
+            this.VBOs[i][ATTRACT_LOCATION] = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.VBOs[i][ATTRACT_LOCATION]);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.attract, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].DYNAMIC_COPY);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].vertexAttribPointer(ATTRACT_LOCATION, 4, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].FLOAT, false, 0, 0);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].enableVertexAttribArray(ATTRACT_LOCATION);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, null);
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindVertexArray(null);
+        }
+    }
     setBuffers(a, b) {
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.VBOs[a][POSITION_LOCATION]);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].vertexAttribPointer(POSITION_LOCATION, 4, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].FLOAT, false, 0, 0);
@@ -14334,12 +14499,12 @@ class Particle {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(1);
 
 
@@ -14413,13 +14578,13 @@ class Quad extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Turtle__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__rendering_gl_Drawable__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Turtle__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__rendering_gl_Drawable__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__globals__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__main__ = __webpack_require__(9);
 
@@ -14660,7 +14825,7 @@ class LSystem extends __WEBPACK_IMPORTED_MODULE_2__rendering_gl_Drawable__["a" /
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14707,79 +14872,97 @@ class Turtle {
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\n#define EPS 0.0001\r\n#define PI 3.1415962\r\n#define SHADOWMAP_SIZE 2048.0\r\n\r\nin vec4 fs_Pos;\r\nin vec4 fs_Nor;\r\nin vec4 fs_Col;\r\nin vec2 fs_UV;\r\n\r\nout vec4 fragColor[2]; \r\n\r\nuniform sampler2D AlbedoMap;\r\nuniform sampler2D SpecularMap;\r\nuniform sampler2D NormalMap;\r\n\r\nuniform samplerCube u_SkyCubeMap;\r\nuniform sampler2D u_ShadowMap;\r\n\r\nuniform mat4 u_Model;\r\nuniform mat4 u_ModelInvTr;  \r\nuniform mat4 u_ViewProj;\r\nuniform mat4 u_View;\r\nuniform vec3 u_CameraWPos; \r\nuniform mat4 u_InvViewProj;  \r\n\r\nuniform mat4 u_LightViewProj;\r\n\r\nuniform vec4 u_lightColor;\r\nuniform vec4 u_lightDirection;\r\n\r\nuniform float u_Time;\r\n\r\n\r\n\r\n\r\nfloat texture2DCompare(sampler2D depths, vec2 uv, vec2 offset, float compare){\r\n    float depth = texture(depths, uv+offset).r;\r\n    float bias = 0.0025;\r\n    //vec2 gradient = vec2(texture(depths, uv).g, texture(depths, uv).b);\r\n    compare = compare - bias;\r\n    if(depth <= compare)\r\n    \treturn 0.1;\r\n    else\r\n    \treturn 1.0;\r\n}\r\n\r\n// poisson disk for sampling\r\nconst vec2 poissonDisk[64] = vec2[](\r\n\tvec2( -0.04117257f, -0.1597612f ),\r\n\tvec2( 0.06731031f, -0.4353096f ),\r\n\tvec2( -0.206701f, -0.4089882f ),\r\n\tvec2( 0.1857469f, -0.2327659f ),\r\n\tvec2( -0.2757695f, -0.159873f ),\r\n\tvec2( -0.2301117f, 0.1232693f ),\r\n\tvec2( 0.05028719f, 0.1034883f ),\r\n\tvec2( 0.236303f, 0.03379251f ),\r\n\tvec2( 0.1467563f, 0.364028f ),\r\n\tvec2( 0.516759f, 0.2052845f ),\r\n\tvec2( 0.2962668f, 0.2430771f ),\r\n\tvec2( 0.3650614f, -0.1689287f ),\r\n\tvec2( 0.5764466f, -0.07092822f ),\r\n\tvec2( -0.5563748f, -0.4662297f ),\r\n\tvec2( -0.3765517f, -0.5552908f ),\r\n\tvec2( -0.4642121f, -0.157941f ),\r\n\tvec2( -0.2322291f, -0.7013807f ),\r\n\tvec2( -0.05415121f, -0.6379291f ),\r\n\tvec2( -0.7140947f, -0.6341782f ),\r\n\tvec2( -0.4819134f, -0.7250231f ),\r\n\tvec2( -0.7627537f, -0.3445934f ),\r\n\tvec2( -0.7032605f, -0.13733f ),\r\n\tvec2( 0.8593938f, 0.3171682f ),\r\n\tvec2( 0.5223953f, 0.5575764f ),\r\n\tvec2( 0.7710021f, 0.1543127f ),\r\n\tvec2( 0.6919019f, 0.4536686f ),\r\n\tvec2( 0.3192437f, 0.4512939f ),\r\n\tvec2( 0.1861187f, 0.595188f ),\r\n\tvec2( 0.6516209f, -0.3997115f ),\r\n\tvec2( 0.8065675f, -0.1330092f ),\r\n\tvec2( 0.3163648f, 0.7357415f ),\r\n\tvec2( 0.5485036f, 0.8288581f ),\r\n\tvec2( -0.2023022f, -0.9551743f ),\r\n\tvec2( 0.165668f, -0.6428169f ),\r\n\tvec2( 0.2866438f, -0.5012833f ),\r\n\tvec2( -0.5582264f, 0.2904861f ),\r\n\tvec2( -0.2522391f, 0.401359f ),\r\n\tvec2( -0.428396f, 0.1072979f ),\r\n\tvec2( -0.06261792f, 0.3012581f ),\r\n\tvec2( 0.08908027f, -0.8632499f ),\r\n\tvec2( 0.9636437f, 0.05915006f ),\r\n\tvec2( 0.8639213f, -0.309005f ),\r\n\tvec2( -0.03422072f, 0.6843638f ),\r\n\tvec2( -0.3734946f, -0.8823979f ),\r\n\tvec2( -0.3939881f, 0.6955767f ),\r\n\tvec2( -0.4499089f, 0.4563405f ),\r\n\tvec2( 0.07500362f, 0.9114207f ),\r\n\tvec2( -0.9658601f, -0.1423837f ),\r\n\tvec2( -0.7199838f, 0.4981934f ),\r\n\tvec2( -0.8982374f, 0.2422346f ),\r\n\tvec2( -0.8048639f, 0.01885651f ),\r\n\tvec2( -0.8975322f, 0.4377489f ),\r\n\tvec2( -0.7135055f, 0.1895568f ),\r\n\tvec2( 0.4507209f, -0.3764598f ),\r\n\tvec2( -0.395958f, -0.3309633f ),\r\n\tvec2( -0.6084799f, 0.02532744f ),\r\n\tvec2( -0.2037191f, 0.5817568f ),\r\n\tvec2( 0.4493394f, -0.6441184f ),\r\n\tvec2( 0.3147424f, -0.7852007f ),\r\n\tvec2( -0.5738106f, 0.6372389f ),\r\n\tvec2( 0.5161195f, -0.8321754f ),\r\n\tvec2( 0.6553722f, -0.6201068f ),\r\n\tvec2( -0.2554315f, 0.8326268f ),\r\n\tvec2( -0.5080366f, 0.8539945f )\r\n);\r\n\r\nfloat rand(vec4 co){\r\n\tfloat dot_product = dot(co, vec4(12.9898,78.233,45.164,94.673));\r\n\treturn fract(sin(dot_product) * 43758.5453);\r\n}\r\n\r\n\r\n\r\n#define PCF_NUM_SAMPLES 8\r\n\r\nfloat PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){\r\n    float result = 0.0;\r\n    float theta = rand(vec4(uv, gl_FragCoord.xy));\r\n\tmat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));\r\n\tfor (int i = 0; i < PCF_NUM_SAMPLES; i++) {\r\n\t\tvec2 offset = (rotation*poissonDisk[i]) * filterRadius;\r\n\t\tresult += texture2DCompare(depths, uv, offset, compare);\r\n\t\t//float gauss = gaussian(filterRadius, length(offset));\r\n\t}\r\n\treturn result / float(PCF_NUM_SAMPLES);\r\n}\r\n\r\nfloat getShadow(vec4 lightSpacePos){\r\n\r\n\t\r\n\tfloat shadow = PCF(u_ShadowMap, \r\n\t\t1.0/SHADOWMAP_SIZE*4.0, \r\n\t\tvec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),\r\n\t\tlightSpacePos.z);\r\n\t\r\n\t\r\n\t//float shadow = texture2DCompare(u_ShadowMap, vec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5), vec2(0.0), lightSpacePos.z);\r\n\r\n\t// float shadow = VSM(u_ShadowMap, \r\n\t// \tvec2((lightSpacePos.x + 1.0) * 0.5, ( lightSpacePos.y + 1.0) * 0.5 ),\r\n\t// \tlightSpacePos.z - bias);\r\n\treturn shadow;\r\n}\r\n\r\n\r\n\r\n\r\nvec3 applyNormalMap(vec3 geomnor, vec3 normap) {\r\n    \r\n    vec3 up = normalize(vec3(0.001, 1, 0.001));\r\n    vec3 surftan = normalize(cross(geomnor, up));\r\n    vec3 surfbinor = cross(geomnor, surftan);\r\n    return normalize(normap.y * surftan + normap.x * surfbinor + normap.z * geomnor);\r\n}\r\n\r\nvec2 LightingFunGGX_FV(float dotLH, float roughness)\r\n{\r\n\tfloat alpha = roughness*roughness;\r\n\r\n\t//F\r\n\tfloat F_a, F_b;\r\n\tfloat dotLH5 = pow(clamp(1.0f - dotLH, 0.0f, 1.0f), 5.0f);\r\n\tF_a = 1.0f;\r\n\tF_b = dotLH5;\r\n\r\n\t//V\r\n\tfloat vis;\r\n\tfloat k = alpha * 0.5f;\r\n\tfloat k2 = k*k;\r\n\tfloat invK2 = 1.0f - k2;\r\n\tvis = 1.0f/(dotLH*dotLH*invK2 + k2);\r\n\r\n\treturn vec2((F_a - F_b)*vis, F_b*vis);\r\n}\r\n\r\nfloat LightingFuncGGX_D(float dotNH, float roughness)\r\n{\r\n\tfloat alpha = roughness*roughness;\r\n\tfloat alphaSqr = alpha*alpha;\r\n\tfloat denom = dotNH * dotNH * (alphaSqr - 1.0f) + 1.0f;\r\n\r\n\treturn alphaSqr / (PI*denom*denom);\r\n}\r\n\r\nvec3 GGX_Spec(vec3 Normal, vec3 HalfVec, float Roughness, vec3 BaseColor, vec3 SpecularColor, vec2 paraFV)\r\n{\r\n\tfloat NoH = clamp(dot(Normal, HalfVec), 0.0, 1.0);\r\n\r\n\tfloat D = LightingFuncGGX_D(NoH * NoH * NoH * NoH, Roughness);\r\n\tvec2 FV_helper = paraFV;\r\n\r\n\tvec3 F0 = SpecularColor;\r\n\tvec3 FV = F0*FV_helper.x + vec3(FV_helper.y, FV_helper.y, FV_helper.y);\r\n\t\r\n\treturn D * FV;\r\n}\r\n\r\nfloat LinearDepth(float d, float f)\r\n{\r\n\t//float f= 1000.0;\r\n\tfloat n = 0.1;\r\n\treturn (2.0 * n) / (f + n - d * (f - n));\r\n}\r\n\r\nvoid main() {\r\n \r\n    // fragment info is in view space\r\n    mat3 invTranspose = mat3(u_ModelInvTr);\r\n    \r\n    vec4 vertexNormal = vec4(invTranspose * vec3(fs_Nor), 0);\r\n\r\n\r\n    vec4 Pos_SS = u_ViewProj * u_Model * fs_Pos;\r\n    Pos_SS /= Pos_SS.w;\r\n\r\n    float Depth = Pos_SS.z;\r\n\r\n\tvec4 Albedo = texture(AlbedoMap, fs_UV);\r\n\r\n    if(Albedo.a < 0.2)\r\n        discard;\r\n\r\n    vec3 col = Albedo.rgb;\r\n    col = pow(col, vec3(2.2));\r\n\r\n\tvec3 waterNormal;\r\n\tbool bWater = false;\r\n\r\n\tif(Albedo.a < 0.6) // Water\r\n\t{\r\n\t\tvec4 normalInfo0 = texture(NormalMap, fs_UV + vec2(u_Time * 0.1, u_Time * 0.1));   \r\n  \t \tvec4 normalInfo1 = texture(NormalMap, fs_UV + vec2(u_Time * 0.076, u_Time * -0.0316));\r\n   \t \tvec4 normalInfo2 = texture(NormalMap, fs_UV - vec2(u_Time * 0.0941, u_Time * 0.07831));\r\n\r\n\t\twaterNormal = vec3( ( (normalInfo0.x * normalInfo2.y) - 0.5) * 2.0 , ((normalInfo1.y * normalInfo2.z) - 0.5) * 2.0, 20.0);\r\n\t\tbWater = true;\r\n\t}\r\n\telse // Glass\r\n\t{\r\n\t\twaterNormal = normalize( (texture(NormalMap, fs_UV).xyz * 2.0) - vec3(1.0) );\r\n\t}\r\n\r\n    vec3 worldNormal = applyNormalMap(vertexNormal.xyz, waterNormal);\r\n\r\n\r\n\r\n\t// read from GBuffers\r\n\tvec4 albedo = vec4(col.xyz, Depth);\r\n\tvec4 specular = texture(SpecularMap, fs_UV);\r\n\tvec4 normal = vec4(worldNormal, 0.0);\r\n\r\n\tfloat Roughness = specular.w;\r\n\tRoughness = clamp(Roughness, 0.05, 0.95);\r\n\r\n\t\r\n\t\r\n\r\n\tfloat depth = albedo.w;\r\n\r\n    vec4 worldPos = u_Model * fs_Pos;\r\n\r\n\tvec3 viewVec = normalize(u_CameraWPos - worldPos.xyz);\r\n\tvec3 halfVec = viewVec + u_lightDirection.xyz;\r\n\r\n\tvec3 reflVec = reflect(-viewVec, normal.xyz);\r\n\tvec4 skycol = texture(u_SkyCubeMap, reflVec);\r\n    skycol = pow(skycol, vec4(2.2));\r\n\r\n\tvec3 fogColor = skycol.xyz * 0.2;\r\n\r\n\tif(bWater)\r\n\t\tskycol *= 0.0;\r\n\telse\r\n\t\tskycol *= 0.3;\r\n\t\r\n\tvec4 lightSpacePos = vec4(0.0);\r\n\tif(depth >= 1.0) //SkyBox\r\n\t{\t\t\r\n\t\tfragColor[0] = skycol;\r\n        fragColor[0].w =  bWater ? 21.0 : 11.0;\r\n        fragColor[1] = vec4(normal.xyz, Roughness);\r\n\t}\r\n\telse\r\n\t{\r\n\t\tlightSpacePos = u_LightViewProj * worldPos;\r\n\t\t\tlightSpacePos /= lightSpacePos.w;\r\n\t\tfloat shadow = getShadow(lightSpacePos);\r\n\r\n\t\tvec4 diffuseColor = vec4(albedo.xyz, 1.0);\r\n\r\n\t\tfloat diffuseTerm = clamp( dot(u_lightDirection.xyz, normal.xyz), 0.0, 1.0);\r\n\t\t\r\n\t\thalfVec = normalize(halfVec);\r\n\t\t\r\n\t\tfloat LoH = clamp(dot( u_lightDirection.xyz, halfVec ), 0.0, 1.0);\r\n\r\n\t\tvec3 specularTerm = vec3(0.0);\r\n\t\tvec3 SpecularColor = specular.xyz;\r\n\t\t\r\n\t\tfloat energyConservation = 1.0 - Roughness * Roughness;\r\n\r\n\t\tfloat waterRoughness = 0.4;\r\n\r\n\t\tspecularTerm = GGX_Spec(normal.xyz, halfVec, (bWater ? waterRoughness :Roughness), diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, (bWater ? waterRoughness :Roughness))) * (bWater ? 1.0 : energyConservation);\r\n\r\n\t\tif(bWater)\r\n\t\t{\r\n\t\t\tspecularTerm *= 6.0;\r\n\t\t}\r\n\r\n\t\tfloat ambientTerm = 0.1;\r\n\r\n\t\tvec4 pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) *  smoothstep( 0.1, 0.5, shadow), diffuseColor.a);\r\n\t\t//pbrColor.xyz += diffuseColor.rgb * ambientTerm;\r\n\t\tpbrColor.xyz += diffuseColor.rgb * ambientTerm * (smoothstep( 0.0, 0.5, diffuseTerm) + 0.5);\r\n\t\tpbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;\r\n\t\t\r\n\t\tif(bWater)\r\n\t\t{\r\n\t\t\t//fresnel\r\n\t\t\tfloat NoV = clamp( dot(viewVec.xyz, worldNormal), 0.0, 1.0);\r\n\t\t\tNoV = 1.0 - NoV;\r\n\t\t\tfloat wNoV = pow(NoV, 10.0);\r\n\t\t\tpbrColor.xyz *= wNoV;\r\n\r\n\r\n\t\t\tfloat LoV = clamp( dot(-viewVec.xyz, u_lightDirection.xyz), 0.0, 1.0);\r\n\t\t\tfloat fNoV = pow( LoV, 40.0);\r\n\r\n\t\t\tpbrColor.xyz += fNoV * 30.0;\r\n\t\t}\r\n\t\t\r\n\r\n        float Opacity = 0.1;\t\t\r\n\r\n\t\tfragColor[0] = vec4( (pbrColor.xyz) * Opacity, bWater ? (Depth + 20.0) : (Depth + 10.0));\r\n\t\t\r\n\t\t\r\n\r\n\t\tif(bWater)\r\n\t\t{\t\t\r\n\t\t\tfloat linearDepth = LinearDepth(Depth, 1000.0);\t\r\n\t\t\tfragColor[0].xyz = mix(fragColor[0].xyz, fogColor, linearDepth * linearDepth );\r\n\t\t\tfragColor[1] = vec4(normal.xyz, 0.05);\r\n\t\t}\r\n\t\telse\r\n\t\t{\r\n\t\t\tfloat linearDepth = LinearDepth(Depth, 200.0);\r\n\t\t\tfragColor[0].xyz = mix(fragColor[0].xyz, fogColor, pow(linearDepth, 2.0) );\r\n\t\t\tfragColor[1] = vec4(normal.xyz, Roughness);\r\n\t\t}\r\n        \r\n\t\t\r\n\t}\r\n}\r\n"
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\n#define M_PI 3.1415926535897932384626433832795\r\n\r\nuniform float u_deltaTime;\r\nuniform float u_Time;\r\n\r\nuniform vec3 u_CameraWPos;\r\nuniform vec4 u_particleInfo;\r\n\r\n/////////////////////////////////////////////////////////////////////////////////////////////////////////////////\r\n\r\n\r\nfloat hash(float n) { return fract(sin(n) * 1e4); }\r\nfloat hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }\r\nfloat noise(float x) { float i = floor(x); float f = fract(x); float u = f * f * (3.0 - 2.0 * f); return mix(hash(i), hash(i + 1.0), u); }\r\nfloat noise(vec2 x) { vec2 i = floor(x); vec2 f = fract(x); float a = hash(i); float b = hash(i + vec2(1.0, 0.0)); float c = hash(i + vec2(0.0, 1.0)); float d = hash(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }\r\n\r\nfloat rand(vec2 co){\r\n    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);\r\n}\r\n\r\n/////////////////////////////////////////////////////////////////////////////////////////////////////////////////\r\n\r\n\r\nlayout(location = 0) in vec4 i_position;\r\nlayout(location = 1) in vec4 i_velocity;\r\nlayout(location = 2) in vec4 i_color;\r\nlayout(location = 3) in vec4 i_attract;\r\n\r\nout vec4 o_position;\r\nout vec4 o_velocity;            \r\nout vec4 o_color;\r\nout vec4 o_attract;\r\n\r\nconst int rainIndex = 0;\r\n\r\n\r\nvec2 squareToDiskConcentric(vec2 xi) \r\n{\r\n    float phi;\r\n    float radius;\r\n\r\n        float a = 2.0*xi.x-1.0; // (a,b) is now on [-1,1]ˆ2\r\n        float b = 2.0*xi.y-1.0;\r\n\r\n        if (a > -b) // region 1 or 2\r\n        {\r\n            if (a > b) // region 1, also |a| > |b|\r\n            {\r\n                radius = a;\r\n                phi = (M_PI*0.25) * (b/a);\r\n            }\r\n            else // region 2, also |b| > |a|\r\n            {\r\n                radius = b;\r\n                phi = (M_PI*0.25) * (2.0 - (a/b));\r\n            }\r\n        }\r\n        else // region 3 or 4\r\n        {\r\n            if (a < b) // region 3, also |a| >= |b|, a != 0\r\n            {\r\n                radius = -a;\r\n                phi = (M_PI*0.25 ) * (4.0 + (b/a));\r\n            }\r\n            else // region 4, |b| >= |a|, but a==0 and b==0 could occur.\r\n            {\r\n                radius = -b;\r\n                if (b != 0.0)\r\n                    phi = (M_PI*0.25 ) * (6.0 - (a/b));\r\n                else\r\n                    phi = 0.0;\r\n            }\r\n        }\r\n\r\n        return vec2(radius * cos(phi), radius * sin(phi));\r\n}\r\n\r\nmat4 rotationMatrix(vec3 axis, float angle)\r\n{\r\n    axis = normalize(axis);\r\n    float s = sin(angle);\r\n    float c = cos(angle);\r\n    float oc = 1.0 - c;\r\n    \r\n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\r\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\r\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\r\n                0.0,                                0.0,                                0.0,                                1.0);\r\n}\r\n\r\nvoid main()\r\n{\r\n    o_color = i_color;\r\n    o_color.a = float(gl_VertexID) + 0.1;\r\n\r\n    o_attract = i_attract;\r\n    o_velocity = i_velocity;\r\n    o_position = i_position;\r\n\r\n    float speed;\r\n    \r\n\r\n    if(u_particleInfo.x < 1.5)//rain\r\n        {\r\n            speed = 300.0;\r\n            o_position.y -= u_deltaTime * speed;\r\n            if(o_position.y < -10.0)\r\n            {\r\n                o_position.x = u_CameraWPos.x + o_position.w;\r\n                o_position.z = u_CameraWPos.z + o_attract.w;\r\n                o_position.y = 150.0 + o_velocity.w;\r\n            }\r\n        }\r\n        else if(u_particleInfo.x < 2.5)//snow\r\n        {\r\n            speed = 20.0;\r\n            o_position.y -= u_deltaTime * speed;\r\n            o_position.x += u_deltaTime * (speed*0.2*sin(u_Time+rand(vec2(gl_VertexID,gl_VertexID+8000))*M_PI));\r\n            o_position.z += u_deltaTime * (speed*0.2*cos(u_Time+rand(vec2(gl_VertexID+8000,gl_VertexID))*M_PI));\r\n            if(o_position.y < -10.0)\r\n            {\r\n                o_position.x = u_CameraWPos.x + o_position.w;\r\n                o_position.z = u_CameraWPos.z + o_attract.w;\r\n                o_position.y = 150.0*rand(vec2(gl_VertexID,gl_VertexID)) - 50.0 + o_velocity.w;\r\n            }\r\n        }\r\n    \r\n    \r\n}\r\n"
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\nuniform mat4 u_ViewProj;\r\nuniform float u_Time;\r\nuniform vec4 u_particleInfo;\r\n\r\nuniform mat4 u_View; // Used for rendering particles as billboards (quads that are always looking at the camera)\r\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\r\n\r\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\r\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\r\nin vec4 vs_Nor;\r\nin vec2 vs_UV;\r\nin vec4 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\r\n\r\n\r\nout vec4 fs_Col;\r\nout vec4 fs_Pos;\r\nout vec2 fs_UV;\r\nout vec2 fs_UV_SS;\r\n\r\n\r\nconst int rainIndex = 0;\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;\r\n    fs_Pos = vs_Pos;\r\n    fs_UV = vs_UV;\r\n\r\n    vec3 offset = vs_Translate.xyz;\r\n    \r\n    mat3 CameraAxes;\r\n\r\n    //Right\r\n    CameraAxes[0][0] = u_View[0][0];\r\n    CameraAxes[0][1] = u_View[1][0];\r\n    CameraAxes[0][2] = u_View[2][0];\r\n    //Up\r\n    CameraAxes[1][0] = u_View[0][1];\r\n    CameraAxes[1][1] = u_View[1][1];\r\n    CameraAxes[1][2] = u_View[2][1];\r\n\r\n     //Forward\r\n    CameraAxes[2][0] = u_View[0][2];\r\n    CameraAxes[2][1] = u_View[1][2];\r\n    CameraAxes[2][2] = u_View[2][2];\r\n\r\n    vec3 billboardPos;\r\n\r\n    \r\n    if(u_particleInfo.x == 1.0)\r\n        //Rain \r\n            billboardPos = offset + vs_Pos.x * CameraAxes[0] + vs_Pos.y * vec3(0.0, 1.4, 0.0);\r\n        else\r\n        //Snow\r\n            billboardPos = offset + vs_Pos.x *  CameraAxes[0] + vs_Pos.y * CameraAxes[1];\r\n    \r\n\r\n    gl_Position = u_ViewProj * vec4(billboardPos, 1.0);\r\n\r\n    vec4 normalizedPos = gl_Position / gl_Position.w;\r\n\r\n    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);\r\n    fs_Pos.a = normalizedPos.z;\r\n}\r\n"
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform sampler2D u_frame0; //Scene\r\nuniform mat4 u_View; \r\nuniform mat4 u_InvViewProj; \r\nuniform vec4 u_particleInfo;\r\n\r\nin vec4 fs_Col;\r\nin vec4 fs_Pos;\r\nin vec2 fs_UV;\r\nin vec2 fs_UV_SS;\r\n\r\nout vec4 out_Col;\r\n\r\nconst int rainIndex = 0;\r\nconst int rainStainIndex = 0;\r\n\r\nfloat LinearDepth(float d, float f)\r\n{\r\n\tfloat n = 0.1;\r\n\treturn (2.0 * n) / (f + n - d * (f - n));\r\n}\r\n\r\nvoid main()\r\n{\r\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\r\n\r\n    if(sceneDepth > 19.0)\r\n\t{\r\n\t\tsceneDepth -= 20.0;\r\n\t}\r\n\telse if(sceneDepth > 9.0)\r\n\t{\r\n\t\tsceneDepth -= 10.0;\r\n\t}\r\n\r\n    float PerticleIndex = fs_Col.a;\r\n    float particleDepth = fs_Pos.a;\r\n\r\n    if(sceneDepth > particleDepth)\r\n    {\r\n        if(PerticleIndex >= float(rainIndex) )\r\n        {\r\n            //Forward\r\n            float dist;\r\n            if(u_particleInfo.x == 1.0)\r\n            //Rain\r\n                dist = pow(smoothstep(0.0, 1.0, 1.0 - pow(fs_Pos.x * 10.0, 2.0)), 10.0) * clamp(1.0 - pow(fs_Pos.y, 4.0 ), 0.0, 1.0);\r\n            else if(u_particleInfo.x == 2.0){\r\n            //Snow\r\n                dist = 1.0 - (length(fs_Pos.xyz) * 3.0);\r\n            }\r\n            float closeFade = clamp(LinearDepth(particleDepth, 1000.0) * 100.0, 0.0, 1.0);\r\n\r\n            out_Col = vec4(0.2, 0.2, 0.2, 0.0) * dist * closeFade;\r\n        }\r\n\r\n        float diff = clamp( LinearDepth(sceneDepth, 1000.0) - LinearDepth(particleDepth, 1000.0), 0.0, 1.0);\r\n             out_Col.xyz *= pow(smoothstep(0.0, 1.0, diff), 0.3);\r\n\r\n       \r\n        out_Col.a = particleDepth;\r\n\r\n        \r\n    }\r\n    else\r\n    {   \r\n        out_Col = vec4(0.0);\r\n    }\r\n\r\n    float linearDepth = LinearDepth(particleDepth, 50.0);\r\n\tout_Col.a *= 1.0 - pow(linearDepth, 2.0);\r\n\r\n   \r\n\r\n    \r\n    out_Col = clamp(out_Col, 0.0, 1.0);\r\n}\r\n"
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_deltaTime;\nuniform float u_Time;\n\nuniform vec3 u_CameraWPos;\nuniform vec4 u_particleInfo;\n\nlayout(location = 0) in vec4 i_position;\nlayout(location = 1) in vec4 i_velocity;\nlayout(location = 2) in vec4 i_color;\nlayout(location = 3) in vec4 i_attract;\n\nout vec4 o_position;\nout vec4 o_velocity;            \nout vec4 o_color;\nout vec4 o_attract;\n\nmat4 rotationMatrix(vec3 axis, float angle)\n{\n    axis = normalize(axis);\n    float s = sin(angle);\n    float c = cos(angle);\n    float oc = 1.0 - c;\n    \n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\n                0.0,                                0.0,                                0.0,                                1.0);\n}\n\nvoid main()\n{   \n    o_position = i_position;\n    o_velocity = i_velocity;\n    o_attract = i_attract;\n\n    o_color = i_color;\n    o_color.a = float(gl_VertexID) + 0.1;\n\n    float speed = 20.0;\n   \n\n\n    if(u_particleInfo.z < 1.0) //false\n    {\n        if(o_position.y > 200.0)\n        {\n            o_position.y = -10.0 + o_velocity.w;\n        }\n        else if(o_position.y < 0.0)\n        {\n\n        }\n        else\n        {\n            o_position.y += u_deltaTime * speed;\n        }     \n    }\n    else //true\n    {\n        if(o_position.y > 200.0)\n        {\n            o_position.y -= 220.0;\n            o_position.y += u_deltaTime * speed;\n        }\n        else\n        {\n            o_position.y += u_deltaTime * speed;\n        }\n    }\n}\n"
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat4 u_View; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec4 vs_Nor;\nin vec2 vs_UV;\nin vec4 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\n\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec2 fs_UV;\nout vec2 fs_UV_SS;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    fs_Pos = vs_Pos;\n    fs_UV = vs_UV;\n\n    vec3 offset = vs_Translate.xyz;\n\n    gl_Position = u_ViewProj * vec4(offset + vs_Pos.xyz, 1.0);\n\n    vec4 normalizedPos = gl_Position / gl_Position.w;\n    \n    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);\n    fs_Pos.a = normalizedPos.z;\n    fs_Pos.xyz += offset;\n}\n"
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\nprecision highp float;\n\nuniform sampler2D u_frame0; //Scene\nuniform sampler2D u_frame1; //Albedo\n\nuniform mat4 u_View; \nuniform mat4 u_InvViewProj; \n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec2 fs_UV;\nin vec2 fs_UV_SS;\n\nout vec4 out_Col;\n\nfloat LinearDepth(float d, float f)\n{\n\t//float f= 1000.0;\n\tfloat n = 0.1;\n\treturn (2.0 * n) / (f + n - d * (f - n));\n}\n\nvoid main()\n{\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\n    float particleDepth = fs_Pos.a;\n\n    if(sceneDepth > 19.0)\n\t{\n\t\tsceneDepth -= 20.0;\n\t}\n\telse if(sceneDepth > 9.0)\n\t{\n\t\tsceneDepth -= 10.0;\n\t}\n\n    if(sceneDepth > particleDepth)\n    {\n        out_Col.xyz = texture(u_frame1, fs_UV).xyz;\n\n        out_Col.xyz += pow(out_Col.xyz, vec3(3.0)) * 3.0;\n\n        if(fs_Pos.y < 5.0)\n        {\n            out_Col.a = clamp(fs_Pos.y / 5.0 , 0.0, 1.0);\n        }\n        else if(fs_Pos.y > 170.0)\n        {\n            out_Col.a = clamp( (190.0 - fs_Pos.y),  0.0, 20.0) / 20.0;\n        }\n        else\n            out_Col.a = 1.0;\n\n        out_Col.a = min(out_Col.a, 0.9);\n    }\n    else\n    {   \n        out_Col = vec4(0.0);\n    }\n\n    float linearDepth = LinearDepth(particleDepth, 50.0);\n\tout_Col.a *= 1.0 - pow(linearDepth, 2.0);\n}\n"
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_deltaTime;\nuniform float u_Time;\n\nuniform vec3 u_CameraWPos;\nuniform vec4 u_particleInfo;\n\nlayout(location = 0) in vec4 i_position;\nlayout(location = 1) in vec4 i_velocity;\nlayout(location = 2) in vec4 i_color;\nlayout(location = 3) in vec4 i_attract;\n\nout vec4 o_position;\nout vec4 o_velocity;            \nout vec4 o_color;\nout vec4 o_attract;\n\nmat4 rotationMatrix(vec3 axis, float angle)\n{\n    axis = normalize(axis);\n    float s = sin(angle);\n    float c = cos(angle);\n    float oc = 1.0 - c;\n    \n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\n                0.0,                                0.0,                                0.0,                                1.0);\n}\n\nvoid main()\n{   \n    o_position = i_position;\n\n    float rad = i_position.a;\n    float radius = i_velocity.a;\n\n    float time = i_color.x < 0.0 ? u_Time : -u_Time;\n\n    float newRad = rad + time * i_velocity.x;\n    \n    o_position.x = sin(newRad) * radius;\n    o_position.z = cos(newRad) * radius;\n\n    o_velocity = i_velocity;\n    o_attract = i_attract;\n\n    o_color = i_color;\n\n    o_color.y = newRad;\n    \n}\n"
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\nuniform mat4 u_ViewProj;\r\nuniform float u_Time;\r\n\r\nuniform mat4 u_View; // Used for rendering particles as billboards (quads that are always looking at the camera)\r\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\r\n\r\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\r\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\r\nin vec4 vs_Nor;\r\nin vec2 vs_UV;\r\nin vec4 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\r\n\r\n\r\nout vec4 fs_Col;\r\nout vec4 fs_Pos;\r\nout vec2 fs_UV;\r\nout vec2 fs_UV_SS;\r\n\r\nmat4 rotationMatrix(vec3 axis, float angle)\r\n{\r\n    axis = normalize(axis);\r\n    float s = sin(angle);\r\n    float c = cos(angle);\r\n    float oc = 1.0 - c;\r\n    \r\n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\r\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\r\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\r\n                0.0,                                0.0,                                0.0,                                1.0);\r\n}\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;\r\n    \r\n    fs_UV = vs_UV;\r\n\r\n    vec3 offset = vs_Translate.xyz;\r\n\r\n    float dir =  vs_Col.x < 0.0 ? vs_Col.y + 3.141592 : vs_Col.y;\r\n\r\n    fs_Pos = vs_Pos * rotationMatrix( vec3(0.0, 1.0, 0.0), dir);\r\n\r\n    gl_Position = u_ViewProj  *  vec4(offset + fs_Pos.xyz * fs_Col.a, 1.0);\r\n\r\n    vec4 normalizedPos = gl_Position / gl_Position.w;\r\n    \r\n    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);\r\n    fs_Pos.a = normalizedPos.z;\r\n    fs_Pos.xyz += offset;\r\n}\r\n"
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform sampler2D u_frame0; //Scene\r\nuniform sampler2D u_frame1; //Albedo\r\n\r\nuniform mat4 u_View; \r\nuniform mat4 u_InvViewProj; \r\n\r\nin vec4 fs_Col;\r\nin vec4 fs_Pos;\r\nin vec2 fs_UV;\r\nin vec2 fs_UV_SS;\r\n\r\nout vec4 out_Col;\r\n\r\nfloat LinearDepth(float d, float f)\r\n{\r\n\t//float f= 1000.0;\r\n\tfloat n = 0.1;\r\n\treturn (2.0 * n) / (f + n - d * (f - n));\r\n}\r\n\r\nvoid main()\r\n{\r\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\r\n    float particleDepth = fs_Pos.a;\r\n\r\n    if(sceneDepth > 19.0)\r\n\t{\r\n\t\tsceneDepth -= 20.0;\r\n\t}\r\n\telse if(sceneDepth > 9.0)\r\n\t{\r\n\t\tsceneDepth -= 10.0;\r\n\t}\r\n\r\n    if(sceneDepth > particleDepth)\r\n    {\r\n        out_Col.xyz = texture(u_frame1, fs_UV).xyz * 0.5;\r\n        float linearDepth = LinearDepth(particleDepth, 1000.0);\r\n\t    out_Col.a = 1.0 - linearDepth*linearDepth;\r\n\r\n    }\r\n    else\r\n    {   \r\n        out_Col = vec4(0.0);\r\n    }\r\n\r\n    \r\n}\r\n"
 
 /***/ }),
-/* 62 */
+/* 63 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\n#define PI 3.1415926\r\n\r\nuniform float u_deltaTime;\r\nuniform float u_Time;\r\n\r\nuniform vec3 u_CameraWPos;\r\nuniform vec4 u_particleInfo;\r\n\r\nlayout(location = 0) in vec4 i_position;\r\nlayout(location = 1) in vec4 i_velocity;\r\nlayout(location = 2) in vec4 i_color;\r\nlayout(location = 3) in vec4 i_attract;\r\n\r\nout vec4 o_position;\r\nout vec4 o_velocity;            \r\nout vec4 o_color;\r\nout vec4 o_attract;\r\n\r\nmat4 rotationMatrix(vec3 axis, float angle)\r\n{\r\n    axis = normalize(axis);\r\n    float s = sin(angle);\r\n    float c = cos(angle);\r\n    float oc = 1.0 - c;\r\n    \r\n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\r\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\r\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\r\n                0.0,                                0.0,                                0.0,                                1.0);\r\n}\r\n\r\nvec2 rotate2D_Axis_Scale(vec2 v, float a, vec2 axis, float scale) {\r\n    float s = sin(a);\r\n    float c = cos(a);\r\n    mat2 m = mat2(c, -s, s, c);\r\n    return axis + m * normalize(v-axis) * scale;\r\n}\r\n\r\nfloat rand(vec2 co){\r\n    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);\r\n}\r\n\r\nvoid main()\r\n{   \r\n    o_position = i_position;\r\n    o_velocity = i_velocity;\r\n    o_attract = i_attract;\r\n\r\n    o_color = i_color;\r\n    o_color.a = float(gl_VertexID) + 0.1;\r\n\r\n    float speed = 10.0;\r\n   \r\n\r\n\r\n    if(u_particleInfo.z < 1.0) //false\r\n    {\r\n        if(o_position.y > 70.0)\r\n        {\r\n            o_position.y = 0.0 + o_velocity.w;\r\n        }\r\n        else if(o_position.y < 0.0)\r\n        {\r\n\r\n        }\r\n        else\r\n        {\r\n            o_position.y += u_deltaTime * speed;\r\n            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow(clamp(o_position.y/100.0+0.75, 0.0, 2.0),2.0);\r\n            o_position.xz = rotate2D_Axis_Scale(o_position.xz, u_deltaTime*o_velocity.x, vec2(0.0,252.0), radius);\r\n        }     \r\n    }\r\n    else //true\r\n    {\r\n        if(o_position.y > 70.0)\r\n        {\r\n            o_position.y -= 70.0;\r\n            o_position.y += u_deltaTime * speed;\r\n            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow(clamp(o_position.y/100.0+0.75, 0.0, 2.0),2.0);\r\n            o_position.xz = rotate2D_Axis_Scale(o_position.xz, u_deltaTime*o_velocity.x, vec2(0.0,252.0), radius);\r\n        }\r\n        else\r\n        {\r\n            o_position.y += u_deltaTime * speed;\r\n            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow(clamp(o_position.y/100.0+0.75, 0.0, 2.0),2.0);\r\n            o_position.xz = rotate2D_Axis_Scale(o_position.xz, u_deltaTime*o_velocity.x, vec2(0.0,252.0), radius);\r\n        }\r\n    }\r\n}\r\n"
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\r\n\r\nuniform mat4 u_ViewProj;\r\nuniform float u_Time;\r\n\r\nuniform mat4 u_View; // Used for rendering particles as billboards (quads that are always looking at the camera)\r\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\r\n#define PI 3.1415926\r\n\r\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\r\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\r\nin vec4 vs_Nor;\r\nin vec2 vs_UV;\r\nin vec4 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\r\n\r\n\r\nout vec4 fs_Col;\r\nout vec4 fs_Pos;\r\nout vec2 fs_UV;\r\nout vec2 fs_UV_SS;\r\nout float fs_Alpha;\r\n\r\nmat4 rotationMatrix(vec3 axis, float angle)\r\n{\r\n    axis = normalize(axis);\r\n    float s = sin(angle);\r\n    float c = cos(angle);\r\n    float oc = 1.0 - c;\r\n    \r\n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\r\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\r\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\r\n                0.0,                                0.0,                                0.0,                                1.0);\r\n}\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;\r\n    fs_UV = vs_UV;\r\n\r\n    vec3 offset = vs_Translate.xyz;\r\n\r\n    mat4 rotMat = rotationMatrix(vec3(0.0,1.0,0.0), u_Time*PI);\r\n    fs_Pos = rotMat*vs_Pos;\r\n\r\n    gl_Position = u_ViewProj * vec4(offset + fs_Pos.xyz, 1.0);\r\n\r\n    vec4 normalizedPos = gl_Position / gl_Position.w;\r\n    \r\n    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);\r\n    fs_Pos.a = normalizedPos.z;\r\n    fs_Pos.xyz += offset;\r\n\r\n    if(vs_Translate.y < 20.0)\r\n    \tfs_Alpha = clamp((vs_Translate.y-10.0)/10.0,0.0,1.0);\r\n    else if(vs_Translate.y > 50.0)\r\n    \tfs_Alpha = clamp((70.0-vs_Translate.y)/20.0,0.0,1.0);\r\n    else\r\n    \tfs_Alpha = 1.0;\r\n}\r\n"
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform sampler2D u_frame0; //Scene\r\nuniform sampler2D u_frame1; //Albedo\r\n\r\nuniform mat4 u_View; \r\nuniform mat4 u_InvViewProj; \r\n\r\nin vec4 fs_Col;\r\nin vec4 fs_Pos;\r\nin vec2 fs_UV;\r\nin vec2 fs_UV_SS;\r\nin float fs_Alpha;\r\n\r\nout vec4 out_Col;\r\n\r\nfloat LinearDepth(float d, float f)\r\n{\r\n\t//float f= 1000.0;\r\n\tfloat n = 0.1;\r\n\treturn (2.0 * n) / (f + n - d * (f - n));\r\n}\r\n\r\nvoid main()\r\n{\r\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\r\n    float particleDepth = fs_Pos.a;\r\n    if(sceneDepth > 19.0)\r\n\t{\r\n\t\tsceneDepth -= 20.0;\r\n\t}\r\n\telse if(sceneDepth > 9.0)\r\n\t{\r\n\t\tsceneDepth -= 10.0;\r\n\t}\r\n\r\n    if(sceneDepth > particleDepth)\r\n    {\r\n        out_Col.xyz = texture(u_frame1, fs_UV).xyz;\r\n\r\n        out_Col.xyz += pow(out_Col.xyz, vec3(3.0)) * 3.0;\r\n\r\n        if(fs_Pos.y < 5.0)\r\n        {\r\n            out_Col.a = clamp(fs_Pos.y / 5.0 , 0.0, 1.0);\r\n        }\r\n        else if(fs_Pos.y > 170.0)\r\n        {\r\n            out_Col.a = clamp( (190.0 - fs_Pos.y),  0.0, 20.0) / 20.0;\r\n        }\r\n        else\r\n            out_Col.a = 1.0;\r\n\r\n        out_Col.a = min(out_Col.a, 0.9);\r\n    }\r\n    else\r\n    {   \r\n        out_Col = vec4(0.0);\r\n    }\r\n\r\n    float linearDepth = LinearDepth(particleDepth, 50.0);\r\n\tout_Col.a *= 1.0 - pow(linearDepth, 2.0);\r\n    out_Col.a *= fs_Alpha;\r\n}\r\n"
+
+/***/ }),
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\nprecision highp float;\n\nuniform float u_deltaTime;\nuniform float u_Time;\n\nuniform vec3 u_CameraWPos;\nuniform vec4 u_particleInfo;\n\nlayout(location = 0) in vec4 i_position;\nlayout(location = 1) in vec4 i_velocity;\nlayout(location = 2) in vec4 i_color;\nlayout(location = 3) in vec4 i_attract;\n\nout vec4 o_position;\nout vec4 o_velocity;            \nout vec4 o_color;\nout vec4 o_attract;\n\nmat4 rotationMatrix(vec3 axis, float angle)\n{\n    axis = normalize(axis);\n    float s = sin(angle);\n    float c = cos(angle);\n    float oc = 1.0 - c;\n    \n    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,\n                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,\n                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,\n                0.0,                                0.0,                                0.0,                                1.0);\n}\n\nvoid main()\n{   \n    o_position = i_position;\n    o_velocity = i_velocity;\n    o_attract = i_attract;\n\n    o_color = i_color;\n    o_color.a = float(gl_VertexID) + 0.1;\n\n    float speed = 400.0;\n    o_position.z += u_deltaTime * speed;\n        \n    float MaxDist = 50000.0;\n\n    if(o_position.z > MaxDist * 0.8)\n    {\n        o_color.xyz = vec3( 1.0 - (o_position.z - MaxDist * 0.8) /(MaxDist * 0.2));\n    }\n    else if(o_position.z < -MaxDist * 0.8)\n    {\n        o_color.xyz = vec3( 1.0 + (o_position.z + MaxDist * 0.8) /(MaxDist * 0.2));\n    }\n   \n    if(o_position.z > 50000.0)\n    {\n        o_position.z -= MaxDist * 2.0;\n        o_color.xyz = vec3(0.0);\n    }\n   \n}\n"
 
 /***/ }),
-/* 63 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\nuniform mat4 u_View;\nuniform mat4 u_Proj;\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform vec3 u_CameraWPos;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec4 vs_Nor;\nin vec2 vs_UV;\nin vec4 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\n\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec2 fs_UV;\nout vec2 fs_UV_SS;\nout vec3 fs_billboardNormal;\n\nfloat LinearDepth(float d, float f)\n{\n\t\n\tfloat n = 0.1;\n\treturn (2.0 * n) / (f + n - d * (f - n));\n}\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    fs_Pos = vs_Pos;\n    fs_UV = vs_UV;\n\n    vec3 offset = vs_Translate.xyz;\n\n    mat3 CameraAxes;\n\n    //Right\n    CameraAxes[0][0] = u_View[0][0];\n    CameraAxes[0][1] = u_View[1][0];\n    CameraAxes[0][2] = u_View[2][0];\n    //Up\n    CameraAxes[1][0] = u_View[0][1];\n    CameraAxes[1][1] = u_View[1][1];\n    CameraAxes[1][2] = u_View[2][1];\n\n     //Forward\n    CameraAxes[2][0] = u_View[0][2];\n    CameraAxes[2][1] = u_View[1][2];\n    CameraAxes[2][2] = u_View[2][2];\n\n    vec3 billboardPos;\n    \n    float scale =  vs_Translate.w * 0.01 + 4000.0;\n\n    vec4 depthPos = u_Proj * u_View * vec4(offset, 1.0);\n    depthPos /= depthPos.w;\n\n    scale *= (LinearDepth(depthPos.z, 1000000.0)* 10.0 + 1.0);\n\n\n\n    \n\n    billboardPos = offset + vs_Pos.x * scale * CameraAxes[0] + vs_Pos.y * scale * CameraAxes[1];\n\n    gl_Position =  u_Proj * u_View * vec4(billboardPos, 1.0);\n\n    vec4 normalizedPos = gl_Position / gl_Position.w;\n    \n    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);\n\n\n    //vec4 SS = u_ViewProj * vec4(billboardPos, 1.0);\n    //SS /= SS.w;\n\n    fs_Pos.a = normalizedPos.z;\n\n\n    fs_Pos.xyz = billboardPos;\n\n    fs_billboardNormal =  normalize(vec3(u_CameraWPos - offset));\n}\n"
 
 /***/ }),
-/* 64 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\nprecision highp float;\n\nuniform sampler2D u_frame0; //Scene\nuniform sampler2D u_frame1; //Albedo\nuniform sampler2D u_frame2; //Normal\nuniform sampler2D u_frame3; //Noise\n\nuniform mat4 u_View; \nuniform mat4 u_InvViewProj; \n\nuniform vec4 u_lightDirection;\nuniform float u_Time;\n\nuniform vec3 u_CameraWPos;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec2 fs_UV;\nin vec2 fs_UV_SS;\nin vec3 fs_billboardNormal;\n\n\n\nout vec4 out_Col;\n\n\nvec3 applyNormalMap(vec3 geomnor, vec3 normap) {\n    \n    vec3 up = normalize(vec3(0.001, 1, 0.001));\n    vec3 surftan = normalize(cross(geomnor, up));\n    vec3 surfbinor = cross(geomnor, surftan);\n    return normalize(normap.y * surftan + normap.x * surfbinor + normap.z * geomnor);\n}\n\nfloat LinearDepth(float d, float f)\n{\n\t\n\tfloat n = 0.1;\n\treturn (2.0 * n) / (f + n - d * (f - n));\n}\n\nvoid main()\n{\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\n    float particleDepth = fs_Pos.a;\n\n    if(sceneDepth > 19.0)\n\t{\n\t\tsceneDepth -= 20.0;\n\t}\n\telse if(sceneDepth > 9.0)\n\t{\n\t\tsceneDepth -= 10.0;\n\t}\n\n    if(sceneDepth > particleDepth)\n    {\n        vec3 viewVec = normalize(u_CameraWPos - fs_Pos.xyz);\n\n        int sprite = int( floor(fs_Col.a) ) % 8;\n        vec4 NoiseMap = texture(u_frame3, vec2(fs_UV.x + u_Time * 0.0983, fs_UV.y - u_Time * 0.0365));\n\n        vec2 Noise = NoiseMap.xy * 2.0 - vec2(1.0);\n        Noise *= 0.02;\n\n        vec2 TwickedUV = fs_UV + Noise;\n\n       out_Col.xyz = texture(u_frame1, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;\n       vec3 normal = texture(u_frame2, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;\n\n   \n       \n\n       normal = applyNormalMap(fs_billboardNormal, normalize(normal * 2.0 - 1.0) );\n\n       // out_Col.xyz = normal;\n       // return;\n\n       float NoV = clamp( dot(normal, viewVec), 0.0, 1.0);\n\n       float NoL = clamp(abs(dot(normal, u_lightDirection.xyz)), 0.2, 1.0);\n\n       vec3 sliverLight = vec3(10.0);\n\n       out_Col.xyz *= fs_Col.xyz * mix(sliverLight, vec3(1.0, 0.6, 0.4) , pow(NoV, 1.5)) * NoL;\n\n       out_Col.a = 1.0;\n\n       \n       out_Col = clamp(out_Col, 0.0, 1.0);\n       \n    }\n    else\n    {   \n        out_Col = vec4(0.0);\n    }\n}\n"
