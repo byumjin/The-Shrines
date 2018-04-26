@@ -69,7 +69,7 @@ void main()
         else
         {
             o_position.y += u_deltaTime * speed;
-            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow((o_position.y/100.0+0.75),2.0);
+            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow(clamp(o_position.y/100.0+0.75, 0.0, 2.0),2.0);
             o_position.xz = rotate2D_Axis_Scale(o_position.xz, u_deltaTime*o_velocity.x, vec2(0.0,252.0), radius);
         }     
     }
@@ -77,15 +77,15 @@ void main()
     {
         if(o_position.y > 50.0)
         {
-            o_position.y -= 50.0;
+            o_position.y -= 75.0;
             o_position.y += u_deltaTime * speed;
-            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow((o_position.y/100.0+0.75),2.0);
+            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow(clamp(o_position.y/100.0+0.75, 0.0, 2.0),2.0);
             o_position.xz = rotate2D_Axis_Scale(o_position.xz, u_deltaTime*o_velocity.x, vec2(0.0,252.0), radius);
         }
         else
         {
             o_position.y += u_deltaTime * speed;
-            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow((o_position.y/100.0+0.75),2.0);
+            float radius = ((1.0+sin(u_Time*PI/2.0+o_velocity.z))/2.0 + 1.0)*o_velocity.y * pow(clamp(o_position.y/100.0+0.75, 0.0, 2.0),2.0);
             o_position.xz = rotate2D_Axis_Scale(o_position.xz, u_deltaTime*o_velocity.x, vec2(0.0,252.0), radius);
         }
     }

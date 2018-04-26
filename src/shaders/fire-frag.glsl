@@ -158,7 +158,7 @@ void main()
     float xpart = fs_UV.x;
     float ypart = fs_UV.y;
     //
-    float clip = 210.0;
+    float clip = 410.0;
     float ypartClip = gl_FragCoord.y/clip;
     float ypartClippedFalloff = clamp(2.0-ypartClip,0.0,1.0);
     float ypartClipped = min(ypartClip,1.0);
@@ -182,9 +182,9 @@ void main()
     //
     float flames = pow(ypartClipped,0.3*xfuel)*pow(noise,0.3*xfuel);
     //
-    float f = ypartClippedFalloff*pow(1.0-flames*flames*flames,2.0 + 1.0 * sin(u_Time));
+    float f = ypartClippedFalloff*pow(1.0-flames*flames*flames,5.0 + 1.0 * sin(u_Time));
     float fff = f*f*f;
-    vec3 fire = 1.25*vec3(f, fff*1.5, fff*fff*1.0);
+    vec3 fire = 1.35*vec3(f, fff, fff*fff*1.0);
     //
     // smoke
     float smokeNoise = 0.5+snoise(0.4*position+timing*vec3(1.0,1.0,0.2))/2.0;
@@ -221,7 +221,7 @@ void main()
         pos.x *= 2.0; // iResolution.x / iResolution.y;
         pos.y += 7.5 * u_Time * 0.02 * r.z;
         //pos.x += sin(t + r.z);
-        d += 0.1 * drop(uv.xy, pos, 0.03);
+        d += 0.05 * drop(uv.xy, pos, 0.03);
     }
 
     vec3 background = texture(u_frame0, uv.xy + d).rgb;

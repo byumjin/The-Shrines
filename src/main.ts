@@ -41,8 +41,8 @@ const controls = {
 
   Fire : false,
   Earth : false,
-  Earth_delaytoDieTimer : 5.0,
-  Earth_Timer: 5.0,
+  Earth_delaytoDieTimer : 14.0,
+  Earth_Timer: 14.0,
 
   Clouds : true,
 
@@ -682,7 +682,7 @@ function main() {
         2.0, 3.0); //size
 
   const particleLeavesSys = new Particle(numLeaves);
-  particleLeavesSys.initialize3(10.0, 0.0, 100.0, 5, 10.0, 252.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
+  particleLeavesSys.initialize3(10.0, 0.0, 80.0, -80, 10.0, 252.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
 
   const camera = new Camera();
 
