@@ -604,12 +604,14 @@ function main() {
   play_single_sound();
 
   // Initial display for framerate
+  /*
   const stats = Stats();
   stats.setMode(0);
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
   document.body.appendChild(stats.domElement);
+  */
 
   // Add controls to the gui
   // Add controls to the gui
@@ -844,10 +846,11 @@ function main() {
 
   function tick() {
 
+    //stats.begin();
     CheckTriggers(camera, camera.position, 315, 30, 20, timer.deltaTime);
 
     camera.update();
-    stats.begin();
+    
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     timer.updateTime();
     renderer.updateTime(timer.deltaTime, timer.currentTime);
@@ -999,7 +1002,7 @@ function main() {
     else
       renderer.renderPresent(camera);
     
-    stats.end();
+    //stats.end();
     requestAnimationFrame(tick);
   }
 
