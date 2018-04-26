@@ -11,6 +11,7 @@ in vec4 fs_Col;
 in vec4 fs_Pos;
 in vec2 fs_UV;
 in vec2 fs_UV_SS;
+in float fs_Alpha;
 
 out vec4 out_Col;
 
@@ -60,4 +61,5 @@ void main()
 
     float linearDepth = LinearDepth(particleDepth, 50.0);
 	out_Col.a *= 1.0 - pow(linearDepth, 2.0);
+    out_Col.a *= fs_Alpha;
 }
