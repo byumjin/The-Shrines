@@ -54,9 +54,9 @@ void main() {
 			if(bWater0)
 			{
 				float depthDistance = clamp( LinearDepth(opaqueColor.a), 0.0, 1.0);
-				depthDistance *= 3.0;
+				depthDistance *= 2.5;
 				depthDistance = clamp(depthDistance, 0.0, 1.0);
-				fragColor[0].xyz =  mix( opaqueColor.xyz , transColor.xyz, depthDistance);
+				fragColor[0].xyz =  mix( opaqueColor.xyz + transColor.xyz * depthDistance , transColor.xyz, depthDistance);
 
 				//fragColor[0].xyz = opaqueColor.xyz;
 				//fragColor[0].xyz =  mix(  vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), pow(depthDistance, 1.0));
@@ -98,7 +98,7 @@ void main() {
 	
 	
 
-	if( transDepth < OpaqueDepth )
+	if( transDepth <= OpaqueDepth )
 	{
 		if(bWater)
 		{

@@ -8,6 +8,8 @@ out vec4 out_Col;
 
 uniform sampler2D u_frame0; //Scene
 uniform sampler2D u_frame1; //Bloom
+uniform sampler2D u_frame2; //Lensflare
+
 uniform vec2 u_screenSize;
 uniform vec4 u_chromaticInfo; //x:dispersal, y:distortion, w : ColorTemp
 
@@ -152,9 +154,12 @@ void main() {
     
     vec3 direction = normalize(vec3(ghostVec, 0.0));
 
-    vec3 bloomColor = textureDistorted(u_frame1, reverseUV, direction.xy, distortion).xyz * 1.5;
+    vec3 bloomColor = textureDistorted(u_frame1, reverseUV, direction.xy, distortion).xyz;
 
-	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + bloomColor) * ColorTemperatureToRGB(u_Temperature);
+    vec3 LensFlareColor = texture(u_frame2, reverseUV).xyz;
+    
+
+	vec3 toneMappedColor = (texture(u_frame0, fs_UV).xyz + bloomColor) * ColorTemperatureToRGB(u_Temperature) + LensFlareColor;
 
     vec3 toneColor = filmicToneMapping(toneMappedColor);
 

@@ -84,7 +84,7 @@ void main()
        vec3 sliverLight = vec3(10.0);
 
        out_Col.xyz *= fs_Col.xyz * mix(sliverLight, vec3(1.0, 0.6, 0.4) , pow(NoV, 1.5)) * NoL;
-
+       //out_Col.xyz *= 1.5;
        out_Col.a = 1.0;
 
        

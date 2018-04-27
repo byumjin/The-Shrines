@@ -275,39 +275,21 @@ void main() {
 			float energyConservation = 1.0 - Roughness * Roughness;
 
 			specularTerm = GGX_Spec(normal.xyz, halfVec, Roughness, diffuseColor.xyz, SpecularColor, LightingFunGGX_FV(LoH, Roughness)) *energyConservation;
-
+			specularTerm = clamp(specularTerm, 0.0, 4.0);
 
 			float ambientTerm = 0.1;
 
 			vec4 pbrColor =  vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm) * smoothstep( 0.1, 0.5, shadow), diffuseColor.a);
 			pbrColor.xyz += diffuseColor.rgb * ambientTerm * (smoothstep( 0.0, 0.5, diffuseTerm) + 0.5);
 			pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a;
-			// vec4 pbrColor;
-			
-			// if(shadow < 0.5)
-			// {
-			// 	pbrColor = vec4( (diffuseColor.rgb) * (diffuseTerm + ambientTerm), diffuseColor.a);
-			// 	pbrColor.xyz = clamp(pbrColor.xyz, 0.0, 1.0) * u_lightColor.xyz * u_lightColor.a * shadow;
-			// }
-			// else
-			// {
-			// 	pbrColor = vec4( (diffuseColor.rgb + SpecularColor * specularTerm) * (diffuseTerm + ambientTerm), diffuseColor.a);
-			// 	pbrColor.xyz *= u_lightColor.xyz * u_lightColor.a * shadow;
-			// }
 
 			out_Col = vec4(pbrColor.xyz, depth);
 
 			//Emissive
 			if(normal.a > 0.8)
 			{
-				out_Col.xyz += albedo.xyz * 3.0 * (diffuseTerm * 0.5 + 0.5);
+				out_Col.xyz += albedo.xyz * 3.0 * (diffuseTerm * 0.3 + 0.7);
 			}
-
-			/*
-			vec3 fogColor = vec3(0.36470588235294117647058823529412, 0.32941176470588235294117647058824, 0.33725490196078431372549019607843);
-			fogColor *= 0.7;
-			fogColor = pow(fogColor, vec3(2.2));
-			*/
 
 			vec3 fogColor = skycol.xyz;
 
@@ -315,6 +297,8 @@ void main() {
 
 				
 			out_Col.xyz = mix(out_Col.xyz, fogColor, pow(linearDepth, 2.0) );
+
+			//out_Col.xyz = mix(vec3(0.0), out_Col.xyz, clamp( pow( clamp(worldPos.y, 0.0, 1.0), 10.0), 0.0, 1.0));
 		
 
 		
