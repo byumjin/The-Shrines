@@ -1215,7 +1215,7 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.HblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) );
-    this.HblurPass.setBlurScale(vec2.fromValues( 2.0, 1.0) );
+    this.HblurPass.setBlurScale(vec2.fromValues( 1.0, 1.0) );
 
     if(index == 0)
       this.HblurPass.setFrame00(this.post32Targets[PipelineEnum.ExtractHighLight]);

@@ -86,7 +86,7 @@ For this, we have used down-sampled( divide by 8 ) scene texture which has high 
 |---|
 |![](imgs/LensFlare.png)|
 
-Using same high light scene image, we can create ghost effects with distortion and repeatation by center of screen. For better quality, Gaussian blurring is also used. We referred to [John chapman’s Lens flare](http://john-chapman-graphics.blogspot.com/2013/02/pseudo-lens-flare.html) which is not physically correct.
+Using same high light scene image as Bloom, we could create ghost effects with distortion and repeatation by center of screen. For better quality, Gaussian blurring is also used. We referred to [John chapman’s Lens flare](http://john-chapman-graphics.blogspot.com/2013/02/pseudo-lens-flare.html) which is not physically correct.
 
 ### Tone Map
 
