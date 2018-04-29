@@ -30,7 +30,14 @@ We have implemented WebGL demo with using many procedural methods for the final 
 We chose deferred rendering for getting screen space information such as rougness, normal, easily, and used 3 G-buffers (first one is for albedo color and opacity, second one is for specular color and roughness, last one is for normal and emissive). And, we used GGX lighting model for physically-based rendering. For perfection, it needs some methods such as pre-filtered light probe to get global illumination in real-time, we only used screen space reflections.
 
 ### Shadow
-...
+
+We used shadow mapping to create dynamic shadows. We chose 2048x2048 texture buffer to store the depth map. To create soft shadow, we tried many methods to realize that, like VSM, PCSS, PCF, etc. Finally, we decided to use **Stratified Poisson-Sampling PCF**. We created soft shadows of static objects(like buildings) and dynamic objects(like trees), and the shadows casted on both opaque objects and tranparent objects(water).
+
+### Moving Trees
+
+To render the trees with animation, we need to modify the vertex positions according to time in vertex shader(vertex animation). So we could no longer to use the same vertex shader as other static objects. Here we used 2 other different shaders for the barks and leaves in *RenderToGBuffer* pass.
+To create the animation of the trees, we followed the instructions of [Vegetation Procedural Animation and Shading in Crysis](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch16.html). We used three channels of the vertex color to represent three different kinds of movement of the leaves, the red channel is used for the stiffness of leaves' edges, the green channel for per-leaf phase variation, and the blue channel for the overall stiffness of the leaves.
+The only problem was that the .obj file cannot store the vertex color information, and we were using TypeScript for the development, so we cannot use fbxLoader tools of three.js. Finally, we stored the vertex colors in another format of file, .ply. When loading models of tree, we both loaded .obj files for positions, normals, texcoords and .ply files for colors.
 
 
 ### Translucent Material
@@ -94,7 +101,10 @@ We used flimic tone mapping referred to [here](https://www.shadertoy.com/view/ls
 
 ### Post-Process in Single Screen Triangular
 
-.....
+We implemented 3 post-process effects for Ice Shrine, Water Shrine and Fire Shrine.
+* Frost Effect: set the uv offsets based on the computation with a noise image. [frosted glass vignette](https://www.shadertoy.com/view/MsySzy) 
+* RainDrops Effect: manipulate with the uv offsets to create the water drops effect, mainly following the reference [Heartfelt](https://www.shadertoy.com/view/ltffzl). Also use the Gaussian Blur to create the blurry parts and the tracks of the water.
+* Fire Effect: blend the fire effect with the render result of the scene and then add a haze effect. 
 
 
 
@@ -103,7 +113,7 @@ We used flimic tone mapping referred to [here](https://www.shadertoy.com/view/ls
 - [Reflection and volumetrics of Killzone Shadow Fall](http://advances.realtimerendering.com/s2014/valient/Valient_Siggraph14_Killzone.pptx)
 - [John chapman’s Lens flare](http://john-chapman-graphics.blogspot.com/2013/02/pseudo-lens-flare.html)
 - [Tone map](https://www.shadertoy.com/view/lslGzl)
-
+- [Advanced Soft Shadow Mapping](http://developer.download.nvidia.com/presentations/2008/GDC/GDC08_SoftShadowMapping.pdf)
 
 ## Music
 
