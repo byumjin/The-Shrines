@@ -31,16 +31,15 @@ vec4 getSSRColor(vec2 UV, float lod)
 	{
 		return mix(texture(u_frame6, UV), texture(u_frame7, UV), fract(lod));
 	}
-	else //if( lod < 3.0)
+	else if( lod < 3.0)
 	{
 		return mix(texture(u_frame7, UV), texture(u_frame8, UV), fract(lod));
 	}
-	/*
 	else
 	{
 		return mix(texture(u_frame8, UV), texture(u_frame9, UV), fract(lod));
 	}
-	*/
+	
 }
 
 

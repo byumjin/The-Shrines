@@ -18,7 +18,7 @@ import { lchmod } from 'fs';
 // Define an object with application parameters and button callbacks
 const controls = {
    
-  SSR_MaxStep : 64,
+  SSR_MaxStep : 72,
   SSR_Opaque_Intensity : 1.0,
   SSR_Trans_Intensity : 0.8,
   SSR_Threshold : 2.0,
@@ -220,7 +220,7 @@ function loadOBJText() {
 
   obj_Lantern = readTextFile('./src/resources/objs/lantern/models/lantern.obj');
   obj_Boat = readTextFile('./src/resources/objs/lantern/models/sailboat.obj');
-  obj_Leaves = readTextFile('./src/resources/objs/lantern/models/leaves.obj');
+  obj_Leaves = readTextFile('./src/resources/objs/lantern/models/Leaf_02.obj');
 }
 
 function loadRoadMap(){
@@ -359,6 +359,7 @@ function loadScene() {
      new Texture('./src/resources/objs/mario/textures/wahoo_Norm.png', false));
   
   mesh0.scale( vec3.fromValues(scale, scale, scale));
+  mesh0.translate(vec3.fromValues(0.0, -1.0, 0.0));
   mesh0.create();
 
  
@@ -497,10 +498,10 @@ function loadScene() {
      new Texture('./src/resources/objs/B_Side/textures/Outter_Normal.png', false));
      mesh_Boat.create();
 
-    mesh_Leaves  = new Mesh(obj_Leaves, vec3.fromValues(10,0,0),
-    new Texture('./src/resources/objs/lantern/textures/Leaves_Albedo.jpg', false),
-     new Texture('./src/resources/objs/lantern/textures/Leaves_Albedo.jpg', false),
-     new Texture('./src/resources/objs/lantern/textures/Normal.png', false));
+    mesh_Leaves  = new Mesh(obj_Leaves, vec3.fromValues(0,0,0),
+    new Texture('./src/resources/objs/lantern/textures/maple_albedo.png', false),
+     new Texture('./src/resources/objs/lantern/textures/maple_albedo.png', false),
+     new Texture('./src/resources/objs/lantern/textures/maple_normal.png', false));
      mesh_Leaves.create();
 
    loadRoadMap();
@@ -836,7 +837,7 @@ function main() {
         2.0, 3.0); //size
 
   const particleLeavesSys = new Particle(numLeaves);
-  particleLeavesSys.initialize3(10.0, 0.0, 100.0, -100.0, 10.0, 252.0, 0.5, 0.5, 0.5, 0.3, 0.4, 0.1);
+  particleLeavesSys.initialize3(10.0, 0.0, 100.0, -100.0, 10.0, 252.0, 2.0, -1.0, 2.0, -1.0, 2.0, -1.0);
 
   const camera = new Camera();
 
@@ -994,7 +995,7 @@ function main() {
   }
 
 
-  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 750, 350, -350, 380);
+  let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 750, 250, -350, 380);
 
   function tick() {
   
@@ -1010,7 +1011,7 @@ function main() {
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh0]);
-    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
+    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner ]);
 
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
@@ -1022,7 +1023,7 @@ function main() {
     
     renderer.renderSSRMip();
     
-    for(var m = 0; m < 4; m++)
+    for(var m = 0; m < 5; m++)
     {
       renderer.renderforHorizontalMipBlur(camera, m);
       renderer.renderforVerticaMipBlur(camera, m);
@@ -1118,7 +1119,7 @@ function main() {
 
   window.addEventListener('mousewheel', function(ev) {
     
-    camera.updatePosition(0.0, -timer.deltaTime * ev.wheelDeltaY);
+    camera.updatePosition(0.0, -timer.deltaTime * ev.wheelDeltaY * 0.5);
 
   }, false);
 

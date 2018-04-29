@@ -40,7 +40,7 @@ void main()
 
     vec3 offset = vs_Translate.xyz;
 
-    mat4 rotMat = rotationMatrix(vec3(0.0,1.0,0.0), u_Time*PI);
+    mat4 rotMat = rotationMatrix(normalize(fs_Col.xyz), u_Time*PI);
     fs_Pos = rotMat*vs_Pos;
 
     gl_Position = u_ViewProj * vec4(offset + fs_Pos.xyz, 1.0);

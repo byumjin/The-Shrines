@@ -189,8 +189,8 @@ HmipblurPass : PostProcess = new PostProcess(
     this.gbTargets = [undefined, undefined, undefined];
     this.tTargets = [undefined, undefined];
     this.tDTargets =  [undefined, undefined];
-    this.post8Buffers = [undefined, undefined];
-    this.post8Targets = [undefined, undefined];
+    this.post8Buffers = [undefined];
+    this.post8Targets = [undefined];
     this.post8Passes = [];
 
     this.post32Buffers = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
@@ -1078,10 +1078,9 @@ HmipblurPass : PostProcess = new PostProcess(
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ParticleMesh]);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.enable(gl.DEPTH_TEST);
-      //gl.enable(gl.BLEND);
-      //gl.blendFunc(gl.ONE, gl.ZERO); 
       this.setClearColor(0.0, 0.0, 0.0, 0.0);
-      //gl.clear(gl.COLOR_BUFFER_BIT);
+
+      gl.disable(gl.CULL_FACE);
 
       if(bSwitch)
       {
@@ -1097,7 +1096,6 @@ HmipblurPass : PostProcess = new PostProcess(
 
       // bind default frame buffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      //gl.blendFunc(gl.ONE, gl.ZERO); 
       gl.disable(gl.DEPTH_TEST);   
     }
 
