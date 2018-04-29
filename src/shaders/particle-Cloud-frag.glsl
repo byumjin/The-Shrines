@@ -79,7 +79,7 @@ void main()
 
        float NoV = clamp( dot(normal, viewVec), 0.0, 1.0);
 
-       float NoL = clamp(abs(dot(normal, u_lightDirection.xyz)), 0.2, 1.0);
+       float NoL = smoothstep(-0.2, 1.0, abs(dot(normal, u_lightDirection.xyz)));
 
        vec3 sliverLight = vec3(10.0);
 

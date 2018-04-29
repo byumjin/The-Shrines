@@ -7,6 +7,7 @@ out vec4 out_Col;
 uniform sampler2D u_frame0;
 uniform vec2 u_screenSize;
 uniform float u_Time;
+uniform float u_deltaTime;
 
 // Rain Drops: Reference: https://www.shadertoy.com/view/ltffzl
 // Gaussian Blur: https://www.shadertoy.com/view/XdfGDH
@@ -182,6 +183,8 @@ void main()
     }
     
     col *= mix(vec3(1.0), vec3(0.9), focus);
+    col = mix(texture(u_frame0, fs_UV.xy).rgb ,col , clamp(u_deltaTime/3.0, 0.0, 1.0));
+    
     
     out_Col = vec4(col, 1.);
 }

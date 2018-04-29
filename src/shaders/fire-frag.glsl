@@ -8,6 +8,7 @@ uniform sampler2D u_frame0;
 uniform sampler2D u_frame1; // noise
 uniform vec2 u_screenSize;
 uniform float u_Time;
+uniform float u_deltaTime;
 
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -228,7 +229,16 @@ void main()
     vec3 background = texture(u_frame0, fs_UV.xy + vec2(d.x, d.y)).rgb;
     
     vec3 col = max(fire,sparks)+smoke;
+
+   
+
     col = mix(col, background, (1.0-length(col)));
+
+
+    col = mix(texture(u_frame0, fs_UV.xy).rgb ,col , clamp(u_deltaTime/3.0, 0.0, 1.0));
+
+    
+
     out_Col = vec4(col, 1.0);
 
 }

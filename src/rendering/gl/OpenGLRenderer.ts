@@ -1384,7 +1384,7 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.bindTexture(gl.TEXTURE_2D, null); 
   }
   
-  renderFrost(){
+  renderFrost(lifeTime : number){
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     
@@ -1394,12 +1394,16 @@ HmipblurPass : PostProcess = new PostProcess(
     this.frostPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
     this.frostPass.setFrame01(this.frostNoiseTexture);
     this.frostPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
+
+    this.frostPass.setTime(this.currentTime);
+    this.frostPass.setdeltaTime(lifeTime);
+
     this.frostPass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
   }
 
-  renderRainy(){
+  renderRainy(lifeTime : number){
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     
@@ -1408,12 +1412,16 @@ HmipblurPass : PostProcess = new PostProcess(
     
     this.rainyPass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
     this.rainyPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
+
+    this.rainyPass.setTime(this.currentTime);
+    this.rainyPass.setdeltaTime(lifeTime);
+
     this.rainyPass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    
   }
 
-  renderFire(){
+  renderFire(lifeTime : number ){
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     
@@ -1423,6 +1431,8 @@ HmipblurPass : PostProcess = new PostProcess(
     this.firePass.setFrame00(this.post8Targets[PipelineEnum.ToneMapping]);
     this.firePass.setFrame01(this.frostNoiseTexture);
     this.firePass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth, gl.drawingBufferHeight));
+    this.firePass.setTime(this.currentTime);
+    this.firePass.setdeltaTime(lifeTime);
     this.firePass.draw();
     // bind default frame buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);    

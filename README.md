@@ -29,14 +29,19 @@ We have implemented WebGL demo with using many procedural methods for the final 
 
 We chose deferred rendering for getting screen space information such as rougness, normal, easily, and used 3 G-buffers (first one is for albedo color and opacity, second one is for specular color and roughness, last one is for normal and emissive). And, we used GGX lighting model for physically-based rendering. For perfection, it needs some methods such as pre-filtered light probe to get global illumination in real-time, we only used screen space reflections.
 
-
 ### Shadow
 ...
 
 
 ### Translucent Material
 
+To add translucent material, we needed to use additional depth buffer only for it and compare with G-buffer's depth buffer. The reason why we could not use G-buffer's depth buffer is for blending between the result of translucent rendering and opaque rendering. And, to present real translucent, the ordering problem should be addressed. But, we just used one layer translucent for simplicity.
+
+
 #### Water
+
+For making wavy water, we used noise map which has 3 noise channels like perlin and worley and blend them with different time seed instead of using normal map. And, our water material compares the depth between opaque and water for changable blending effects along the distance between them.
+
 
 ### Screen Space Reflections
 
@@ -44,8 +49,7 @@ We chose deferred rendering for getting screen space information such as rougnes
 |---|---|---|---|
 |![](imgs/SSR_Off01.png)|![](imgs/SSR_On01.png)|![](imgs/SSR_Off02.png)|![](imgs/SSR_On02.png)|
 
-...
-
+To obtain dynamic global illumination, we referred to [Reflection and volumetrics of Killzone Shadow Fall](http://advances.realtimerendering.com/s2014/valient/Valient_Siggraph14_Killzone.pptx) for our screen space reflections. It uses simple linear interpolation to complement the artifacts caused by overshooting ray. And, as using previous frame instead of current frame, we could get secondary reflections and even reflections of particle. And we realized that even if we are super large step size of water material, it is difficult to recognize its artifacts. So, our demo can reflect the original scene image even when the camera sees the scene from far away.
 
 
 ### GPU particles
@@ -53,28 +57,17 @@ We chose deferred rendering for getting screen space information such as rougnes
 We used feedback transformation to generate thousands particles with lower cost. Unexpectedly, feedback transformation is slower than the method using texture to create a bunch of particles (over 1 million). This is caused by the fact that the cost will increase significantly as feedback transformation's buffer size increases. This is because the array retrieving time increases as the index of the array element increases. But, it is true that, in terms of management, feedback transformation is more comfortable than texture particles because it does not need fragment shader stage.
 We made our particles with billboard quad or object's mesh itself. To reduce disharmony, we blended our particles from original scene image with scene depth.
 
+| Clouds | Boats | Lanterns | Rain | Snow | Flowers |
+|---|---|---|---|---|---|
+|![](imgs/Clouds.png)|![](imgs/boats.png)|![](imgs/lantern.png)|![](imgs/rain.png)|![](imgs/snow.png)|![](imgs/flowers.png)|
+
 #### Clouds
 
 | Clouds |
 |---|
 |![](imgs/Clouds.png)|
 
-...
-
-#### Boats
-...
-
-#### Lanterns
-...
-
-#### Rain
-...
-
-#### Snow
-...
-
-#### Flowers
-...
+We also used similar noise map like those of water to make the clouds spread. And, to make them like volumetric clouds, normal map is used for lighting. Unlike usual lambertian shading, we used smoothstep of absolute value of N dot L with 0.2 as minimal value. This prevents to make clouds to be balck and brighter when the clouds' billborad faces sun light. 
 
 
 ### HDR
@@ -114,4 +107,5 @@ We used flimic tone mapping referred to [here](https://www.shadertoy.com/view/ls
 
 ## Music
 
+- idealism - another perspective
 

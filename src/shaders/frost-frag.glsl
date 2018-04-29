@@ -8,6 +8,7 @@ uniform sampler2D u_frame0;
 uniform sampler2D u_frame1; // noise
 uniform vec2 u_screenSize;
 uniform float u_Time;
+uniform float u_deltaTime;
 
 // Experiment: Frosted Glass II by Shadmar
 // Original by Jack Davenport : https://www.shadertoy.com/view/MtsSWs#
@@ -39,5 +40,10 @@ void main()
    
     rnd *= .025*vigfin+d.rg*FROSTYNESS*vigfin;
     uv += rnd;
-    out_Col = mix(texture(u_frame0, uv),vec4(COLOR_RGB,1.0),COLORIZE*vec4(rnd.r));
+
+    vec3 col = mix(texture(u_frame0, fs_UV.xy).rgb ,mix(texture(u_frame0, uv),vec4(COLOR_RGB,1.0),COLORIZE*vec4(rnd.r)).xyz , clamp(u_deltaTime/3.0, 0.0, 1.0));
+
+
+    out_Col.xyz = col;
+    out_Col.a = 1.0;
 }

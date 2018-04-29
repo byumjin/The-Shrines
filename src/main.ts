@@ -28,11 +28,13 @@ const controls = {
 
   FireFly : false,
   Rain : false,
+  Rain_delaytoStartTimer : 3.0,
   Rain_delaytoDieTimer : 3.0,
   Rain_Timer: 3.0,
 
   Snow : false,
   Snow_delaytoDieTimer : 3.0,
+  Snow_delaytoStartTimer : 3.0,
   Snow_Timer: 3.0,
 
   Lantern : false,
@@ -40,6 +42,10 @@ const controls = {
   Lantern_Timer: 10.0,
 
   Fire : false,
+  Fire_delaytoDieTimer : 3.0,
+  Fire_delaytoStartTimer : 3.0,
+  Fire_Timer: 3.0,
+
   Earth : false,
   Earth_delaytoDieTimer : 14.0,
   Earth_Timer: 14.0,
@@ -161,7 +167,7 @@ function play_single_sound() {
   gainNode = JukeBox.createGain(); // Create a gainNode reference.
   gainNode.connect(JukeBox.destination); // Add context to gainNode
 
-  fetch('./src/music/far away (lofi hip-hop mix).mp3')
+  fetch('./src/music/idealism - another perspective.mp3')
     .then(r=>r.arrayBuffer())
     .then(b=>JukeBox.decodeAudioData(b))
     .then(data=>{
@@ -630,7 +636,7 @@ function main() {
   BLOOM.add(controls, 'Bloom_Iteration', 0, 32).step(1);
   BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
   BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
- */
+  */
 
   /*
   var PARTICLE = gui.addFolder('Particle');  
@@ -867,10 +873,6 @@ function main() {
       [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh0]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
       [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
-    // renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-    //   [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter]);
-    // renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-    //   [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2, mesh_lake, m_shrines_balconis, m_shrines_colums, m_shrines_main, m_shrines_poles, m_shrines_gold, mesh_B_Outter]);
 
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
@@ -952,37 +954,82 @@ function main() {
 
       if(controls.Rain_Timer < controls.Rain_delaytoDieTimer)
       {
-        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, true); 
+        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true); 
       }
       else
       {
-        if(!controls.Snow)
-        {
-          controls.Snow_Timer += timer.deltaTime;
-
-          if(controls.Snow_Timer < controls.Snow_delaytoDieTimer)
-          {
-            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, true); 
-          }
-          else
-          {
-            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false); 
-          }
-        }
-        else
-        {
-          controls.Snow_Timer = 0.0;
-          
-          renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true);   
-        }
+        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false); 
       }
+
+      controls.Rain_delaytoStartTimer -= timer.deltaTime;
+          if(controls.Rain_delaytoStartTimer < 0.0)
+          controls.Rain_delaytoStartTimer = 0.0;
     }
     else
     {
       controls.Rain_Timer = 0.0;
-      
       renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true);   
+
+
+      controls.Rain_delaytoStartTimer += timer.deltaTime;
+          if(controls.Rain_delaytoStartTimer > 3.0)
+          controls.Rain_delaytoStartTimer = 3.0;
     }
+
+    var bbNRain = !controls.Rain && (controls.Rain_Timer >= controls.Rain_delaytoDieTimer);
+
+    if(!controls.Snow)
+    {
+      controls.Snow_Timer += timer.deltaTime;
+
+          if(controls.Snow_Timer < controls.Snow_delaytoDieTimer)
+          {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true); 
+          }
+          else if(bbNRain)
+          {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false); 
+          }
+
+
+          controls.Snow_delaytoStartTimer -= timer.deltaTime;
+          if(controls.Snow_delaytoStartTimer < 0.0)
+          controls.Snow_delaytoStartTimer = 0.0;
+     }
+    else if(bbNRain)
+    {
+       controls.Snow_Timer = 0.0;
+       renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true);   
+
+
+       controls.Snow_delaytoStartTimer += timer.deltaTime;
+       if(controls.Snow_delaytoStartTimer > 3.0)
+      controls.Snow_delaytoStartTimer = 3.0;
+    }
+
+
+    if(!controls.Fire)
+    {
+
+      controls.Fire_delaytoStartTimer -= timer.deltaTime;
+      
+      if(controls.Fire_delaytoStartTimer < 0.0)
+      controls.Fire_delaytoStartTimer = 0.0;
+
+    }
+    else
+    {
+
+      controls.Fire_delaytoStartTimer += timer.deltaTime;
+
+      if(controls.Fire_delaytoStartTimer > 3.0)
+      controls.Fire_delaytoStartTimer = 3.0;
+
+    }
+
+    var bNRain = (0.0 >= controls.Rain_delaytoStartTimer);
+    var bNSnow = (0.0 >= controls.Snow_delaytoStartTimer);
+    var bNFire = (0.0 >= controls.Fire_delaytoStartTimer);
 
     renderer.renderforSavingCurrentFrame(camera);
 
@@ -1006,12 +1053,12 @@ function main() {
 
     //renderer.renderFXAA(camera);
     
-    if(controls.Rain)
-      renderer.renderRainy();   
-    else if( controls.Snow)
-      renderer.renderFrost();
-    else if (controls.Fire)
-      renderer.renderFire();
+    if(!bNRain)
+      renderer.renderRainy(controls.Rain_delaytoStartTimer);   
+    else if(!bNSnow)
+      renderer.renderFrost(controls.Snow_delaytoStartTimer);
+    else if (!bNFire)
+      renderer.renderFire(controls.Fire_delaytoStartTimer);
     else
       renderer.renderPresent(camera);
     
