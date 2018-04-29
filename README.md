@@ -59,7 +59,7 @@ We made our particles with billboard quad or object's mesh itself. To reduce dis
 
 | Clouds | Boats | Lanterns | Rain | Snow | Flowers |
 |---|---|---|---|---|---|
-|![](imgs/Clouds.png)|![](imgs/boats.png)|![](imgs/lantern.png)|![](imgs/rain.png)|![](imgs/snow.png)|![](imgs/flowers.png)|
+|![](imgs/p_clouds.png)|![](imgs/boats.png)|![](imgs/lantern.png)|![](imgs/rain.png)|![](imgs/snow.png)|![](imgs/flowers.png)|
 
 #### Clouds
 
