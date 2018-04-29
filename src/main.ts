@@ -753,14 +753,14 @@ function main() {
 
   // Initial display for framerate
   
-  
+  /*
   const stats = Stats();
   stats.setMode(0);
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
   document.body.appendChild(stats.domElement);
-  
+  */
 
   // Add controls to the gui
   // Add controls to the gui
@@ -998,7 +998,7 @@ function main() {
 
   function tick() {
   
-    stats.begin();
+    //stats.begin();
 
     CheckTriggers(camera, camera.position, 315, 30, 20, timer.deltaTime);
     camera.update();
@@ -1067,7 +1067,7 @@ function main() {
     else
       renderer.renderPresent(camera);
 
-    stats.end();
+    //stats.end();
     
     requestAnimationFrame(tick);
   }

@@ -2,7 +2,7 @@
 precision highp float;
 
 #define EPS 0.0001
-#define PI 3.1415962
+#define PI 3.141592
 #define SHADOWMAP_SIZE 1024.0
 
 in vec4 fs_Pos;
@@ -122,7 +122,7 @@ float rand(vec4 co){
 
 
 
-#define PCF_NUM_SAMPLES 4
+#define PCF_NUM_SAMPLES 36
 
 float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
     float result = 0.0;
