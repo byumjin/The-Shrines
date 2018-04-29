@@ -41,7 +41,7 @@ const PipelineEnum = {"SceneImage":0, "SSR":1, "SSR_MIP":2, "SaveFrame": 3, "Sha
                      "FXAA": 1};
 
 
-var gShadowMapSize = 2048;
+var gShadowMapSize = 1024;
 
 
 class OpenGLRenderer {
@@ -226,8 +226,9 @@ HmipblurPass : PostProcess = new PostProcess(
   }
 
 
-  setSize(width: number, height: number) {
-    console.log(width, height);
+  setSize(width: number, height: number)
+  {
+    
     this.canvas.width = width;
     this.canvas.height = height;
 
@@ -494,11 +495,7 @@ HmipblurPass : PostProcess = new PostProcess(
 
 
   updateTime(deltaTime: number, currentTime: number) {
-    this.deferredShader.setTime(currentTime);
-    this.rainyPass.setTime(currentTime);
-    this.firePass.setTime(currentTime);
-    for (let pass of this.post8Passes) pass.setTime(currentTime);
-    for (let pass of this.post32Passes) pass.setTime(currentTime);
+    
     this.currentTime = currentTime;
     this.deltaTime = deltaTime;
   }
@@ -523,6 +520,8 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    //gl.enable(gl.CULL_FACE);
+    //gl.cullFace(gl.BACK);
     
     let view = camera.viewMatrix;
     let proj = camera.projectionMatrix;
@@ -578,11 +577,15 @@ HmipblurPass : PostProcess = new PostProcess(
         barkProg.setCenter(drawable.center);
         barkProg.bindTexToUnit("AlbedoMap", drawable.albedoMap, 0);
         barkProg.bindTexToUnit("SpecularMap", drawable.specularMap, 1);
-        barkProg.bindTexToUnit("NormalMap", drawable.normalMap, 2);
-
+        barkProg.bindTexToUnit("NormalMap", drawable.normalMap, 2);      
+        
         barkProg.draw(drawable);
+
+        
       }
     }
+
+    gl.disable(gl.CULL_FACE);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindTexture(gl.TEXTURE_2D, null);
@@ -594,13 +597,29 @@ HmipblurPass : PostProcess = new PostProcess(
 
     gl.clearDepth(1.0);
 
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.enable(gl.DEPTH_TEST);
-    gl.viewport(0, 0, gShadowMapSize, gShadowMapSize);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK);
 
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    gl.viewport(0, 0, gShadowMapSize, gShadowMapSize);
+    
+
     shadowProg.setViewProjMatrix(lightViewProjMat);
+
+    /*
+    shadowProg.setTime(this.currentTime);
+
+    for (var i =0; i< drawables.length ; i++)
+    {
+      shadowProg.setModelMatrix(drawables[i].modelMat);
+      shadowProg.setCenter(drawables[i].center);
+      shadowProg.setAlbedoMap( drawables[i].albedoMap.texture );
+      shadowProg.draw(drawables[i]);
+    }
+    */
+
+    
     leafProg.setViewProjMatrix(lightViewProjMat);
     leafProg.setTime(this.currentTime);
     barkProg.setViewProjMatrix(lightViewProjMat);
@@ -632,6 +651,8 @@ HmipblurPass : PostProcess = new PostProcess(
         barkProg.draw(drawables[i]);
       }
     }
+    
+
     gl.disable(gl.CULL_FACE);
 
     // bind default frame buffer
@@ -647,6 +668,9 @@ HmipblurPass : PostProcess = new PostProcess(
     this.setClearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    gl.enable(gl.CULL_FACE);
+    gl.cullFace(gl.BACK);
+   
     
     let view = camera.viewMatrix;
     let proj = camera.projectionMatrix;
@@ -686,6 +710,10 @@ HmipblurPass : PostProcess = new PostProcess(
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindTexture(gl.TEXTURE_2D, null);
+
+    gl.disable(gl.CULL_FACE);
+
+   
 
   }
 
@@ -916,10 +944,11 @@ HmipblurPass : PostProcess = new PostProcess(
       }
 
       
-
+      
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ParticleMesh]);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.enable(gl.DEPTH_TEST);
+      gl.enable(gl.CULL_FACE);
       //gl.enable(gl.BLEND);
       //gl.blendFunc(gl.ONE, gl.ZERO); 
       this.setClearColor(0.0, 0.0, 0.0, 0.0);
@@ -939,12 +968,14 @@ HmipblurPass : PostProcess = new PostProcess(
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       //gl.blendFunc(gl.ONE, gl.ZERO); 
       gl.disable(gl.DEPTH_TEST);   
+      gl.disable(gl.CULL_FACE);
     }
 
 
     renderBoatParticle(camera: Camera, mesh: Mesh, particleSystem: Particle, feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram)
       {
          //transformation Feedback
+        
         feedbackShader.use();
         feedbackShader.setdeltaTime(this.deltaTime);
         feedbackShader.setTime(this.currentTime);    
@@ -976,14 +1007,14 @@ HmipblurPass : PostProcess = new PostProcess(
         
         //render       
         mesh.setCopyVBOs(particleSystem.VBOs[particleSystem.currentBufferSetIndex][2], particleSystem.VBOs[particleSystem.currentBufferSetIndex][0]);
-       
-  
         
   
+        
+        
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.ParticleMesh]);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
         gl.enable(gl.DEPTH_TEST);
-
+        gl.enable(gl.CULL_FACE);
         this.setClearColor(0.0, 0.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -998,6 +1029,8 @@ HmipblurPass : PostProcess = new PostProcess(
         // bind default frame buffer
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.disable(gl.DEPTH_TEST);   
+        gl.disable(gl.CULL_FACE);
+        
       }
 
   renderLeavesParticle(camera: Camera, mesh: Mesh, particleSystem: Particle, feedbackShader: ShaderProgram, particleRenderShader : ShaderProgram,
@@ -1115,11 +1148,12 @@ HmipblurPass : PostProcess = new PostProcess(
       this.setClearColor(0.0, 0.0, 0.0, 0.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
-      if(clouds)
-     {
 
-      particleRenderShader.setViewMatrix(camera.viewMatrix);
-      particleRenderShader.setProjMatrix(camera.cloudProjectionMatrix);
+      if(clouds)
+      {
+
+        particleRenderShader.setViewMatrix(camera.viewMatrix);
+        particleRenderShader.setProjMatrix(camera.cloudProjectionMatrix);
 
         particleRenderShader.setViewProjMatrix(camera.viewProjectionMatrix);
         particleRenderShader.setInvViewProjMatrix(camera.invViewProjectionMatrix);

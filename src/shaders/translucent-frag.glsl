@@ -3,7 +3,7 @@ precision highp float;
 
 #define EPS 0.0001
 #define PI 3.1415962
-#define SHADOWMAP_SIZE 2048.0
+#define SHADOWMAP_SIZE 1024.0
 
 in vec4 fs_Pos;
 in vec4 fs_Nor;
@@ -122,7 +122,7 @@ float rand(vec4 co){
 
 
 
-#define PCF_NUM_SAMPLES 8
+#define PCF_NUM_SAMPLES 4
 
 float PCF(sampler2D depths, float filterRadius, vec2 uv, float compare){
     float result = 0.0;
@@ -215,21 +215,19 @@ float LinearDepth(float d, float f)
 
 void main() {
  
-    // fragment info is in view space
-    mat3 invTranspose = mat3(u_ModelInvTr);
-    
-    vec4 vertexNormal = vec4(invTranspose * vec3(fs_Nor), 0);
-
-
-    vec4 Pos_SS = u_ViewProj * u_Model * fs_Pos;
-    Pos_SS /= Pos_SS.w;
-
-    float Depth = Pos_SS.z;
-
 	vec4 Albedo = texture(AlbedoMap, fs_UV);
 
     if(Albedo.a < 0.2)
         discard;
+
+    // fragment info is in view space
+    mat3 invTranspose = mat3(u_ModelInvTr);    
+    vec4 vertexNormal = vec4(invTranspose * vec3(fs_Nor), 0);
+
+    vec4 Pos_SS = u_ViewProj * u_Model * fs_Pos;
+    Pos_SS /= Pos_SS.w;
+
+    float Depth = Pos_SS.z;	
 
     vec3 col = Albedo.rgb;
     col = pow(col, vec3(2.2));
@@ -271,7 +269,7 @@ void main() {
     vec4 worldPos = u_Model * fs_Pos;
 
 	vec3 viewVec = normalize(u_CameraWPos - worldPos.xyz);
-	vec3 halfVec = viewVec + u_lightDirection.xyz;
+	
 
 	vec3 reflVec = reflect(-viewVec, normal.xyz);
 	vec4 skycol = texture(u_SkyCubeMap, reflVec);
@@ -301,7 +299,7 @@ void main() {
 
 		float diffuseTerm = clamp( dot(u_lightDirection.xyz, normal.xyz), 0.0, 1.0);
 		
-		halfVec = normalize(halfVec);
+		vec3 halfVec = normalize(viewVec + u_lightDirection.xyz);
 		
 		float LoH = clamp(dot( u_lightDirection.xyz, halfVec ), 0.0, 1.0);
 

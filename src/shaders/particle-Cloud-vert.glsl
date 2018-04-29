@@ -46,11 +46,6 @@ void main()
     CameraAxes[1][1] = u_View[1][1];
     CameraAxes[1][2] = u_View[2][1];
 
-     //Forward
-    CameraAxes[2][0] = u_View[0][2];
-    CameraAxes[2][1] = u_View[1][2];
-    CameraAxes[2][2] = u_View[2][2];
-
     vec3 billboardPos;
     
     float scale =  vs_Translate.w * 0.01 + 4000.0;
@@ -58,11 +53,7 @@ void main()
     vec4 depthPos = u_Proj * u_View * vec4(offset, 1.0);
     depthPos /= depthPos.w;
 
-    scale *= (LinearDepth(depthPos.z, 1000000.0)* 10.0 + 1.0);
-
-
-
-    
+    scale *= (LinearDepth(depthPos.z, 1000000.0)* 10.0 + 1.0);    
 
     billboardPos = offset + vs_Pos.x * scale * CameraAxes[0] + vs_Pos.y * scale * CameraAxes[1];
 
@@ -70,16 +61,10 @@ void main()
 
     vec4 normalizedPos = gl_Position / gl_Position.w;
     
-    fs_UV_SS = vec2( (normalizedPos.x + 1.0)* 0.5, (normalizedPos.y + 1.0) * 0.5);
-
-
-    //vec4 SS = u_ViewProj * vec4(billboardPos, 1.0);
-    //SS /= SS.w;
-
-    fs_Pos.a = normalizedPos.z;
-
+    fs_UV_SS = (normalizedPos.xy + vec2(1.0))* 0.5;
 
     fs_Pos.xyz = billboardPos;
+    fs_Pos.a = normalizedPos.z;
 
     fs_billboardNormal =  normalize(vec3(u_CameraWPos - offset));
 }

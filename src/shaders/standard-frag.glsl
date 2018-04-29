@@ -33,23 +33,19 @@ vec3 applyNormalMap(vec3 geomnor, vec3 normap) {
 }
 
 void main() {
- 
-   // fragment info is in view space
-    mat3 invTranspose = mat3(u_ModelInvTr);
-    vec4 vertexNormal = vec4(invTranspose * vec3(fs_Nor), 0);
 
-
-    vec4 Pos_SS = u_ViewProj * u_Model * fs_Pos;
-    Pos_SS /= Pos_SS.w;
- 
     vec4 Albedo = texture(AlbedoMap, fs_UV);
 
     if(Albedo.a < 0.2)
         discard;
 
-    vec3 col = Albedo.rgb;
+    mat3 invTranspose = mat3(u_ModelInvTr);
+    vec4 vertexNormal = vec4(invTranspose * vec3(fs_Nor), 0);
 
-    
+    vec4 Pos_SS = u_ViewProj * u_Model * fs_Pos;
+    Pos_SS /= Pos_SS.w;
+
+    vec3 col = Albedo.rgb;
 
     //inverse gamma correct
     col = pow(col, vec3(2.2));
@@ -57,30 +53,9 @@ void main() {
     fragColor[0] = vec4(col, Pos_SS.z);
     fragColor[1] = texture(SpecularMap, fs_UV);
 
-    //fragColor[1].w = (sin(u_Time) + 1.0) * 0.5;
-
-    vec4 normalInfo;
-    //rainy
-    bool bWater = texture(NormalMap, fs_UV).a < 0.5;
-	if(bWater)
-	{
-		normalInfo = texture(NormalMap, fs_UV - vec2(0.0, u_Time * 0.05));
-
-        
-	}
-    else
-    {
-        normalInfo = texture(NormalMap, fs_UV);
-    }
-
-     
-    normalInfo.xyz = (normalInfo.xyz*2.0 - vec3(1.0)); 
-
-    if(bWater)
-    {
-        normalInfo.z += 10.0;
-        normalInfo.xyz = normalize(normalInfo.xyz);
-    }
+    vec4 normalInfo = texture(NormalMap, fs_UV);     
+    normalInfo.xyz = normalize(normalInfo.xyz*2.0 - vec3(1.0)); 
+    
 
     vec3 worldNormal = applyNormalMap(vertexNormal.xyz, normalInfo.xyz);
 

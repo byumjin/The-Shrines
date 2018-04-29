@@ -183,7 +183,7 @@ function play_single_sound() {
         audio_buf.start(0);
         });
 
-        console.log(`Music On!`);
+        //console.log(`Music On!`);
 }
 
 function changeVolume(volume : number)
@@ -324,7 +324,7 @@ function loadRoadMap(){
   mesh.create();
   Array_Conn.push(mesh);
   road_Mesh_Map.set("conn", Array_Conn);
-  console.log(road_Mesh_Map);
+  //console.log(road_Mesh_Map);
 }
 
 function loadScene() {
@@ -516,7 +516,7 @@ function loadScene() {
    LS0.setInitialDirection(90);
    LS0.process(1);
    LS0.create();
-   console.log(LS0);
+   //console.log(LS0);
 
    LS1 = new LSystem(vec3.fromValues(0,1.5,-55),
    new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
@@ -529,7 +529,7 @@ function loadScene() {
    LS1.setInitialDirection(180)
    LS1.process(1);
    LS1.create();
-   console.log(LS1);
+   //console.log(LS1);
 
    LS2 = new LSystem(vec3.fromValues(-55,1.5,0),
    new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
@@ -542,7 +542,7 @@ function loadScene() {
    LS2.setInitialDirection(-90)
    LS2.process(1);
    LS2.create();
-   console.log(LS2);
+   //console.log(LS2);
 
    LS3 = new LSystem(vec3.fromValues(0,1.5,55),
    new Texture('./src/resources/objs/shrines/textures/marbles_albedo.png', false),
@@ -555,7 +555,7 @@ function loadScene() {
    LS3.setInitialDirection(0)
    LS3.process(1);
    LS3.create();
-   console.log(LS3);
+   //console.log(LS3);
 }
 
 function CheckTriggers(cam : Camera, camPos: vec3, distance: number, height: number, range: number, deltaTime : number){
@@ -756,7 +756,6 @@ function main() {
   
   const stats = Stats();
   stats.setMode(0);
-  stats.s
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
@@ -968,7 +967,7 @@ function main() {
 
 
   //let lightColor : vec4 = vec4.fromValues(1.0, 0.4, 0.05, 1.0);
-  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.5); // this is for shadow complement
+  let lightColor : vec4 = vec4.fromValues(1.0, 1.0, 1.0, 2.0); // this is for shadow complement
   let lightPosition : vec4 = vec4.fromValues(0.0, 50.0, 0.0, 1.0);
   let lightD : vec3 = vec3.create();
   vec3.normalize(lightD, vec3.fromValues(-1.0, 0.4, 1.0));
@@ -998,56 +997,41 @@ function main() {
   let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 750, 350, -350, 380);
 
   function tick() {
-
   
-      stats.begin();
+    stats.begin();
 
     CheckTriggers(camera, camera.position, 315, 30, 20, timer.deltaTime);
-
     camera.update();
-    
-    gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+
     timer.updateTime();
     renderer.updateTime(timer.deltaTime, timer.currentTime);
     
-    renderer.clear();
+    //renderer.clear();
     renderer.clearGB();
 
-    renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, 
-      [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh0]);
-    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, 
-      [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
+    renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh0]);
+    renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh_B_Glass ]);
 
     renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
-
     renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
-    
-    
-
     renderer.renderAddTranslucent();  
-
     renderer.renderSSR(camera, skyCubeMap.cubemap_texture,
                        controls.SSR_MaxStep, controls.SSR_Opaque_Intensity, controls.SSR_Trans_Intensity, controls.SSR_Threshold);
 
     
     renderer.renderSSRMip();
-
     
-    for(var m = 0; m < 5; m++)
+    for(var m = 0; m < 4; m++)
     {
       renderer.renderforHorizontalMipBlur(camera, m);
       renderer.renderforVerticaMipBlur(camera, m);
     } 
-    
-    
 
     renderer.renderClouds(camera, cloudQuad, particleCloud, lightColor, lightDirection, cloudsTexture.texture, cloudsNormalTexture.texture, mesh_lake.normalMap.texture, feedBackCloudShader, particleCloudRenderShader, controls.Clouds);
     renderer.renderBoatParticle(camera, mesh_Boat, particleBoatSys, feedBackBoatShader, particleBoatRenderShader);
     
     UpdateParticle(renderer, camera, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, particleSys, feedBackShader, particleRenderShader);
-
-    
 
     var bNRain = (0.0 >= controls.Rain_delaytoStartTimer);
     var bNSnow = (0.0 >= controls.Snow_delaytoStartTimer);
@@ -1057,6 +1041,7 @@ function main() {
 
     renderer.renderforHighLightCurrentFrame(camera);
     renderer.renderforHighLightLensFlare(camera);
+
     for(var  i = 0; i< controls.Bloom_Iteration; i++)
     {
       renderer.renderforHorizontalBlur(camera, i);
@@ -1072,8 +1057,6 @@ function main() {
     }
 
     renderer.renderTonemapping(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion, controls.Temperature );
-
-    //renderer.renderFXAA(camera);
     
     if(!bNRain)
       renderer.renderRainy(controls.Rain_delaytoStartTimer);   
@@ -1083,8 +1066,8 @@ function main() {
       renderer.renderFire(controls.Fire_delaytoStartTimer);
     else
       renderer.renderPresent(camera);
-    
-      stats.end();
+
+    stats.end();
     
     requestAnimationFrame(tick);
   }
@@ -1146,22 +1129,18 @@ function main() {
       if (String.fromCharCode(ev.keyCode) == 'W')
       {
         camera.bForward = true;
-        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
       if (String.fromCharCode(ev.keyCode) == 'A')
       {
         camera.bLeft = true;
-        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
       if (String.fromCharCode(ev.keyCode) == 'S')
       {
         camera.bBackward = true;
-        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
       if (String.fromCharCode(ev.keyCode) == 'D')
       {
         camera.bRight = true;
-        //CheckTriggers(camera, camera.position, 250, 75, 75, timer.deltaTime);
       }
     }
 

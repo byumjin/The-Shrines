@@ -20,10 +20,7 @@ in vec2 fs_UV;
 in vec2 fs_UV_SS;
 in vec3 fs_billboardNormal;
 
-
-
 out vec4 out_Col;
-
 
 vec3 applyNormalMap(vec3 geomnor, vec3 normap) {
     
@@ -33,17 +30,10 @@ vec3 applyNormalMap(vec3 geomnor, vec3 normap) {
     return normalize(normap.y * surftan + normap.x * surfbinor + normap.z * geomnor);
 }
 
-float LinearDepth(float d, float f)
-{
-	
-	float n = 0.1;
-	return (2.0 * n) / (f + n - d * (f - n));
-}
-
 void main()
 {
     float sceneDepth = texture(u_frame0, fs_UV_SS).a;
-    float particleDepth = fs_Pos.a;
+    //float particleDepth = fs_Pos.a;
 
     if(sceneDepth > 19.0)
 	{
@@ -54,28 +44,22 @@ void main()
 		sceneDepth -= 10.0;
 	}
 
-    if(sceneDepth > particleDepth)
+    if(sceneDepth >= 1.0)
     {
-        vec3 viewVec = normalize(u_CameraWPos - fs_Pos.xyz);
+       vec3 viewVec = normalize(u_CameraWPos - fs_Pos.xyz);
 
-        int sprite = int( floor(fs_Col.a) ) % 8;
-        vec4 NoiseMap = texture(u_frame3, vec2(fs_UV.x + u_Time * 0.0983, fs_UV.y - u_Time * 0.0365));
+       int sprite = int( floor(fs_Col.a) ) % 8;
+       vec4 NoiseMap = texture(u_frame3, vec2(fs_UV.x + u_Time * 0.0983, fs_UV.y - u_Time * 0.0365));
 
-        vec2 Noise = NoiseMap.xy * 2.0 - vec2(1.0);
-        Noise *= 0.02;
+       vec2 Noise = NoiseMap.xy * 2.0 - vec2(1.0);
+       Noise *= 0.02;
 
-        vec2 TwickedUV = fs_UV + Noise;
+       vec2 TwickedUV = fs_UV + Noise;
 
-       out_Col.xyz = texture(u_frame1, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;
-       vec3 normal = texture(u_frame2, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;
+       out_Col.xyz = texture(u_frame1, vec2( (float(sprite) * 0.125) + (TwickedUV.x * 0.125)  , TwickedUV.y)  ).xyz;
+       vec3 normal = texture(u_frame2, vec2( (float(sprite) * 0.125) + (TwickedUV.x * 0.125)  , TwickedUV.y)  ).xyz;
 
-   
-       
-
-       normal = applyNormalMap(fs_billboardNormal, normalize(normal * 2.0 - 1.0) );
-
-       // out_Col.xyz = normal;
-       // return;
+       normal = applyNormalMap(fs_billboardNormal, normalize(normal * 2.0 - 1.0));
 
        float NoV = clamp( dot(normal, viewVec), 0.0, 1.0);
 
@@ -84,12 +68,8 @@ void main()
        vec3 sliverLight = vec3(10.0);
 
        out_Col.xyz *= fs_Col.xyz * mix(sliverLight, vec3(1.0, 0.6, 0.4) , pow(NoV, 1.5)) * NoL;
-       //out_Col.xyz *= 1.5;
-       out_Col.a = 1.0;
-
-       
-       out_Col = clamp(out_Col, 0.0, 1.0);
-       
+       out_Col.a = 1.0;       
+       out_Col = clamp(out_Col, 0.0, 1.0);       
     }
     else
     {   

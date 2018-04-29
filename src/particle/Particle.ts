@@ -137,7 +137,7 @@ class Particle
       this.position[p * 4 + 2] = posXZ[1] *  depth + zOffset;
       
        // Life
-      this.velocity[p * 4] = 0.0;
+      this.velocity[p * 4] = Math.random();
       this.velocity[p * 4 + 1] = 0.0;
       this.velocity[p * 4 + 2] = 0.0;
 
