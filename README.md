@@ -33,6 +33,14 @@ We chose deferred rendering for getting screen space information such as rougnes
 
 We used shadow mapping to create dynamic shadows. We chose 2048x2048 texture buffer to store the depth map. To create soft shadow, we tried many methods to realize that, like VSM, PCSS, PCF, etc. Finally, we decided to use **Stratified Poisson-Sampling PCF**. We created soft shadows of static objects(like buildings) and dynamic objects(like trees), and the shadows casted on both opaque objects and tranparent objects(water).
 
+|No Shadow|With Shadow|
+|---|---|
+|<img src="./imgs/noShadow.JPG" width="450" height="380">|<img src="./imgs/softShadow.JPG" width="450" height="380">|
+
+|Hard Shadow|Soft Shadow|
+|---|---|
+|<img src="./imgs/hardShadow.JPG" width="450" height="380">|<img src="./imgs/softShadow2.JPG" width="450" height="380">|
+
 ### Moving Trees
 
 To render the trees with animation, we need to modify the vertex positions according to time in vertex shader(vertex animation). So we could no longer to use the same vertex shader as other static objects. Here we used 2 other different shaders for the barks and leaves in *RenderToGBuffer* pass.
@@ -76,6 +84,13 @@ We made our particles with billboard quad or object's mesh itself. To reduce dis
 
 We also used similar noise map like those of water to make the clouds spread. And, to make them like volumetric clouds, normal map is used for lighting. Unlike usual lambertian shading, we used smoothstep of absolute value of N dot L with 0.2 as minimal value. This prevents to make clouds to be balck and brighter when the clouds' billborad faces sun light. 
 
+### Procedural Roads
+
+We used L-System to generate the diffrent roads, and there are multiple base geometries for the roads and the connection corners, which are randomly generated during every reloading of the scene.
+
+|Random 1|Random 2|Random 3|
+|---|---|---|
+|<img src="./imgs/LRoad1.JPG" width="300" height="180">|<img src="./imgs/LRoad2.JPG" width="300" height="180">|<img src="./imgs/LRoad3.JPG" width="300" height="180">|
 
 ### HDR
 
@@ -100,6 +115,10 @@ Using same high light scene image as Bloom, we could create ghost effects with d
 We used flimic tone mapping referred to [here](https://www.shadertoy.com/view/lslGzl)
 
 ### Post-Process in Single Screen Triangular
+
+|Frost|Rainy|Fire|
+|---|---|---|
+|<img src="./imgs/frost.JPG" width="300" height="150">|<img src="./imgs/rain.gif" width="300" height="150">|<img src="./imgs/fire.gif" width="300" height="150">|
 
 We implemented 3 post-process effects for Ice Shrine, Water Shrine and Fire Shrine.
 * Frost Effect: set the uv offsets based on the computation with a noise image. [frosted glass vignette](https://www.shadertoy.com/view/MsySzy) 
