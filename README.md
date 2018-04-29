@@ -35,17 +35,21 @@ We used shadow mapping to create dynamic shadows. We chose 2048x2048 texture buf
 
 |No Shadow|With Shadow|
 |---|---|
-|<img src="./imgs/noShadow.JPG" width="450" height="380">|<img src="./imgs/softShadow.JPG" width="450" height="380">|
+|<img src="./imgs/noShadow.JPG" width="400" height="345">|<img src="./imgs/softShadow.JPG" width="400" height="345">|
 
 |Hard Shadow|Soft Shadow|
 |---|---|
-|<img src="./imgs/hardShadow.JPG" width="450" height="380">|<img src="./imgs/softShadow2.JPG" width="450" height="380">|
+|<img src="./imgs/hardShadow.JPG" width="400" height="345">|<img src="./imgs/softShadow2.JPG" width="400" height="345">|
 
 ### Moving Trees
 
 To render the trees with animation, we need to modify the vertex positions according to time in vertex shader(vertex animation). So we could no longer to use the same vertex shader as other static objects. Here we used 2 other different shaders for the barks and leaves in *RenderToGBuffer* pass.
 To create the animation of the trees, we followed the instructions of [Vegetation Procedural Animation and Shading in Crysis](https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch16.html). We used three channels of the vertex color to represent three different kinds of movement of the leaves, the red channel is used for the stiffness of leaves' edges, the green channel for per-leaf phase variation, and the blue channel for the overall stiffness of the leaves.
 The only problem was that the .obj file cannot store the vertex color information, and we were using TypeScript for the development, so we cannot use fbxLoader tools of three.js. Finally, we stored the vertex colors in another format of file, .ply. When loading models of tree, we both loaded .obj files for positions, normals, texcoords and .ply files for colors.
+
+|Tree Rendering|Vertex Color|
+|---|---|
+|<img src="./imgs/tree.gif" width="450" height="420">|<img src="./imgs/tree_color.JPG" width="450" height="400">|
 
 
 ### Translucent Material
