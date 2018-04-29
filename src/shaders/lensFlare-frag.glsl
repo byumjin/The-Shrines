@@ -27,7 +27,7 @@ void main()
  
   const int uGhosts = 3; // number of ghost samples
   float uGhostDispersal = 0.2; // dispersion factor
-  float uDistortion = 2.0;
+  float uDistortion = 1.5;
   const float u_intensity = 0.5;
 
 

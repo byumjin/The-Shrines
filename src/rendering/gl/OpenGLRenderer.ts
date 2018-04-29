@@ -83,9 +83,9 @@ class OpenGLRenderer {
 
   SSRDownSampling: number = 0.5;
 
-  LensDownSampling: number = 0.5;
-  LensBlurDownSampling: number = 0.25;
-  BloomDownSampling: number = 0.25;
+  LensDownSampling: number = 0.25;
+  LensBlurDownSampling: number = 0.125;
+  BloomDownSampling: number = 0.125;
 
   // the shader that renders from the gbuffers into the postbuffers
   deferredShader :  PostProcess = new PostProcess(
@@ -1215,7 +1215,7 @@ HmipblurPass : PostProcess = new PostProcess(
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.HblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth * this.BloomDownSampling, gl.drawingBufferHeight * this.BloomDownSampling) );
-    this.HblurPass.setBlurScale(vec2.fromValues( 4.0, 1.0) );
+    this.HblurPass.setBlurScale(vec2.fromValues( 2.0, 1.0) );
 
     if(index == 0)
       this.HblurPass.setFrame00(this.post32Targets[PipelineEnum.ExtractHighLight]);
@@ -1248,13 +1248,13 @@ HmipblurPass : PostProcess = new PostProcess(
   renderforHorizontalMipBlur(camera: Camera, LOD : number) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SSR_HBLURRED_MIP_0 + 2*LOD]);
 
-    var denom = Math.pow(2.0, LOD + 1.0);
-    gl.viewport(0, 0, gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom);
+    var denom = Math.pow(2.0, LOD);
+    gl.viewport(0, 0, (gl.drawingBufferWidth * this.SSRDownSampling) / denom, (gl.drawingBufferHeight  * this.SSRDownSampling) / denom);
     gl.disable(gl.DEPTH_TEST);
     
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    this.HmipblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom) );
+    this.HmipblurPass.setScreenSize(vec2.fromValues( (gl.drawingBufferWidth  * this.SSRDownSampling) / denom, (gl.drawingBufferHeight  * this.SSRDownSampling) / denom) );
     this.HmipblurPass.setBlurScale(vec2.fromValues( 1.0, 1.0) );
     this.HmipblurPass.setFrame00(this.post32Targets[PipelineEnum.SSR_MIP]);
     this.HmipblurPass.setmipLod(LOD);
@@ -1267,14 +1267,14 @@ HmipblurPass : PostProcess = new PostProcess(
 
   renderforVerticaMipBlur(camera: Camera, LOD : number) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.post32Buffers[PipelineEnum.SSR_VBLURRED_MIP_0 + 2*LOD]);
-    var denom = Math.pow(2.0, LOD + 1.0);
+    var denom = Math.pow(2.0, LOD);
 
-    gl.viewport(0, 0, gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom);
+    gl.viewport(0, 0, (gl.drawingBufferWidth  * this.SSRDownSampling) / denom, (gl.drawingBufferHeight  * this.SSRDownSampling) / denom);
     gl.disable(gl.DEPTH_TEST);
     
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    this.VmipblurPass.setScreenSize(vec2.fromValues( gl.drawingBufferWidth / denom, gl.drawingBufferHeight / denom) );
+    this.VmipblurPass.setScreenSize(vec2.fromValues( (gl.drawingBufferWidth  * this.SSRDownSampling) / denom, (gl.drawingBufferHeight  * this.SSRDownSampling) / denom) );
     this.VmipblurPass.setBlurScale(vec2.fromValues( 1.0, 1.0) );
     this.VmipblurPass.setFrame00(this.post32Targets[PipelineEnum.SSR_HBLURRED_MIP_0 + 2*LOD]);
     this.VmipblurPass.setmipLod(LOD);

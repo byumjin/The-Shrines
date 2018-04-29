@@ -852,24 +852,24 @@ const controls = {
     SSR_Opaque_Intensity: 1.0,
     SSR_Trans_Intensity: 0.8,
     SSR_Threshold: 2.0,
-    Bloom_Iteration: 16,
+    Bloom_Iteration: 4,
     Bloom_Dispersal: 0.5,
-    Bloom_Distortion: 8.0,
+    Bloom_Distortion: 0.5,
     FireFly: false,
     Rain: false,
-    Rain_delaytoStartTimer: 3.0,
+    Rain_delaytoStartTimer: 0.0,
     Rain_delaytoDieTimer: 3.0,
     Rain_Timer: 3.0,
     Snow: false,
     Snow_delaytoDieTimer: 3.0,
-    Snow_delaytoStartTimer: 3.0,
+    Snow_delaytoStartTimer: 0.0,
     Snow_Timer: 3.0,
     Lantern: false,
     Lantern_delaytoDieTimer: 10.0,
     Lantern_Timer: 10.0,
     Fire: false,
     Fire_delaytoDieTimer: 3.0,
-    Fire_delaytoStartTimer: 3.0,
+    Fire_delaytoStartTimer: 0.0,
     Fire_Timer: 3.0,
     Earth: false,
     Earth_delaytoDieTimer: 14.0,
@@ -1231,6 +1231,83 @@ function CheckTriggers(cam, camPos, distance, height, range, deltaTime) {
         controls.Earth = false;
     }
 }
+function UpdateParticle(renderer, camera, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, particleSys, feedBackShader, particleRenderShader) {
+    if (!controls.Lantern) {
+        controls.Lantern_Timer += timer.deltaTime;
+        if (controls.Lantern_Timer < controls.Lantern_delaytoDieTimer) {
+            renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, controls.Lantern, true);
+        }
+        else {
+            renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, controls.Lantern, false);
+        }
+    }
+    else {
+        controls.Lantern_Timer = 0.0;
+        renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, controls.Lantern, true);
+    }
+    if (!controls.Earth) {
+        controls.Earth_Timer += timer.deltaTime;
+        if (controls.Earth_Timer < controls.Earth_delaytoDieTimer) {
+            renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, true);
+        }
+        else {
+            renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, false);
+        }
+    }
+    else {
+        controls.Earth_Timer = 0.0;
+        renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, true);
+    }
+    if (!controls.Rain) {
+        controls.Rain_Timer += timer.deltaTime;
+        if (controls.Rain_Timer < controls.Rain_delaytoDieTimer) {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true);
+        }
+        else {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false);
+        }
+        controls.Rain_delaytoStartTimer -= timer.deltaTime;
+        if (controls.Rain_delaytoStartTimer < 0.0)
+            controls.Rain_delaytoStartTimer = 0.0;
+    }
+    else {
+        controls.Rain_Timer = 0.0;
+        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true);
+        controls.Rain_delaytoStartTimer += timer.deltaTime;
+        if (controls.Rain_delaytoStartTimer > 3.0)
+            controls.Rain_delaytoStartTimer = 3.0;
+    }
+    var bbNRain = !controls.Rain && (controls.Rain_Timer >= controls.Rain_delaytoDieTimer);
+    if (!controls.Snow) {
+        controls.Snow_Timer += timer.deltaTime;
+        if (controls.Snow_Timer < controls.Snow_delaytoDieTimer) {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true);
+        }
+        else if (bbNRain) {
+            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false);
+        }
+        controls.Snow_delaytoStartTimer -= timer.deltaTime;
+        if (controls.Snow_delaytoStartTimer < 0.0)
+            controls.Snow_delaytoStartTimer = 0.0;
+    }
+    else if (bbNRain) {
+        controls.Snow_Timer = 0.0;
+        renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true);
+        controls.Snow_delaytoStartTimer += timer.deltaTime;
+        if (controls.Snow_delaytoStartTimer > 3.0)
+            controls.Snow_delaytoStartTimer = 3.0;
+    }
+    if (!controls.Fire) {
+        controls.Fire_delaytoStartTimer -= timer.deltaTime;
+        if (controls.Fire_delaytoStartTimer < 0.0)
+            controls.Fire_delaytoStartTimer = 0.0;
+    }
+    else {
+        controls.Fire_delaytoStartTimer += timer.deltaTime;
+        if (controls.Fire_delaytoStartTimer > 3.0)
+            controls.Fire_delaytoStartTimer = 3.0;
+    }
+}
 function main() {
     play_single_sound();
     // Initial display for framerate
@@ -1253,20 +1330,13 @@ function main() {
     SSR.add(controls, 'SSR_Threshold', 0.0, 10.0).step(0.1);
   
     var BLOOM = gui.addFolder('BLOOM');
-    BLOOM.add(controls, 'Bloom_Iteration', 0, 32).step(1);
+    BLOOM.add(controls, 'Bloom_Iteration', 0, 16).step(1);
     BLOOM.add(controls, 'Bloom_Dispersal', 0.0, 20.0).step(0.01);
-    BLOOM.add(controls, 'Bloom_Distortion', 0.0, 16.0).step(0.1);
-    */
-    /*
-    var PARTICLE = gui.addFolder('Particle');
-    //PARTICLE.add(controls, 'FireFly');
-    PARTICLE.add(controls, 'Rain');
-    PARTICLE.add(controls, 'Snow');
-    PARTICLE.add(controls, 'Lantern');
-    PARTICLE.add(controls, 'Clouds');
+    BLOOM.add(controls, 'Bloom_Distortion', 0.0, 8.0).step(0.01);
     */
     var ENVIRONMENT = gui.addFolder('Environment');
     ENVIRONMENT.add(controls, 'Temperature', 3600, 10000).step(1);
+    ENVIRONMENT.add(controls, 'Clouds');
     var MUSIC = gui.addFolder('Music');
     MUSIC.add(controls, 'Volume', 0.0, 1.0).step(0.01).onChange(function () {
         changeVolume(controls.Volume);
@@ -1427,81 +1497,7 @@ function main() {
         }
         renderer.renderClouds(camera, cloudQuad, particleCloud, lightColor, lightDirection, cloudsTexture.texture, cloudsNormalTexture.texture, mesh_lake.normalMap.texture, feedBackCloudShader, particleCloudRenderShader, controls.Clouds);
         renderer.renderBoatParticle(camera, mesh_Boat, particleBoatSys, feedBackBoatShader, particleBoatRenderShader);
-        if (!controls.Lantern) {
-            controls.Lantern_Timer += timer.deltaTime;
-            if (controls.Lantern_Timer < controls.Lantern_delaytoDieTimer) {
-                renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, controls.Lantern, true);
-            }
-            else {
-                renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, controls.Lantern, false);
-            }
-        }
-        else {
-            controls.Lantern_Timer = 0.0;
-            renderer.renderLanternParticle(camera, mesh_Lantern, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, controls.Lantern, true);
-        }
-        if (!controls.Earth) {
-            controls.Earth_Timer += timer.deltaTime;
-            if (controls.Earth_Timer < controls.Earth_delaytoDieTimer) {
-                renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, true);
-            }
-            else {
-                renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, false);
-            }
-        }
-        else {
-            controls.Earth_Timer = 0.0;
-            renderer.renderLeavesParticle(camera, mesh_Leaves, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, controls.Earth, true);
-        }
-        if (!controls.Rain) {
-            controls.Rain_Timer += timer.deltaTime;
-            if (controls.Rain_Timer < controls.Rain_delaytoDieTimer) {
-                renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true);
-            }
-            else {
-                renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false);
-            }
-            controls.Rain_delaytoStartTimer -= timer.deltaTime;
-            if (controls.Rain_delaytoStartTimer < 0.0)
-                controls.Rain_delaytoStartTimer = 0.0;
-        }
-        else {
-            controls.Rain_Timer = 0.0;
-            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 1.0, true);
-            controls.Rain_delaytoStartTimer += timer.deltaTime;
-            if (controls.Rain_delaytoStartTimer > 3.0)
-                controls.Rain_delaytoStartTimer = 3.0;
-        }
-        var bbNRain = !controls.Rain && (controls.Rain_Timer >= controls.Rain_delaytoDieTimer);
-        if (!controls.Snow) {
-            controls.Snow_Timer += timer.deltaTime;
-            if (controls.Snow_Timer < controls.Snow_delaytoDieTimer) {
-                renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true);
-            }
-            else if (bbNRain) {
-                renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 0.0, false);
-            }
-            controls.Snow_delaytoStartTimer -= timer.deltaTime;
-            if (controls.Snow_delaytoStartTimer < 0.0)
-                controls.Snow_delaytoStartTimer = 0.0;
-        }
-        else if (bbNRain) {
-            controls.Snow_Timer = 0.0;
-            renderer.renderParticle(camera, particleQuad, particleSys, feedBackShader, particleRenderShader, controls.FireFly, 2.0, true);
-            controls.Snow_delaytoStartTimer += timer.deltaTime;
-            if (controls.Snow_delaytoStartTimer > 3.0)
-                controls.Snow_delaytoStartTimer = 3.0;
-        }
-        if (!controls.Fire) {
-            controls.Fire_delaytoStartTimer -= timer.deltaTime;
-            if (controls.Fire_delaytoStartTimer < 0.0)
-                controls.Fire_delaytoStartTimer = 0.0;
-        }
-        else {
-            controls.Fire_delaytoStartTimer += timer.deltaTime;
-            if (controls.Fire_delaytoStartTimer > 3.0)
-                controls.Fire_delaytoStartTimer = 3.0;
-        }
+        UpdateParticle(renderer, camera, particleLanternSys, feedBackLanternShader, particleLanternRenderShader, particleLeavesSys, feedBackLeavesShader, particleLeavesRenderShader, particleSys, feedBackShader, particleRenderShader);
         var bNRain = (0.0 >= controls.Rain_delaytoStartTimer);
         var bNSnow = (0.0 >= controls.Snow_delaytoStartTimer);
         var bNFire = (0.0 >= controls.Fire_delaytoStartTimer);
@@ -1513,7 +1509,7 @@ function main() {
             renderer.renderforVerticalBlur(camera);
         }
         renderer.renderforLensFlare(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion);
-        for (var i = 0; i < 8; i++) {
+        for (var i = 0; i < 1; i++) {
             renderer.renderforLensflareHorizontalBlur(camera, i);
             renderer.renderforLensflareVerticalBlur(camera);
         }
@@ -12930,9 +12926,9 @@ class OpenGLRenderer {
     constructor(canvas) {
         this.canvas = canvas;
         this.SSRDownSampling = 0.5;
-        this.LensDownSampling = 0.5;
-        this.LensBlurDownSampling = 0.25;
-        this.BloomDownSampling = 0.25;
+        this.LensDownSampling = 0.25;
+        this.LensBlurDownSampling = 0.125;
+        this.BloomDownSampling = 0.125;
         // the shader that renders from the gbuffers into the postbuffers
         this.deferredShader = new __WEBPACK_IMPORTED_MODULE_3__PostProcess__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_2__ShaderProgram__["a" /* Shader */](__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAGMENT_SHADER, __webpack_require__(30)));
         this.translucentAddPass = new __WEBPACK_IMPORTED_MODULE_3__PostProcess__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_2__ShaderProgram__["a" /* Shader */](__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAGMENT_SHADER, __webpack_require__(31)));
@@ -13740,7 +13736,7 @@ class OpenGLRenderer {
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].clear(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].COLOR_BUFFER_BIT);
         this.HblurPass.setScreenSize(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth * this.BloomDownSampling, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight * this.BloomDownSampling));
-        this.HblurPass.setBlurScale(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(4.0, 1.0));
+        this.HblurPass.setBlurScale(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(2.0, 1.0));
         if (index == 0)
             this.HblurPass.setFrame00(this.post32Targets[PipelineEnum.ExtractHighLight]);
         else
@@ -13765,11 +13761,11 @@ class OpenGLRenderer {
     }
     renderforHorizontalMipBlur(camera, LOD) {
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, this.post32Buffers[PipelineEnum.SSR_HBLURRED_MIP_0 + 2 * LOD]);
-        var denom = Math.pow(2.0, LOD + 1.0);
-        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].viewport(0, 0, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth / denom, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight / denom);
+        var denom = Math.pow(2.0, LOD);
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].viewport(0, 0, (__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth * this.SSRDownSampling) / denom, (__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight * this.SSRDownSampling) / denom);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].clear(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].COLOR_BUFFER_BIT);
-        this.HmipblurPass.setScreenSize(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth / denom, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight / denom));
+        this.HmipblurPass.setScreenSize(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues((__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth * this.SSRDownSampling) / denom, (__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight * this.SSRDownSampling) / denom));
         this.HmipblurPass.setBlurScale(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(1.0, 1.0));
         this.HmipblurPass.setFrame00(this.post32Targets[PipelineEnum.SSR_MIP]);
         this.HmipblurPass.setmipLod(LOD);
@@ -13780,11 +13776,11 @@ class OpenGLRenderer {
     }
     renderforVerticaMipBlur(camera, LOD) {
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].bindFramebuffer(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FRAMEBUFFER, this.post32Buffers[PipelineEnum.SSR_VBLURRED_MIP_0 + 2 * LOD]);
-        var denom = Math.pow(2.0, LOD + 1.0);
-        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].viewport(0, 0, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth / denom, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight / denom);
+        var denom = Math.pow(2.0, LOD);
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].viewport(0, 0, (__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth * this.SSRDownSampling) / denom, (__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight * this.SSRDownSampling) / denom);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].clear(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].COLOR_BUFFER_BIT);
-        this.VmipblurPass.setScreenSize(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth / denom, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight / denom));
+        this.VmipblurPass.setScreenSize(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues((__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth * this.SSRDownSampling) / denom, (__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight * this.SSRDownSampling) / denom));
         this.VmipblurPass.setBlurScale(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(1.0, 1.0));
         this.VmipblurPass.setFrame00(this.post32Targets[PipelineEnum.SSR_HBLURRED_MIP_0 + 2 * LOD]);
         this.VmipblurPass.setmipLod(LOD);
@@ -13996,7 +13992,7 @@ module.exports = "#version 300 es\nprecision highp float;\n\nin vec2 fs_UV;\nout
 /* 34 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nin vec2 fs_UV;\r\nout vec4 out_Col;\r\n\r\nuniform sampler2D u_frame0; //Scene\r\nuniform sampler2D u_frame1; //SSR_Mask\r\n//uniform sampler2D u_frame2; //SSR\r\nuniform sampler2D u_frame3; //ParticleRain\r\nuniform sampler2D u_frame4; //ParticleMesh\r\nuniform sampler2D u_DepthMap; //Cloud\r\n\r\nuniform sampler2D u_frame5; //SSR 0\r\nuniform sampler2D u_frame6; //SSR 1\r\nuniform sampler2D u_frame7; //SSR 2\r\nuniform sampler2D u_frame8; //SSR 3\r\nuniform sampler2D u_frame9; //SSR 4\r\n\r\nuniform sampler2D u_Gbuffer_Specular;\r\nuniform sampler2D u_Gbuffer_Albedo;\r\n\r\n\r\nvec4 getSSRColor(vec2 UV, float lod)\r\n{\r\n\tif( lod < 1.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame5, UV), texture(u_frame6, UV), lod);\r\n\t}\r\n\telse if( lod < 2.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame6, UV), texture(u_frame7, UV), fract(lod));\r\n\t}\r\n\telse if( lod < 3.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame7, UV), texture(u_frame8, UV), fract(lod));\r\n\t}\r\n\telse\r\n\t{\r\n\t\treturn mix(texture(u_frame8, UV), texture(u_frame9, UV), fract(lod));\r\n\t}\r\n}\r\n\r\n\r\nvoid main() {\r\n\r\n\tvec2 reverseUV = fs_UV;\r\n\treverseUV.y = 1.0 - reverseUV.y;\r\n\r\n\tfloat roughness = texture(u_Gbuffer_Specular, reverseUV).a;\r\n\tvec4 sceneImagecolor = texture(u_frame0, fs_UV);\r\n \tvec4 meshParticle = texture(u_frame4, reverseUV);\r\n\r\n\tsceneImagecolor.xyz = mix(sceneImagecolor.xyz, meshParticle.xyz, meshParticle.a);\r\n\t\r\n\tfloat opaqueDepth = texture(u_Gbuffer_Albedo, reverseUV).a;\r\n\r\n\tfloat SSRMask = texture(u_frame1, fs_UV).a;\r\n\r\n\t//bool bWater;\r\n\tbool bTrans;\r\n\r\n\tfloat sceneDepth = texture(u_frame0, reverseUV).a;\r\n\r\n\tif(sceneDepth >= 9.0)\r\n\t{\r\n\t\tbTrans = true;\r\n\t}\r\n\r\n\tvec4 SSRMipColor = getSSRColor(fs_UV, log2(roughness + 1.0) * 4.0);\r\n\t//vec4 SSRMipColor = \t\t\t\t   texture(u_frame5, fs_UV);\r\n\r\n\r\n\tvec4 particles = texture(u_frame3, reverseUV) + texture(u_DepthMap, reverseUV);\r\n\t\r\n\tvec3 finalColor = vec3(0.0);\r\n\r\n\tSSRMask = clamp(SSRMask, 0.0, 1.0);\r\n\r\n\tif(SSRMask <= 0.0)\r\n\t\tfinalColor = sceneImagecolor.xyz + particles.xyz;\r\n\telse\r\n\t{\r\n\t\tif(bTrans)\r\n\t\t{\r\n\t\t\tfinalColor = SSRMipColor.xyz + particles.xyz  + sceneImagecolor.xyz;\r\n\t\t}\r\n\t\telse\r\n\t\t\tfinalColor = (SSRMipColor.xyz + particles.xyz) * sceneImagecolor.xyz + sceneImagecolor.xyz;\r\n\t}\r\n\t\t\r\n\t//vec4 RainColor = texture(u_frame3, reverseUV);\t\r\n\t//finalColor.xyz += RainColor.xyz;\r\n\t//vec4 cloudColor = texture(u_DepthMap, reverseUV);\r\n\t//finalColor.xyz += cloudColor.xyz;\r\n\r\n\r\n\tout_Col = vec4( finalColor, sceneImagecolor.a);\r\n}\r\n"
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nin vec2 fs_UV;\r\nout vec4 out_Col;\r\n\r\nuniform sampler2D u_frame0; //Scene\r\nuniform sampler2D u_frame1; //SSR_Mask\r\n//uniform sampler2D u_frame2; //SSR\r\nuniform sampler2D u_frame3; //ParticleRain\r\nuniform sampler2D u_frame4; //ParticleMesh\r\nuniform sampler2D u_DepthMap; //Cloud\r\n\r\nuniform sampler2D u_frame5; //SSR 0\r\nuniform sampler2D u_frame6; //SSR 1\r\nuniform sampler2D u_frame7; //SSR 2\r\nuniform sampler2D u_frame8; //SSR 3\r\nuniform sampler2D u_frame9; //SSR 4\r\n\r\nuniform sampler2D u_Gbuffer_Specular;\r\nuniform sampler2D u_Gbuffer_Albedo;\r\n\r\n\r\nvec4 getSSRColor(vec2 UV, float lod)\r\n{\r\n\tif( lod < 1.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame5, UV), texture(u_frame6, UV), lod);\r\n\t}\r\n\telse if( lod < 2.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame6, UV), texture(u_frame7, UV), fract(lod));\r\n\t}\r\n\telse if( lod < 3.0)\r\n\t{\r\n\t\treturn mix(texture(u_frame7, UV), texture(u_frame8, UV), fract(lod));\r\n\t}\r\n\telse\r\n\t{\r\n\t\treturn mix(texture(u_frame8, UV), texture(u_frame9, UV), fract(lod));\r\n\t}\r\n}\r\n\r\n\r\nvoid main() {\r\n\r\n\tvec2 reverseUV = fs_UV;\r\n\treverseUV.y = 1.0 - reverseUV.y;\r\n\r\n\tfloat roughness = texture(u_Gbuffer_Specular, reverseUV).a;\r\n\tvec4 sceneImagecolor = texture(u_frame0, fs_UV);\r\n \tvec4 meshParticle = texture(u_frame4, reverseUV);\r\n\r\n\tsceneImagecolor.xyz = mix(sceneImagecolor.xyz, meshParticle.xyz, meshParticle.a);\r\n\t\r\n\tfloat opaqueDepth = texture(u_Gbuffer_Albedo, reverseUV).a;\r\n\r\n\tfloat SSRMask = texture(u_frame1, fs_UV).a;\r\n\r\n\t//bool bWater;\r\n\tbool bTrans;\r\n\r\n\tfloat sceneDepth = texture(u_frame0, reverseUV).a;\r\n\r\n\tif(sceneDepth >= 9.0)\r\n\t{\r\n\t\tbTrans = true;\r\n\t}\r\n\r\n\tvec4 SSRMipColor = getSSRColor(fs_UV, log2(roughness + 1.0) * 4.0);\r\n\t//vec4 SSRMipColor = \t\t\t\t   texture(u_frame5, fs_UV);\r\n\r\n\r\n\tvec4 particles = texture(u_frame3, reverseUV) + texture(u_DepthMap, reverseUV);\r\n\t\r\n\tvec3 finalColor = vec3(0.0);\r\n\r\n\tSSRMask = clamp(SSRMask, 0.0, 1.0);\r\n\r\n\tif(SSRMask <= 0.0)\r\n\t\tfinalColor = sceneImagecolor.xyz + particles.xyz;\r\n\telse\r\n\t{\r\n\t\tif(bTrans)\r\n\t\t{\r\n\t\t\tfinalColor = SSRMipColor.xyz + particles.xyz  + sceneImagecolor.xyz;\r\n\t\t}\r\n\t\telse\r\n\t\t\tfinalColor = (SSRMipColor.xyz + particles.xyz) * sceneImagecolor.xyz + sceneImagecolor.xyz;\r\n\t}\r\n\r\n\r\n\tout_Col = vec4( finalColor, sceneImagecolor.a);\r\n}\r\n"
 
 /***/ }),
 /* 35 */
@@ -14008,7 +14004,7 @@ module.exports = "#version 300 es\nprecision highp float;\n\nin vec2 fs_UV;\nout
 /* 36 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\n#define EPSILON 1e-10\n\nin vec2 fs_UV;\nout vec4 out_Col;\n\nuniform sampler2D u_frame0; //Scene\nuniform vec2 u_screenSize;\nuniform vec4 u_chromaticInfo; //x:dispersal, y:distortion, w : ColorTemp\n\nvec4 textureDistorted(sampler2D tex, vec2 texcoord,  vec2 direction, // direction of distortion\n              vec3 distortion)\n  {\n    return vec4\n      (\n\t\ttexture(tex, texcoord + direction * distortion.r).r,\n\t\ttexture(tex, texcoord + direction * distortion.g).g,\n\t\ttexture(tex, texcoord + direction * distortion.b).b,\n        0.0\n      );\n  }\n  \nvoid main()\n{\n \n  const int uGhosts = 3; // number of ghost samples\n  float uGhostDispersal = 0.2; // dispersion factor\n  float uDistortion = 2.0;\n  const float u_intensity = 0.5;\n\n\n  vec2 texcoord = fs_UV;\n  //texcoord.y = 1.0 - texcoord.y;\n\n  vec3 distortion = vec3(-u_screenSize.x * uDistortion, 0.0, u_screenSize.x * uDistortion);\n  \n  // ghost vector to image centre:\n  vec2 ghostVec = (vec2(0.5, 0.5) - texcoord) * uGhostDispersal;\n  \n  vec3 direction = normalize(vec3(ghostVec, 0.0));\n  // sample ghosts:  \n  vec4 result = vec4(0,0,0,0);\n  vec4 ghost = vec4(0, 0, 0, 0);\n\n  for(int i = 0; i < uGhosts; i++)\n  {\n     vec2 offset = fract(texcoord + ghostVec * float(i + 1) * 2.0 );\n     float att = (1.0 - float(i + 1) / float(uGhosts));\n     ghost += textureDistorted(u_frame0, offset, direction.xy, distortion) * att;\n     ghost += textureDistorted(u_frame0, vec2(1.0) - offset, direction.xy, distortion) * att;\n    \n  }  \n\n\n  float weightLens = length(vec2(0.5, 0.5) - texcoord) / length(vec2(0.5, 0.5));\n  weightLens = pow( clamp(1.0 - clamp(weightLens, 0.0, 1.0), 0.0, 1.0), 3.0);\n  //weightLens *= 2.0;\n  ghost *= weightLens;\n\n  result += ghost;\n\n  \n\n/*\n  // sample halo:\n  float uHaloWidth = 0.45;\n  vec2 haloVec = normalize(ghostVec) * uHaloWidth;\n  \n  result = textureDistorted(u_frame0, texcoord + haloVec, direction.xy, distortion) *weight;\n  result *= 1.0;\n  result += ghost;\n  */\n \n  out_Col = result * u_intensity;\n  out_Col.w = 1.0;\n}\n"
+module.exports = "#version 300 es\nprecision highp float;\n\n#define EPSILON 1e-10\n\nin vec2 fs_UV;\nout vec4 out_Col;\n\nuniform sampler2D u_frame0; //Scene\nuniform vec2 u_screenSize;\nuniform vec4 u_chromaticInfo; //x:dispersal, y:distortion, w : ColorTemp\n\nvec4 textureDistorted(sampler2D tex, vec2 texcoord,  vec2 direction, // direction of distortion\n              vec3 distortion)\n  {\n    return vec4\n      (\n\t\ttexture(tex, texcoord + direction * distortion.r).r,\n\t\ttexture(tex, texcoord + direction * distortion.g).g,\n\t\ttexture(tex, texcoord + direction * distortion.b).b,\n        0.0\n      );\n  }\n  \nvoid main()\n{\n \n  const int uGhosts = 3; // number of ghost samples\n  float uGhostDispersal = 0.2; // dispersion factor\n  float uDistortion = 1.5;\n  const float u_intensity = 0.5;\n\n\n  vec2 texcoord = fs_UV;\n  //texcoord.y = 1.0 - texcoord.y;\n\n  vec3 distortion = vec3(-u_screenSize.x * uDistortion, 0.0, u_screenSize.x * uDistortion);\n  \n  // ghost vector to image centre:\n  vec2 ghostVec = (vec2(0.5, 0.5) - texcoord) * uGhostDispersal;\n  \n  vec3 direction = normalize(vec3(ghostVec, 0.0));\n  // sample ghosts:  \n  vec4 result = vec4(0,0,0,0);\n  vec4 ghost = vec4(0, 0, 0, 0);\n\n  for(int i = 0; i < uGhosts; i++)\n  {\n     vec2 offset = fract(texcoord + ghostVec * float(i + 1) * 2.0 );\n     float att = (1.0 - float(i + 1) / float(uGhosts));\n     ghost += textureDistorted(u_frame0, offset, direction.xy, distortion) * att;\n     ghost += textureDistorted(u_frame0, vec2(1.0) - offset, direction.xy, distortion) * att;\n    \n  }  \n\n\n  float weightLens = length(vec2(0.5, 0.5) - texcoord) / length(vec2(0.5, 0.5));\n  weightLens = pow( clamp(1.0 - clamp(weightLens, 0.0, 1.0), 0.0, 1.0), 3.0);\n  //weightLens *= 2.0;\n  ghost *= weightLens;\n\n  result += ghost;\n\n  \n\n/*\n  // sample halo:\n  float uHaloWidth = 0.45;\n  vec2 haloVec = normalize(ghostVec) * uHaloWidth;\n  \n  result = textureDistorted(u_frame0, texcoord + haloVec, direction.xy, distortion) *weight;\n  result *= 1.0;\n  result += ghost;\n  */\n \n  out_Col = result * u_intensity;\n  out_Col.w = 1.0;\n}\n"
 
 /***/ }),
 /* 37 */
@@ -15085,7 +15081,7 @@ module.exports = "#version 300 es\n\nuniform mat4 u_View;\nuniform mat4 u_Proj;\
 /* 68 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform sampler2D u_frame0; //Scene\nuniform sampler2D u_frame1; //Albedo\nuniform sampler2D u_frame2; //Normal\nuniform sampler2D u_frame3; //Noise\n\nuniform mat4 u_View; \nuniform mat4 u_InvViewProj; \n\nuniform vec4 u_lightDirection;\nuniform float u_Time;\n\nuniform vec3 u_CameraWPos;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec2 fs_UV;\nin vec2 fs_UV_SS;\nin vec3 fs_billboardNormal;\n\n\n\nout vec4 out_Col;\n\n\nvec3 applyNormalMap(vec3 geomnor, vec3 normap) {\n    \n    vec3 up = normalize(vec3(0.001, 1, 0.001));\n    vec3 surftan = normalize(cross(geomnor, up));\n    vec3 surfbinor = cross(geomnor, surftan);\n    return normalize(normap.y * surftan + normap.x * surfbinor + normap.z * geomnor);\n}\n\nfloat LinearDepth(float d, float f)\n{\n\t\n\tfloat n = 0.1;\n\treturn (2.0 * n) / (f + n - d * (f - n));\n}\n\nvoid main()\n{\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\n    float particleDepth = fs_Pos.a;\n\n    if(sceneDepth > 19.0)\n\t{\n\t\tsceneDepth -= 20.0;\n\t}\n\telse if(sceneDepth > 9.0)\n\t{\n\t\tsceneDepth -= 10.0;\n\t}\n\n    if(sceneDepth > particleDepth)\n    {\n        vec3 viewVec = normalize(u_CameraWPos - fs_Pos.xyz);\n\n        int sprite = int( floor(fs_Col.a) ) % 8;\n        vec4 NoiseMap = texture(u_frame3, vec2(fs_UV.x + u_Time * 0.0983, fs_UV.y - u_Time * 0.0365));\n\n        vec2 Noise = NoiseMap.xy * 2.0 - vec2(1.0);\n        Noise *= 0.02;\n\n        vec2 TwickedUV = fs_UV + Noise;\n\n       out_Col.xyz = texture(u_frame1, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;\n       vec3 normal = texture(u_frame2, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;\n\n   \n       \n\n       normal = applyNormalMap(fs_billboardNormal, normalize(normal * 2.0 - 1.0) );\n\n       // out_Col.xyz = normal;\n       // return;\n\n       float NoV = clamp( dot(normal, viewVec), 0.0, 1.0);\n\n       float NoL = smoothstep(-0.2, 1.0, abs(dot(normal, u_lightDirection.xyz)));\n\n       vec3 sliverLight = vec3(10.0);\n\n       out_Col.xyz *= fs_Col.xyz * mix(sliverLight, vec3(1.0, 0.6, 0.4) , pow(NoV, 1.5)) * NoL;\n       //out_Col.xyz *= 1.5;\n       out_Col.a = 1.0;\n\n       \n       out_Col = clamp(out_Col, 0.0, 1.0);\n       \n    }\n    else\n    {   \n        out_Col = vec4(0.0);\n    }\n}\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform sampler2D u_frame0; //Scene\nuniform sampler2D u_frame1; //Albedo\nuniform sampler2D u_frame2; //Normal\nuniform sampler2D u_frame3; //Noise\n\nuniform mat4 u_View; \nuniform mat4 u_InvViewProj; \n\nuniform vec4 u_lightDirection;\nuniform float u_Time;\n\nuniform vec3 u_CameraWPos;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec2 fs_UV;\nin vec2 fs_UV_SS;\nin vec3 fs_billboardNormal;\n\n\n\nout vec4 out_Col;\n\n\nvec3 applyNormalMap(vec3 geomnor, vec3 normap) {\n    \n    vec3 up = normalize(vec3(0.001, 1, 0.001));\n    vec3 surftan = normalize(cross(geomnor, up));\n    vec3 surfbinor = cross(geomnor, surftan);\n    return normalize(normap.y * surftan + normap.x * surfbinor + normap.z * geomnor);\n}\n\nfloat LinearDepth(float d, float f)\n{\n\t\n\tfloat n = 0.1;\n\treturn (2.0 * n) / (f + n - d * (f - n));\n}\n\nvoid main()\n{\n    float sceneDepth = texture(u_frame0, fs_UV_SS).a;\n    float particleDepth = fs_Pos.a;\n\n    if(sceneDepth > 19.0)\n\t{\n\t\tsceneDepth -= 20.0;\n\t}\n\telse if(sceneDepth > 9.0)\n\t{\n\t\tsceneDepth -= 10.0;\n\t}\n\n    if(sceneDepth > particleDepth)\n    {\n        vec3 viewVec = normalize(u_CameraWPos - fs_Pos.xyz);\n\n        int sprite = int( floor(fs_Col.a) ) % 8;\n        vec4 NoiseMap = texture(u_frame3, vec2(fs_UV.x + u_Time * 0.0983, fs_UV.y - u_Time * 0.0365));\n\n        vec2 Noise = NoiseMap.xy * 2.0 - vec2(1.0);\n        Noise *= 0.02;\n\n        vec2 TwickedUV = fs_UV + Noise;\n\n       out_Col.xyz = texture(u_frame1, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;\n       vec3 normal = texture(u_frame2, vec2( (float(sprite) / 8.0) + (TwickedUV.x / 8.0)  , TwickedUV.y)  ).xyz;\n\n   \n       \n\n       normal = applyNormalMap(fs_billboardNormal, normalize(normal * 2.0 - 1.0) );\n\n       // out_Col.xyz = normal;\n       // return;\n\n       float NoV = clamp( dot(normal, viewVec), 0.0, 1.0);\n\n       float NoL = smoothstep(-0.4, 1.0, abs(dot(normal, u_lightDirection.xyz)));\n\n       vec3 sliverLight = vec3(10.0);\n\n       out_Col.xyz *= fs_Col.xyz * mix(sliverLight, vec3(1.0, 0.6, 0.4) , pow(NoV, 1.5)) * NoL;\n       //out_Col.xyz *= 1.5;\n       out_Col.a = 1.0;\n\n       \n       out_Col = clamp(out_Col, 0.0, 1.0);\n       \n    }\n    else\n    {   \n        out_Col = vec4(0.0);\n    }\n}\n"
 
 /***/ })
 /******/ ]);

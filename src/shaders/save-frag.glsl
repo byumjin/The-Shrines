@@ -88,11 +88,6 @@ void main() {
 		else
 			finalColor = (SSRMipColor.xyz + particles.xyz) * sceneImagecolor.xyz + sceneImagecolor.xyz;
 	}
-		
-	//vec4 RainColor = texture(u_frame3, reverseUV);	
-	//finalColor.xyz += RainColor.xyz;
-	//vec4 cloudColor = texture(u_DepthMap, reverseUV);
-	//finalColor.xyz += cloudColor.xyz;
 
 
 	out_Col = vec4( finalColor, sceneImagecolor.a);
