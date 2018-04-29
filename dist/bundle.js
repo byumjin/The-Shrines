@@ -13736,7 +13736,7 @@ class OpenGLRenderer {
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].disable(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].DEPTH_TEST);
         __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].clear(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].COLOR_BUFFER_BIT);
         this.HblurPass.setScreenSize(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferWidth * this.BloomDownSampling, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].drawingBufferHeight * this.BloomDownSampling));
-        this.HblurPass.setBlurScale(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(2.0, 1.0));
+        this.HblurPass.setBlurScale(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec2 */].fromValues(1.0, 1.0));
         if (index == 0)
             this.HblurPass.setFrame00(this.post32Targets[PipelineEnum.ExtractHighLight]);
         else
