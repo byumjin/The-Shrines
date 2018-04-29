@@ -57,7 +57,9 @@ const controls = {
   
   Vignette_Effect: true,
 
-  Volume : 0.5
+  Volume : 0.5,
+
+  ShowFPS : false
 };
 
 
@@ -736,20 +738,30 @@ function UpdateParticle(renderer: any, camera : Camera, particleLanternSys: Part
     }
 }
 
+/*
+function changeStats()
+{
+  if(controls.ShowFPS)
+  stats.set
+  else
+}
+*/
+
 function main() {
 
   play_single_sound();
 
   // Initial display for framerate
   
-  /*
+  
   const stats = Stats();
   stats.setMode(0);
+  stats.s
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
   document.body.appendChild(stats.domElement);
-  */
+  
 
   // Add controls to the gui
   // Add controls to the gui
@@ -768,6 +780,13 @@ function main() {
   BLOOM.add(controls, 'Bloom_Distortion', 0.0, 8.0).step(0.01);
   */
 
+  /*
+  var PERFORMANCE = gui.addFolder('Peformance');
+  PERFORMANCE.add(controls, 'ShowFPS').onChange(function()
+  {
+    changeStats();
+  });
+  */
 
   var ENVIRONMENT = gui.addFolder('Environment');
   ENVIRONMENT.add(controls, 'Temperature', 3600, 10000).step(1);
@@ -980,7 +999,9 @@ function main() {
 
   function tick() {
 
-    //stats.begin();
+  
+      stats.begin();
+
     CheckTriggers(camera, camera.position, 315, 30, 20, timer.deltaTime);
 
     camera.update();
@@ -1044,7 +1065,7 @@ function main() {
 
     renderer.renderforLensFlare(camera, controls.Bloom_Dispersal, controls.Bloom_Distortion);
 
-    for(var  i = 0; i< 1; i++)
+    for(var  i = 0; i< 2; i++)
     {
       renderer.renderforLensflareHorizontalBlur(camera, i);
       renderer.renderforLensflareVerticalBlur(camera);
@@ -1063,7 +1084,8 @@ function main() {
     else
       renderer.renderPresent(camera);
     
-    //stats.end();
+      stats.end();
+    
     requestAnimationFrame(tick);
   }
 

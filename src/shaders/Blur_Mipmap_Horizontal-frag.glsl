@@ -15,11 +15,14 @@ float weight[5];
 
 void main()
 {	
-	offset[0] = 0.0; offset[1] = 1.0; offset[2] = 2.0; offset[3] = 3.0; offset[4] = 4.0;
-	weight[0] = 0.2270270270; weight[1] =  0.1945945946; weight[2] = 0.1216216216; weight[3] = 0.0540540541; weight[4] = 0.0162162162;
+	offset[0] = 0.0; offset[1] = 1.3846153846; offset[2] = 3.2307692308;
+	weight[0] = 0.2270270270; weight[1] =  0.3162162162; weight[2] = 0.0702702703;
+
+	//offset[0] = 0.0; offset[1] = 1.0; offset[2] = 2.0; offset[3] = 3.0; offset[4] = 4.0;
+	//weight[0] = 0.2270270270; weight[1] =  0.1945945946; weight[2] = 0.1216216216; weight[3] = 0.0540540541; weight[4] = 0.0162162162;
 
 	out_Col = textureLod( u_frame0, fs_UV , u_Lod) * weight[0];
-    for (int i=1; i<5; i++)
+    for (int i=1; i<3; i++)
 	{
         out_Col += textureLod( u_frame0, ( vec2(fs_UV)+vec2( offset[i] * u_BlurScale.x  / u_screenSize.x, 0.0)), u_Lod) * weight[i];
         out_Col += textureLod( u_frame0, ( vec2(fs_UV)-vec2( offset[i] * u_BlurScale.x / u_screenSize.x, 0.0)), u_Lod) * weight[i];
