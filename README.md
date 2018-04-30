@@ -1,6 +1,6 @@
 # The Shrines
 * CGGT, University of Pennsylvania
-* Byumjin Kim, Jiawei Wang
+* [Byumjin Kim](https://github.com/byumjin), [Jiawei Wang](https://github.com/Jiaww)
 * Apr. 2018
 
 ## Live Demo
