@@ -14,7 +14,22 @@
       </style>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <div id="help-box" class="hidden" >
+      <p>
+        <center><img src="imgs/UI.png"></center>
+      </p>     
+    </div>
+    <div id="webgl-container" class="gradient-bg-cyan-black" onclick="showHelpBox(false)">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <audio id="music" src="src/music/idealism - another perspective.mp3" autoplay loop></audio>
+
+
     <script type="text/javascript" src="dist/bundle.js"></script>
+
+    <script type="text/javascript" src="src/index.js"></script>
+
+    
   </body>
 </html>

@@ -753,7 +753,7 @@ function changeStats()
 
 function main() {
 
-  play_single_sound();
+  //play_single_sound();
 
   // Initial display for framerate
   
@@ -1114,7 +1114,6 @@ function main() {
       camera.bMiddleClick = true;
     if (ev.button == 2)
       camera.bRightClick = true;
-
   }, false);
 
   window.addEventListener('mousemove', function(ev) {
@@ -1207,11 +1206,13 @@ function main() {
 }
 
 
-  
 
 function setup() {
   timer.startTime = Date.now();
   loadOBJText();
+
+
+
   main();
 }
 

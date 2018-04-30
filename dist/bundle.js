@@ -1318,7 +1318,7 @@ function changeStats()
 }
 */
 function main() {
-    play_single_sound();
+    //play_single_sound();
     // Initial display for framerate
     /*
     const stats = Stats();
