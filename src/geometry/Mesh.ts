@@ -177,7 +177,7 @@ class Mesh extends Drawable {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUV);
     gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
 
-    console.log(`Created Mesh from PLY`);
+    //console.log(`Created Mesh from PLY`);
     this.objString = ""; // hacky clear
   }
 

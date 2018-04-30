@@ -88,9 +88,9 @@ export class Texture {
 
 	if(index == 0)
 	{
-		// Pos X+
-		
+		// Pos X+		
 		const img_Pos_X = new Image();
+		img_Pos_X.src = imgSource + "0.png";
 
 		img_Pos_X.onload = function(){
 			gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
@@ -100,17 +100,18 @@ export class Texture {
 			gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-			this.bLoaded[index] = true;			
+			this.bLoaded[index] = true;	
 			
 		}.bind(this);
 
-		img_Pos_X.src = imgSource + "0.png";
+		
 	}
 	else if(index == 1)
 	{
 		// Neg X-
 		
 		const img_Neg_X = new Image();
+		img_Neg_X.src = imgSource + "1.png";
 
 		img_Neg_X.onload = function(){
 			gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
@@ -124,14 +125,14 @@ export class Texture {
 			
 		}.bind(this);
 
-		img_Neg_X.src = imgSource + "1.png";
+		
 	}
 	else if(index == 2)
 	{
 		// Pos Y+
 		
 		const img_Pos_Y = new Image();
-
+		img_Pos_Y.src = imgSource + "2.png";
 		img_Pos_Y.onload = function(){
 			gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
 			gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, lvl, formatDst, img_Pos_Y.width, img_Pos_Y.height, 0, formatSrc, formatBit, img_Pos_Y);
@@ -143,15 +144,13 @@ export class Texture {
 			this.bLoaded[index] = true;
 			
 		}.bind(this);
-
-		img_Pos_Y.src = imgSource + "2.png";
-
 	}
 	else if(index == 3)
 	{
 		// Neg Y-
 		
 		const img_Neg_Y = new Image();
+		img_Neg_Y.src = imgSource + "3.png";
 
 		img_Neg_Y.onload = function(){
 			gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
@@ -165,13 +164,14 @@ export class Texture {
 			
 		}.bind(this);
 
-		img_Neg_Y.src = imgSource + "3.png";
+		
 	}
 	else if(index == 4)
 	{
 		// Pos Z+
 		
 		const img_Pos_Z = new Image();
+		img_Pos_Z.src = imgSource + "4.png";
 
 		img_Pos_Z.onload = function(){
 			gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
@@ -185,7 +185,7 @@ export class Texture {
 			
 		}.bind(this);
 
-		img_Pos_Z.src = imgSource + "4.png";
+		
 
 	}
 	else if(index == 5)
@@ -193,6 +193,7 @@ export class Texture {
 		// Neg Z-
 	
 		const img_Neg_Z = new Image();
+		img_Neg_Z.src = imgSource + "5.png";
 
 		img_Neg_Z.onload = function(){
 			gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.cubemap_texture);
@@ -204,9 +205,10 @@ export class Texture {
 			//gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
 
 			this.bLoaded[index] = true;
+
 		}.bind(this);
 
-		img_Neg_Z.src = imgSource + "5.png";
+		
 	}
 
 	

@@ -84,7 +84,7 @@ export class PlyLoader{
 
         var faces = null;
 
-        console.log("PLY number of lines = " + lines.length);
+        //console.log("PLY number of lines = " + lines.length);
 
         for (var i = 0; i < lines.length; i++)
         {
@@ -114,7 +114,7 @@ export class PlyLoader{
                     // Reset index for building VAOs
                     if (PLY_index == this.Ply_Vertices) {
 
-                        console.log("Resetting Index...");
+                        //console.log("Resetting Index...");
 
                         this.FaceIndex = 0;
 
@@ -205,6 +205,7 @@ export class PlyLoader{
             }
         }
 
+        /*
         console.log("PLY_Vertices = " + this.Ply_Vertices + " loaded");
         console.log("PLY_Faces = " + this.Ply_Faces + " loaded");
         console.log("arrayVertex length = " + this.arrayVertex.length);
@@ -212,6 +213,7 @@ export class PlyLoader{
         console.log("arrayTexture length = " + this.arrayTexture.length);
         console.log("arrayColor length = " + this.arrayColor.length);
         console.log("arrayIndex length = " + this.arrayIndex.length);
+        */
 
 	}
 
@@ -224,7 +226,7 @@ export class PlyLoader{
 
         var faces = null;
 
-        console.log("PLY number of lines = " + lines.length);
+        //console.log("PLY number of lines = " + lines.length);
 
         for (var i = 0; i < lines.length; i++)
         {
@@ -249,7 +251,7 @@ export class PlyLoader{
                     // Reset index for building VAOs
                     if (PLY_index == this.Ply_Vertices) {
 
-                        console.log("Resetting Index...");
+                        //console.log("Resetting Index...");
 
                         this.FaceIndex = 0;
 
@@ -321,8 +323,8 @@ export class PlyLoader{
             }
         }
 
-        console.log("arrayColor length = " + this.arrayColor.length);
-        console.log("arrayIndex length = " + this.arrayIndex.length);
+        //console.log("arrayColor length = " + this.arrayColor.length);
+        //console.log("arrayIndex length = " + this.arrayIndex.length);
 
     }
 }

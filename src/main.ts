@@ -134,6 +134,10 @@ let mesh_Boat: Mesh;
 let mesh_Leaves: Mesh;
 
 let skyCubeMap: Texture;
+let tempCubeMap: Texture;
+let bSkyBoxLoaded: Boolean = false;
+let SkyBox : Texture;
+
 let cloudsTexture: Texture;
 let cloudsNormalTexture: Texture;
 
@@ -179,7 +183,9 @@ function play_single_sound() {
         audio_buf.loop = true;
         
         audio_buf.connect(gainNode);
-        gainNode.gain.value = controls.Volume;
+        //gainNode.gain.value = controls.Volume;
+
+        //gainNode.gain.setTargetAtTime(1.0, 0.0, 0.5);
         audio_buf.start(0);
         });
 
@@ -328,8 +334,8 @@ function loadRoadMap(){
 }
 
 function loadScene() {
-  square && square.destroy();
-  mesh0 && mesh0.destroy();
+
+  tempCubeMap = new Texture('./src/resources/objs/skybox/dawnSky_', true);
 
   skyCubeMap = new Texture('./src/resources/objs/skybox/dawnSky_', true);
   skyCubeMap.loadCubeImg('./src/resources/objs/skybox/dawnSky_', 0);
@@ -341,9 +347,6 @@ function loadScene() {
 
   cloudsTexture = new Texture('./src/resources/clouds/clouds.png', false);
   cloudsNormalTexture = new Texture('./src/resources/clouds/clouds_Normal.png', false);
-
-  square = new Square(vec3.fromValues(0, 0, 0));
-  square.create();
 
   particleQuad = new Quad(vec3.fromValues(0, 0, 0));
   particleQuad.create();
@@ -792,11 +795,14 @@ function main() {
   ENVIRONMENT.add(controls, 'Temperature', 3600, 10000).step(1);
   ENVIRONMENT.add(controls, 'Clouds');
 
+  // making error?
+  /*
   var MUSIC = gui.addFolder('Music');
   MUSIC.add(controls, 'Volume', 0.0, 1.0, ).step(0.01).onChange(function()
   {
     changeVolume(controls.Volume);
   });
+  */
 
   gui.close();
   
@@ -997,9 +1003,23 @@ function main() {
 
   let lightViewProj = getDirLightViewProj(lightDirection, lightPosition, 750, 250, -350, 380);
 
+  SkyBox = tempCubeMap;
+
   function tick() {
   
     //stats.begin();
+
+    if(!bSkyBoxLoaded)
+    {
+      if(skyCubeMap.isComplete(true))
+      {
+        bSkyBoxLoaded = true;
+        SkyBox = skyCubeMap;
+      }
+    }
+    
+    
+
 
     CheckTriggers(camera, camera.position, 315, 30, 20, timer.deltaTime);
     camera.update();
@@ -1007,17 +1027,17 @@ function main() {
     timer.updateTime();
     renderer.updateTime(timer.deltaTime, timer.currentTime);
     
-    //renderer.clear();
+    renderer.clear();
     renderer.clearGB();
 
     renderer.renderToGBuffer(camera, standardDeferred, leafDeferred, barkDeferred, [LS0, LS1, LS2, LS3, mesh_Leaf2, mesh_Bark2,m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner, mesh0]);
     renderer.renderToShadowDepth(camera, standardShadowMapping, leafShadowMapping, barkShadowMapping, lightViewProj, [LS0, LS1, LS2, LS3, mesh_lake, mesh_Leaf2, mesh_Bark2, m_shrines_balconis, m_shrines_colums, m_shrines_poles, m_shrines_gold, mesh_B_Outter, mesh_B_Inner ]);
 
-    renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
-    renderer.renderFromGBuffer(camera, skyCubeMap.cubemap_texture, lightViewProj, lightColor, lightDirection);
+    renderer.renderToTranslucent(camera, translucentDeferred, [mesh_lake, mesh_B_Glass], SkyBox.cubemap_texture, lightViewProj, lightColor, lightDirection);
+    renderer.renderFromGBuffer(camera, SkyBox.cubemap_texture, lightViewProj, lightColor, lightDirection);
 
     renderer.renderAddTranslucent();  
-    renderer.renderSSR(camera, skyCubeMap.cubemap_texture,
+    renderer.renderSSR(camera, SkyBox.cubemap_texture,
                        controls.SSR_MaxStep, controls.SSR_Opaque_Intensity, controls.SSR_Trans_Intensity, controls.SSR_Threshold);
 
     
@@ -1174,6 +1194,13 @@ function main() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
   camera.updateProjectionMatrix();
+
+  /*
+  while(!skyCubeMap.isComplete(true))
+  {
+    console.log("Loading...");
+  }
+  */
 
   // Start the render loop
   tick();
